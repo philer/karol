@@ -1,0 +1,16 @@
+{
+  "url": "TODO",
+  "player_height": 72,
+  "sprites": {
+    "player_north": "botty-idle-north",
+    "player_east": "botty-idle-east",
+    "player_south": "botty-idle-south",
+    "player_west": "botty-idle-west"
+  },
+  "images": {
+    "botty-idle-north": ["botty.png", 0, 0, 64, 104],
+    "botty-idle-south": ["botty.png", 0, 104, 64, 104],
+    "botty-idle-west": ["botty.png", 0, 208, 64, 104],
+    "botty-idle-east": ["botty.png", 0, 312, 64, 104]
+  }
+}

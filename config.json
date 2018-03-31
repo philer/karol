@@ -1,3 +1,4 @@
 {
-  "sprite_theme": "img/neoz7"
+  "tile_theme": "img/neoz7",
+  "player_theme": "img/botty"
 }

@@ -7,12 +7,12 @@
   "tile_gap": 3,
   "tile_gap_z": 1,
   "noise_amplifier": 5,
-  "mapping": {
+  "sprites": {
     "floor": "grass_high",
     "block": "bricks_grey",
     "mark": "flower_grass"
   },
-  "sprites": {
+  "images": {
     "grass_high": ["spritemap.png", 8, 103, 79, 70],
     "stone": ["spritemap.png", 9, 403, 79, 69],
     "bricks_grey": ["spritemap.png", 8, 1032, 79, 69],

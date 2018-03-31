@@ -3,25 +3,28 @@
   "tile_width": 132,
   "tile_depth": 66,
   "block_height": 33,
+  "player_height": 33,
   "tile_gap": 2,
   "tile_gap_z": 2,
   "noise_amplifier": 2,
-  "mapping": {
+  "sprites": {
     "floor": "grass",
     "block": "dirt",
+    "cuboid": "building-section-windows",
     "mark": "roof-center-slab",
     "player_north": "concrete-river-north",
     "player_east": "concrete-river-east",
     "player_south": "concrete-river-south",
     "player_west": "concrete-river-west"
   },
-  "sprites": {
+  "images": {
     "grass": ["landscape.png", 398, 265, 132, 99],
     "dirt": ["landscape.png", 266, 723, 132, 99],
     "roof-center-slab": ["buildings.png", 595, 1425, 99, 54],
     "concrete-river-north": ["city.png", 398, 555, 132, 101],
     "concrete-river-east": ["city.png", 529, 1419, 132, 101],
     "concrete-river-south": ["city.png", 530, 101, 132, 101],
-    "concrete-river-west": ["city.png", 529, 1318, 132, 101]
+    "concrete-river-west": ["city.png", 529, 1318, 132, 101],
+    "building-section-windows": ["buildings.png", 595, 1230, 98, 84]
   }
 }

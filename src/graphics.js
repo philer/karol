@@ -11,7 +11,7 @@
 import * as noise from "./perlin.js";
 import {fetchJson} from "./util.js";
 
-const DEFAULT_THEME = "img/simple/";
+const DEFAULT_THEME_DIR = "img/simple/";
 
 // themes should provide their own settings
 const DEFAULT_SETTINGS = {
@@ -24,19 +24,9 @@ const DEFAULT_SETTINGS = {
   noise_amplifier: 1,
 };
 
-// should be included in a themes "mapping"
-const SPRITE_NAMES = [
-  "floor",
-  "block",
-  "mark",
-  "player_north",
-  "player_east",
-  "player_south",
-  "player_west"
-];
-
-
 const ORIENTATIONS = ["north", "east", "south", "west"];
+const PLAYER_SPRITE_NAMES = ORIENTATIONS.map(str => "player_" + str);
+const TILE_SPRITE_NAMES = ["floor", "block", "mark", "cuboid"];
 
 // drawable objects
 const sprites  = {};
@@ -53,56 +43,20 @@ let ctx;
 let _showPlayer = true;
 let _showHeightNoise = true;
 
+export function showPlayer(show=true) {
+  _showPlayer = show;
+}
+
+export function showHeightNoise(show=true) {
+  _showHeightNoise = show;
+}
+
 /**
  * Initialize the module. Loads graphics.
  * @return {Promise}
  */
 export function init(cfg) {
   return Promise.all([initSprites(cfg), initCanvas()]);
-}
-
-/**
- * Load sprite theme including fallbacks
- * @param  {Object} cfg
- * @return {Promise}
- */
-async function initSprites(cfg) {
-  const themeDir = cfg.sprite_theme + "/";
-  const theme = Object.assign(
-                  {},
-                  DEFAULT_SETTINGS,
-                  await fetchJson(themeDir + "theme.json")
-                );
-  tileWidth = theme.tile_width;
-  tileDepth = theme.tile_depth;
-  blockHeight = theme.block_height;
-  playerHeight = theme.player_height;
-  tileGap = theme.tile_gap;
-  tileGapZ = theme.tile_gap_z;
-  noiseAmplifier = theme.noise_amplifier;
-
-  const defaultTheme = await fetchJson(DEFAULT_THEME + "theme.json");
-
-  const loaders = [];
-  for (const key of SPRITE_NAMES) {
-    let mappedSpriteName = theme.mapping[key];
-    let file, crop;
-    if (mappedSpriteName) {
-      [file, ...crop] = theme.sprites[mappedSpriteName];
-      file = themeDir + file;
-    } else {
-      mappedSpriteName = defaultTheme.mapping[key];
-      [file, ...crop] = defaultTheme.sprites[mappedSpriteName];
-      file = DEFAULT_THEME + file;
-    }
-    if (crop.length) {
-      sprites[key] = new AtlasSprite(file, ...crop);
-    } else {
-      sprites[key] = new Sprite(file);
-    }
-    loaders.push(sprites[key].load())
-  }
-  return Promise.all(loaders);
 }
 
 /**
@@ -118,25 +72,62 @@ async function initCanvas() {
   ctx.imageSmoothingEnabled = false;
 }
 
-export function showPlayer(show=true) {
-  _showPlayer = show;
-}
+/**
+ * Load sprite theme including fallbacks
+ * @param  {Object} cfg
+ * @return {Promise}
+ */
+async function initSprites(cfg) {
+  const tileThemeDir = cfg.tile_theme + "/";
+  const playerThemeDir = (cfg.player_theme || cfg.tile_theme) + "/";
 
-export function showHeightNoise(show=true) {
-  _showHeightNoise = show;
-}
+  const [tileTheme, playerTheme, defaultTheme] = await Promise.all([
+      tileThemeDir + "theme.json",
+      playerThemeDir + "theme.json",
+      DEFAULT_THEME_DIR + "theme.json",
+    ].map(fetchJson));
 
-function loadImage(path) {
-  if (path in imageCache) {
-    return imageCache[path];
+  const sizes = Object.assign({}, DEFAULT_SETTINGS, tileTheme);
+  tileWidth      = sizes.tile_width;
+  tileDepth      = sizes.tile_depth;
+  blockHeight    = sizes.block_height;
+  tileGap        = sizes.tile_gap;
+  tileGapZ       = sizes.tile_gap_z;
+  noiseAmplifier = sizes.noise_amplifier;
+  playerHeight   = playerTheme.player_height || sizes.player_height;
+
+  for (const key of PLAYER_SPRITE_NAMES) {
+    if (playerTheme.sprites.hasOwnProperty(key)) {
+      sprites[key] = createSprite(key, playerTheme, playerThemeDir);
+    } else if (tileTheme.sprites.hasOwnProperty(key)) {
+      sprites[key] = createSprite(key, tileTheme, tileThemeDir);
+    } else {
+      sprites[key] = createSprite(key, defaultTheme, DEFAULT_THEME_DIR);
+    }
   }
-  return imageCache[path] = new Promise(function(resolve) {
-    const image = new Image();
-    image.onload = function() {
-      resolve(image);
-    };
-    image.src = path;
-  });
+  for (const key of TILE_SPRITE_NAMES) {
+    if (tileTheme.sprites.hasOwnProperty(key)) {
+      sprites[key] = createSprite(key, tileTheme, tileThemeDir);
+    } else {
+      sprites[key] = createSprite(key, defaultTheme, DEFAULT_THEME_DIR);
+    }
+  }
+  return Promise.all(Object.values(sprites).map(sprite => sprite.load()));
+}
+
+function createSprite(spriteName, theme, themeDir) {
+  let filename, crop;
+  try {
+    [filename, ...crop] = theme.images[theme.sprites[spriteName]];
+  } catch (err) {
+    console.warn(`Bad theme config: No image for sprite '${spriteName}' in ${themeDir}`);
+    return;
+  }
+  if (crop.length) {
+    return new AtlasSprite(themeDir + filename, ...crop);
+  } else {
+    return new Sprite(themeDir + filename);
+  }
 }
 
 /**
@@ -186,6 +177,19 @@ class AtlasSprite {
                   x + this.xOffset, y - this.height - this.yOffset,
                   this._scaledWidth, this._scaledHeight);
   }
+}
+
+function loadImage(path) {
+  if (path in imageCache) {
+    return imageCache[path];
+  }
+  return imageCache[path] = new Promise(function(resolve) {
+    const image = new Image();
+    image.onload = function() {
+      resolve(image);
+    };
+    image.src = path;
+  });
 }
 
 
