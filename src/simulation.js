@@ -1,7 +1,5 @@
-import {World} from "./world.js";
 import * as graphics from "./graphics.js";
-
-import {sleep, rand} from "./util.js";
+import {sleep} from "./util.js";
 
 const nativeSymbols = {
   "linksdrehen":   "turnLeft",

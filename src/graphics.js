@@ -140,9 +140,9 @@ class Sprite {
   }
   async load() {
     this._image = await loadImage(this.imagePath);
-    const scale = tileWidth / img.width;
+    const scale = tileWidth / this._image.width;
     this._scaledWidth = tileWidth;
-    this._scaledHeight = scale * img.height;
+    this._scaledHeight = scale * this._image.height;
     this.height = this._scaledHeight - tileDepth;
   }
   draw(ctx, x, y) {
