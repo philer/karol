@@ -1,0 +1,41 @@
+old
+data
+doc
+
+
+.*
+!.gitignore
+
+### OS files ###
+
+.DS_Store
+Thumbs.db
+*.swp
+.nfs*
+
+### Editors & IDEs ###
+!.editorconfig
+
+.hg
+.idea
+*.sublime-*
+_ide_helper.php
+_ide_helper_models.php
+.gource.conf
+.bundle
+.phpstorm.meta.php
+
+### JS ###
+!.eslintrc*
+!.babelrc*
+node_modules
+jspm_packages
+**/*.js.map
+yarn-error.log
+
+### Python ####
+__pycache__
+*.pyc
+
+### VM files ###
+.vagrant

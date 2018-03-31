@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Karol</title>
+    <link rel="icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+    <link rel="stylesheet" href="main.css">
+  </head>
+  <body>
+
+    <section class="panel editor-panel">
+      <header>
+        <h2>Code</h2>
+      </header>
+      <div class="editor-container">
+        <textarea id="editor" spellcheck="false"></textarea>
+      </div>
+      <form class="editor-buttons">
+        <button id="run-button">Run</button>
+        <button id="stop-button">Stop</button>
+      </form>
+    </section>
+
+    <section class="panel world-panel">
+      <header>
+        <h2>World</h2>
+      </header>
+
+      <div class="world-canvas-container-outer">
+        <label class="world-tools-toggle-icon" for="world-tools-toggle">&#9881;</label>
+        <input type="checkbox" class="offscreen" id="world-tools-toggle">
+        <nav class="world-tools">
+          <label class="world-tools-toggle-icon" for="world-tools-toggle">✕</label>
+          <form id="world-create-form">
+            <label>
+              <span>Width:</span>
+              <input id="width-input" type="number" value="18">
+            </label>
+            <label>
+              <span>Length:</span>
+              <input id="length-input" type="number" value="7">
+            </label>
+            <label>
+              <span>Height:</span>
+              <input id="height-input" type="number" value="5">
+            </label>
+            <button>Reset</button>
+          </form>
+
+          <form id="world-load-form">
+            <label for="file-input">Load *.kdw file:</label>
+            <input type="file" id="file-input">
+            <button>Load</button>
+          </form>
+
+          <form id="world-settings">
+            <label for="world-simulation-speed">Speed:</label>
+            <input type="range" min="1" max="2.5" step="any" id="world-simulation-speed">
+            <label>
+              <input type="checkbox" id="world-show-flat">
+              Flat World
+            </label>
+            <label>
+              <input type="checkbox" id="world-show-player" checked="checked">
+              Show Robot
+            </label>
+          </form>
+        </nav>
+
+        <div class="world-canvas-container-inner">
+          <canvas width="600" height="400" id="world-canvas">
+            Your Browser needs to support HTML5
+          </canvas>
+        </div>
+      </div>
+
+      <div class="world-output">
+        <p id="status-text"></p>
+        <!-- <pre id="debug-text"></pre> -->
+      </div>
+
+    </section>
+
+    <script src="build/core.js"></script>
+  </body>
+</html>

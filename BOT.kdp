@@ -1,0 +1,79 @@
+
+wiederhole 5 mal
+  schritt
+*wiederhole
+linksdrehen
+
+hinlegen
+schritt
+linksdrehen
+wiederhole 4 mal
+  hinlegen
+  schritt
+*wiederhole
+rechtsdrehen
+hinlegen schritt
+hinlegen schritt
+schritt
+rechtsdrehen
+hinlegen schritt
+schritt
+rechtsdrehen
+hinlegen schritt
+hinlegen schritt
+linksdrehen
+schritt
+hinlegen schritt
+linksdrehen
+hinlegen schritt
+schritt
+linksdrehen
+hinlegen
+rechtsdrehen
+schritt
+
+schritt
+hinlegen schritt
+hinlegen schritt
+schritt
+linksdrehen
+wiederhole 3 mal
+  hinlegen schritt
+*wiederhole
+schritt linksdrehen
+hinlegen schritt
+hinlegen schritt
+schritt linksdrehen
+wiederhole 3 mal
+  hinlegen schritt
+*wiederhole
+schritt
+linksdrehen
+wiederhole 4 mal
+  schritt
+*wiederhole
+
+schritt schritt
+hinlegen schritt
+linksdrehen
+wiederhole 4 mal
+  hinlegen schritt
+*wiederhole
+linksdrehen
+hinlegen schritt
+hinlegen schritt
+linksdrehen linksdrehen
+schritt schritt
+hinlegen schritt
+hinlegen schritt
+rechtsdrehen
+wiederhole 4 mal
+  schritt
+*wiederhole
+linksdrehen
+schritt
+
+markesetzen
+wiederhole 25 mal
+  rechtsdrehen
+*wiederhole

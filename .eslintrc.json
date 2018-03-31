@@ -1,0 +1,30 @@
+{
+  "root": true,
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "sourceType": "module",
+    "ecmaFeatures": {"impliedStrict": true}
+  },
+  "rules": {
+    "block-scoped-var": "warn",
+    "comma-dangle": [
+      "warn",
+      "always-multiline"
+    ],
+    "no-console": "warn",
+    "no-var": "warn",
+    "semi": [
+      "error",
+      "always"
+    ],
+    "strict": "error",
+    "no-cond-assign": "off"
+  },
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "Promise": true
+  }
+}
