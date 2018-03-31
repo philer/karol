@@ -197,7 +197,7 @@
     noise_amplifier: 1,
   };
 
-  const ORIENTATIONS = ["north", "east", "south", "west"];
+  const ORIENTATIONS = ["south", "east", "north", "west"];
   const PLAYER_SPRITE_NAMES = ORIENTATIONS.map(str => "player_" + str);
   const TILE_SPRITE_NAMES = ["floor", "block", "mark", "cuboid"];
 
