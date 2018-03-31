@@ -7,7 +7,6 @@ import {fetchJson} from "./util.js";
 import {readKdwFile} from "./files.js";
 
 
-
 const keyMap = {
   "ArrowLeft":  "LinksDrehen",
   "a":          "LinksDrehen",

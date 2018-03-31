@@ -6,8 +6,8 @@
   "author": "Philipp Miller",
   "license": "MIT",
   "scripts": {
-    "build": "rollup -f iife --sourcemap -o build/core.js src/index.js",
-    "watch": "rollup -f iife --watch --sourcemap -o build/core.js src/index.js",
+    "build": "rollup -c rollup.config.js",
+    "watch": "rollup -c rollup.config.js --watch",
     "lint": "eslint src/* --cache --cache-location /tmp/ --format node_modules/eslint-friendly-formatter"
   },
   "devDependencies": {
