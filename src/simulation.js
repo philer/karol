@@ -1,19 +1,19 @@
+import {World} from "./world.js";
 import * as graphics from "./graphics.js";
-import * as actions from "./actions.js";
 
 import {sleep, rand} from "./util.js";
 
 const nativeSymbols = {
-  "linksdrehen": actions.turnLeft,
-  "rechtsdrehen": actions.turnRight,
-  "schritt": actions.step,
-  "schrittzurück": actions.stepBackwards,
-  "hinlegen": actions.placeBlock,
-  "aufheben": actions.takeBlock,
-  "markesetzen": actions.placeMark,
-  "markelöschen": actions.takeMark,
+  "linksdrehen":   "turnLeft",
+  "rechtsdrehen":  "turnRight",
+  "schritt":       "step",
+  "schrittzurück": "stepBackwards",
+  "hinlegen":      "placeBlock",
+  "aufheben":      "takeBlock",
+  "markesetzen":   "placeMark",
+  "markelöschen":  "takeMark",
 
-  "istwand": actions.isLookingAtEdge,
+  "istwand":       "isLookingAtEdge",
 };
 
 let world;
@@ -25,10 +25,6 @@ export function setSpeed(speed) {
 
 export function redraw() {
   graphics.render(world);
-  // document.getElementById("debug-text").innerHTML
-  //      = JSON.stringify(world.player, undefined, "  ")
-  //      + "\n"
-  //      + JSON.stringify({world});
 }
 
 export function setWorld(newWorld) {
@@ -36,27 +32,12 @@ export function setWorld(newWorld) {
   redraw();
 }
 
-export function setWorldDimensions(width, length, height) {
-  world = createWorld(width, length, height);
-  redraw();
-}
-
-function createWorld(width, length, height) {
-  return {
-    width, length, height,
-    player: {x: 0, y: 0, orientation: 0},
-    tiles: Array.from({length: width * length},
-                      () => ({blocks: 0, mark: false})),
-    seed: rand(Math.pow(-2, 16), Math.pow(2, 16)),
-  };
-}
-
 export async function execute(identifier, ignore_delay=false) {
-  const action = nativeSymbols[identifier];
-  if (!action) {
+  const methodName = nativeSymbols[identifier];
+  if (!methodName) {
     throw new Error(`RunTime Error: ${identifier} is not defined.`);
   }
-  action(world);
+  world[methodName]();
   redraw();
 
   if (!ignore_delay) {
@@ -65,9 +46,9 @@ export async function execute(identifier, ignore_delay=false) {
 }
 
 export function evaluate(identifier) {
-  const action = nativeSymbols[identifier];
-  if (!action) {
+  const methodName = nativeSymbols[identifier];
+  if (!methodName) {
     throw new Error(`RunTime Error: ${identifier} is not defined.`);
   }
-  return action(world);
+  return world[methodName]();
 }

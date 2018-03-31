@@ -1,5 +1,6 @@
 import * as graphics from "./graphics.js";
 import * as simulation from "./simulation.js";
+import {World} from "./world.js";
 import {Interpreter} from "./interpreter.js";
 
 import {fetchJson} from "./util.js";
@@ -38,9 +39,9 @@ const statusOutput = byId("status-text");
 
 function resetSimulation(evt) {
   if (evt) evt.preventDefault();
-  simulation.setWorldDimensions(+widthInput.value,
+  simulation.setWorld(new World(+widthInput.value,
                                 +lengthInput.value,
-                                +heightInput.value);
+                                +heightInput.value));
 }
 
 function loadWorld(evt) {

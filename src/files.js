@@ -1,3 +1,4 @@
+import {World} from "./world.js";
 
 /**
  * Read a .kdw file
@@ -49,10 +50,7 @@ export function parseKdw(kdw) {
     }*/
     tiles.push(tile);
   }
-  return {
-    version: parts[0],
-    width, length, height,
-    tiles,
-    player: {x: playerX, y: playerY, orientation},
-  };
+  return new World(width, length, height, 0,
+                   {x: playerX, y: playerY, orientation},  // player
+                   tiles);
 }

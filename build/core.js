@@ -435,120 +435,135 @@
     }
   }
 
-  // TODO immutable state update (redux style)
+  class World {
 
-  function move({x, y, orientation}, forward=1, left=0) {
-    switch (orientation) {
-      case 0: x += left; y += forward; break;
-      case 1: x += forward; y += left; break;
-      case 2: x -= left; y -= forward; break;
-      case 3: x -= forward; y -= left; break;
+    constructor(width, length, height, seed, player, tiles) {
+      this.width = width;
+      this.length = length;
+      this.height = height;
+      this.seed = seed || rand(1<<31, -(1<<31));
+      this.player = player || {x: 0, y: 0, orientation: 0};
+      this.tiles = tiles || Array.from({length: width * length},
+                                       () => ({blocks: 0, mark: false}));
     }
-    return [x, y];
-  }
-
-  function inWorld(x, y, world) {
-    return x >= 0 && y >= 0
-        && x < world.width && y < world.length;
-  }
 
 
-  function isLookingAtEdge(world) {
-    const [x, y] = move(world.player);
-    return !inWorld(x, y, world);
-  }
-
-  function step(world, forward=true) {
-    const player = world.player;
-    const length = world.length;
-    const z = world.tiles[player.x * length + player.y].blocks;
-    let [x, y] = move(player, forward ? 1 : -1);
-    if (!inWorld(x, y, world)) {
-      throw new Error("invalid move: out of world");
+    /**
+     * Get coordinates of tile by offset from player position.
+     * @param  {int} options.x           current location
+     * @param  {int} options.y           current location y
+     * @param  {int} options.orientation forward direction
+     * @param  {int} forward             forward offset
+     * @param  {int} left                sideways offset
+     * @return {Array}                   [x, y] coordinates of target tile
+     */
+    static move({x, y, orientation}, forward=1, left=0) {
+      switch (orientation) {
+        case 0: x += left; y += forward; break;
+        case 1: x += forward; y += left; break;
+        case 2: x -= left; y -= forward; break;
+        case 3: x -= forward; y -= left; break;
+      }
+      return [x, y];
     }
-    if (1 < Math.abs(z - world.tiles[x * length + y].blocks)) {
-      throw new Error("invalid move: jump too high");
+
+
+    contains(x, y) {
+      return x >= 0 && y >= 0 && x < this.width && y < this.length;
     }
-    if (world.tiles[x * length + y].cuboid) {
-      throw new Error("invalid move: cuboid");
+
+    isLookingAtEdge() {
+      return !this.contains(...World.move(this.player));
     }
-    [world.player.x, world.player.y] = [x, y];
-  }
-
-  function stepBackwards(world) {
-    step(world, false);
-  }
 
 
-  function turnLeft(world) {
-    world.player.orientation = (world.player.orientation + 1) % 4;
-  }
-
-  function turnRight(world) {
-    world.player.orientation = (world.player.orientation + 3) % 4;
-  }
-
-
-  function placeBlock(world) {
-    const {length, height, player, tiles} = world;
-    const [x, y] = move(player);
-    if (!inWorld(x, y, world)) {
-      throw new Error("invalid action: out of world");
+    step(forward=1, left=0) {
+      const z = this.tiles[this.player.x * this.length + this.player.y].blocks;
+      const [x, y] = World.move(this.player, forward, left);
+      if (!this.contains(x, y)) {
+        throw new Error("invalid move: out of world");
+      }
+      const targetTile = this.tiles[x * this.length + y];
+      if (1 < Math.abs(z - targetTile.blocks)) {
+        throw new Error("invalid move: jump too high");
+      }
+      if (targetTile.cuboid) {
+        throw new Error("invalid move: cuboid");
+      }
+      [this.player.x, this.player.y] = [x, y];
     }
-    const tile = tiles[x * length + y];
-    if (tile.cuboid) {
-      throw new Error("invalid action: block on cuboid");
-    }
-    if (tile.blocks >= height) {
-      throw new Error("invalid action: building too high");
-    }
-    tile.blocks++;
-  }
 
-  function takeBlock(world) {
-    const {length, player, tiles} = world;
-    const [x, y] = move(player);
-    if (!inWorld(x, y, world)) {
-      throw new Error("invalid action: out of world");
+    stepBackwards() {
+      this.step(-1);
     }
-    const tile = tiles[x * length + y];
-    if (tile.blocks <= 0) {
-      throw new Error("invalid action: no blocks");
-    }
-    tile.blocks--;
-  }
 
 
-  function placeMark(world) {
-    const {x, y} = world.player;
-    const tile = world.tiles[x * world.length + y];
-    // can't stand on cuboid -> no need to check
-    if (tile.mark) {
-      throw new Error("invalid action: already has a mark");
+    turnLeft() {
+      this.player.orientation = (this.player.orientation + 1) % 4;
     }
-    tile.mark = true;
-  }
 
-  function takeMark(world) {
-    const {x, y} = world.player;
-    const tile = world.tiles[x * world.length + y];
-    if (!tile.mark) {
-      throw new Error("invalid action: no mark");
+    turnRight() {
+      this.player.orientation = (this.player.orientation + 3) % 4;
     }
-    tile.mark = false;
+
+
+    placeBlock() {
+      const [x, y] = World.move(this.player);
+      if (!this.contains(x, y)) {
+        throw new Error("invalid action: out of world");
+      }
+      const targetTile = this.tiles[x * this.length + y];
+      if (targetTile.cuboid) {
+        throw new Error("invalid action: block on cuboid");
+      }
+      if (targetTile.blocks >= this.height) {
+        throw new Error("invalid action: building too high");
+      }
+      targetTile.blocks++;
+    }
+
+    takeBlock() {
+      const [x, y] = World.move(this.player);
+      if (!this.contains(x, y)) {
+        throw new Error("invalid action: out of world");
+      }
+      const targetTile = this.tiles[x * this.length + y];
+      if (targetTile.blocks <= 0) {
+        throw new Error("invalid action: no blocks");
+      }
+      targetTile.blocks--;
+    }
+
+
+    placeMark() {
+      const targetTile = this.tiles[this.player.x * this.length + this.player.y];
+      // can't stand on cuboid -> no need to check
+      if (targetTile.mark) {
+        throw new Error("invalid action: already has a mark");
+      }
+      targetTile.mark = true;
+    }
+
+    takeMark() {
+      const targetTile = this.tiles[this.player.x * this.length + this.player.y];
+      if (!targetTile.mark) {
+        throw new Error("invalid action: no mark");
+      }
+      targetTile.mark = false;
+    }
   }
 
   const nativeSymbols = {
-    "linksdrehen": turnLeft,
-    "rechtsdrehen": turnRight,
-    "schritt": step,
-    "schrittzurück": stepBackwards,
-    "hinlegen": placeBlock,
-    "aufheben": takeBlock,
-    "markesetzen": placeMark,
-    "markelöschen": takeMark,
+    "linksdrehen":   "turnLeft",
+    "rechtsdrehen":  "turnRight",
+    "schritt":       "step",
+    "schrittzurück": "stepBackwards",
+    "hinlegen":      "placeBlock",
+    "aufheben":      "takeBlock",
+    "markesetzen":   "placeMark",
+    "markelöschen":  "takeMark",
 
-    "istwand": isLookingAtEdge,
+    "istwand":       "isLookingAtEdge",
   };
 
   let world;
@@ -560,10 +575,6 @@
 
   function redraw() {
     render(world);
-    // document.getElementById("debug-text").innerHTML
-    //      = JSON.stringify(world.player, undefined, "  ")
-    //      + "\n"
-    //      + JSON.stringify({world});
   }
 
   function setWorld(newWorld) {
@@ -571,27 +582,12 @@
     redraw();
   }
 
-  function setWorldDimensions(width, length, height) {
-    world = createWorld(width, length, height);
-    redraw();
-  }
-
-  function createWorld(width, length, height) {
-    return {
-      width, length, height,
-      player: {x: 0, y: 0, orientation: 0},
-      tiles: Array.from({length: width * length},
-                        () => ({blocks: 0, mark: false})),
-      seed: rand(Math.pow(-2, 16), Math.pow(2, 16)),
-    };
-  }
-
   async function execute(identifier, ignore_delay=false) {
-    const action = nativeSymbols[identifier];
-    if (!action) {
+    const methodName = nativeSymbols[identifier];
+    if (!methodName) {
       throw new Error(`RunTime Error: ${identifier} is not defined.`);
     }
-    action(world);
+    world[methodName]();
     redraw();
 
     if (!ignore_delay) {
@@ -600,18 +596,17 @@
   }
 
   function evaluate(identifier) {
-    const action = nativeSymbols[identifier];
-    if (!action) {
+    const methodName = nativeSymbols[identifier];
+    if (!methodName) {
       throw new Error(`RunTime Error: ${identifier} is not defined.`);
     }
-    return action(world);
+    return world[methodName]();
   }
 
   var simulation = /*#__PURE__*/Object.freeze({
     setSpeed: setSpeed,
     redraw: redraw,
     setWorld: setWorld,
-    setWorldDimensions: setWorldDimensions,
     execute: execute,
     evaluate: evaluate
   });
@@ -1053,12 +1048,9 @@
       }*/
       tiles.push(tile);
     }
-    return {
-      version: parts[0],
-      width, length, height,
-      tiles,
-      player: {x: playerX, y: playerY, orientation},
-    };
+    return new World(width, length, height, 0,
+                     {x: playerX, y: playerY, orientation},  // player
+                     tiles);
   }
 
   const keyMap = {
@@ -1092,9 +1084,9 @@
 
   function resetSimulation(evt) {
     if (evt) evt.preventDefault();
-    setWorldDimensions(+widthInput.value,
+    setWorld(new World(+widthInput.value,
                                   +lengthInput.value,
-                                  +heightInput.value);
+                                  +heightInput.value));
   }
 
   function loadWorld(evt) {
