@@ -1,76 +1,89 @@
-Wiederhole 5 mal
-  Schritt()
-*Wiederhole
-LinksDrehen()
+anweisung buchstabe_B
+    hinlegen
+    schritt
+    linksdrehen
+    wiederhole 4 mal
+        hinlegen
+        schritt
+    *wiederhole
+    rechtsdrehen
+    hinlegen schritt
+    hinlegen schritt
+    schritt
+    rechtsdrehen
+    hinlegen schritt
+    schritt
+    rechtsdrehen
+    hinlegen schritt
+    hinlegen schritt
+    linksdrehen
+    schritt
+    hinlegen schritt
+    linksdrehen
+    hinlegen schritt
+    schritt
+    linksdrehen
+    hinlegen
+    rechtsdrehen
+    schritt
+*anweisung
 
-hinlegen
-schritt
-linksdrehen
-wiederhole 4 mal
-  hinlegen
-  schritt
-*wiederhole
-rechtsdrehen
-hinlegen schritt
-hinlegen schritt
-schritt
-rechtsdrehen
-hinlegen schritt
-schritt
-rechtsdrehen
-hinlegen schritt
-hinlegen schritt
-linksdrehen
-schritt
-hinlegen schritt
-linksdrehen
-hinlegen schritt
-schritt
-linksdrehen
-hinlegen
-rechtsdrehen
-schritt
+anweisung buchstabe_O
+    schritt
+    hinlegen schritt
+    hinlegen schritt
+    schritt
+    linksdrehen
+    wiederhole 3 mal
+        hinlegen schritt
+    *wiederhole
+    schritt linksdrehen
+    hinlegen schritt
+    hinlegen schritt
+    schritt linksdrehen
+    wiederhole 3 mal
+        hinlegen schritt
+    *wiederhole
+    schritt
+    linksdrehen
+    wiederhole 4 mal
+        schritt
+    *wiederhole
+*anweisung
 
-schritt
-hinlegen schritt
-hinlegen schritt
-schritt
-linksdrehen
-wiederhole 3 mal
-  hinlegen schritt
-*wiederhole
-schritt linksdrehen
-hinlegen schritt
-hinlegen schritt
-schritt linksdrehen
-wiederhole 3 mal
-  hinlegen schritt
-*wiederhole
-schritt
-linksdrehen
-wiederhole 4 mal
-  schritt
-*wiederhole
+anweisung buchstabe_T
+    schritt schritt
+    hinlegen schritt
+    linksdrehen
+    wiederhole 4 mal
+        hinlegen schritt
+    *wiederhole
+    linksdrehen
+    hinlegen schritt
+    hinlegen schritt
+    linksdrehen linksdrehen
+    schritt schritt
+    hinlegen schritt
+    hinlegen schritt
+    rechtsdrehen
+    wiederhole 4 mal
+        schritt
+    *wiederhole
+    linksdrehen
+    schritt
+*anweisung
 
-schritt schritt
-hinlegen schritt
-linksdrehen
-wiederhole 4 mal
-  hinlegen schritt
-*wiederhole
-linksdrehen
-hinlegen schritt
-hinlegen schritt
-linksdrehen linksdrehen
-schritt schritt
-hinlegen schritt
-hinlegen schritt
-rechtsdrehen
-wiederhole 4 mal
-  schritt
-*wiederhole
-linksdrehen
-schritt
+
+programm
+    Wiederhole 5 mal
+        Schritt()
+    *Wiederhole
+    LinksDrehen()
+
+    buchstabe_B
+    buchstabe_O
+    buchstabe_T
+*programm
 
 markesetzen
 wiederhole 25 mal

@@ -1,3 +1,5 @@
+const MAX_RECURSION_DEPTH = 1000;
+
 // token types
 const IDENTIFIER = "IDENTIFIER";
 const INTEGER = "INTEGER";
@@ -179,6 +181,7 @@ export class TokenIterator {
 export class Parser {
   constructor(tokens) {
     this.tokens = tokens;
+    this.depth = 0;
     this.forward();
   }
 
@@ -253,9 +256,11 @@ export class Parser {
   readSequence() {
     const statements = [];
     const endTokens = [ASTERISC, ELSE, EOF];
+    this.depth++;
     while (!endTokens.includes(this.currentToken.type)) {
       statements.push(this.readStatement());
     }
+    this.depth--;
     return statements;
   }
 
@@ -303,6 +308,11 @@ export class Parser {
         return statement;
 
       case PROGRAM:
+        if (this.depth > 1) {
+          throw new Error("Parse Error on line "
+                          + this.tokens.line
+                          + ": Can't define program in nested context.");
+        }
         this.forward();
         statement.sequence = this.readSequence();
         this.eat(ASTERISC);
@@ -310,6 +320,11 @@ export class Parser {
         return statement;
 
       case ROUTINE:
+        if (this.depth > 1) {
+          throw new Error("Parse Error on line "
+                          + this.tokens.line
+                          + ": Can't define routine in nested context.");
+        }
         this.forward();
         statement.identifier = this.readToken(IDENTIFIER);
         statement.sequence = this.readSequence();
@@ -317,11 +332,11 @@ export class Parser {
         this.eat(ROUTINE);
         return statement;
     }
-    throw new Error("Error while parsing token "
-                    + this.currentToken
-                    + " on line "
+    throw new Error("Parse Error on line "
                     + this.tokens.line
-                    + ". I have no idea what happened.");
+                    + " while parsing token "
+                    + this.currentToken
+                    + ": I have no idea what happened.");
   }
 }
 
@@ -342,6 +357,7 @@ export class Interpreter {
    */
   constructor(runtime) {
     this.runtime = runtime;
+    this.routines = Object.create(null);
   }
 
   interrupt() {
@@ -368,7 +384,15 @@ export class Interpreter {
         if (this._interrupted) {
           return;
         }
-        await this.runtime.execute(statement.identifier);
+        if (statement.identifier in this.routines) {
+          if (this.depth > MAX_RECURSION_DEPTH) {
+            throw new Error("RunTime Error: Maximum recursion depth (" + MAX_RECURSION_DEPTH + ") exceeded.");
+          }
+          await this.visitSequence(
+                        this.routines[statement.identifier]);
+        } else {
+          await this.runtime.execute(statement.identifier);
+        }
         break;
 
       case IF:
@@ -392,6 +416,14 @@ export class Interpreter {
         }
         break;
       }
+
+      case PROGRAM:
+        await this.visitSequence(statement.sequence);
+        break;
+
+      case ROUTINE:
+        this.routines[statement.identifier] = statement.sequence;
+        break;
 
       default:
         throw new Error(`Unimplemented statement type ${statement.type}`);
