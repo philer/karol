@@ -712,11 +712,31 @@
       this.line = 1;
     }
 
-    // [Symbol.iterator]() {
-    //   return this;
-    // }
+    /**
+     * @return {Iterator} this
+     */
+    [Symbol.iterator]() {
+      return this;
+    }
 
+    /**
+     * Implement iterator protocol
+     * @return {Object}
+     */
     next() {
+      const token = this.nextToken();
+      if (token.type === EOF) {
+        return {done: true};
+      }
+      return {value: token, done: false};
+    }
+
+    /**
+     * Read the next token, forwarding the internal position
+     * accordingly.
+     * @return {Token}
+     */
+    nextToken() {
       // eat whitespace, stop when we're done.
       let whitespace = "";
       while (this.position < this.text.length
@@ -767,9 +787,7 @@
 
       // end of file
       if (this.position >= this.text.length) {
-        const eof = new Token(EOF, "");
-        eof.done = true;
-        return eof;
+        return new Token(EOF);
       }
 
       // found nothing useful
@@ -788,7 +806,7 @@
     }
 
     forward() {
-      this.currentToken = this.tokens.next();
+      this.currentToken = this.tokens.nextToken();
     }
 
     eat(type) {
@@ -1021,43 +1039,46 @@
     }
   }
 
-  const tokenTypeClassNames = {
+  /**
+   * Map TokenTypes to css class names
+   */
+  const ttClasses = Object.create(null);
 
-    [TokenTypes.IDENTIFIER]: "identifier",
+  ttClasses[TokenTypes.IDENTIFIER] = "identifier";
+  ttClasses[TokenTypes.INTEGER] =  "number";
+  [
+    TokenTypes.NOT,
+    TokenTypes.IF,
+    TokenTypes.THEN,
+    TokenTypes.ELSE,
+    TokenTypes.WHILE,
+    TokenTypes.DO,
+    TokenTypes.REPEAT,
+    TokenTypes.TIMES,
+    TokenTypes.PROGRAM,
+    TokenTypes.ROUTINE,
+  ].forEach(tt => ttClasses[tt] = "keyword");
+  [
+    TokenTypes.LPAREN,
+    TokenTypes.RPAREN,
+    TokenTypes.DOT,
+    TokenTypes.ASTERISC,
+  ].forEach(tt => ttClasses[tt] = "punctuation");
 
-    [TokenTypes.INTEGER]: "number",
 
-    [TokenTypes.NOT]: "keyword",
-    [TokenTypes.IF]: "keyword",
-    [TokenTypes.THEN]: "keyword",
-    [TokenTypes.ELSE]: "keyword",
-    [TokenTypes.WHILE]: "keyword",
-    [TokenTypes.DO]: "keyword",
-    [TokenTypes.REPEAT]: "keyword",
-    [TokenTypes.TIMES]: "keyword",
-    [TokenTypes.PROGRAM]: "keyword",
-    [TokenTypes.ROUTINE]: "keyword",
-
-    [TokenTypes.LPAREN]: "punctuation",
-    [TokenTypes.RPAREN]: "punctuation",
-    [TokenTypes.DOT]: "punctuation",
-    [TokenTypes.ASTERISC]: "punctuation",
-    [TokenTypes.WHITESPACE]: null,
-    [TokenTypes.EOF]: null,
-  };
-
+  /**
+   * Add syntax highlighting HTML tags to given code snippet.
+   * @param  {String} text code
+   * @return {String}      code with tokens wrapped in HTML tags
+   */
   function highlight(text) {
     let html = "";
-    const tokens = new TokenIterator(text, true);
-    let token = tokens.next();
-    while (!token.done) {
-      const className = tokenTypeClassNames[token.type];
-      if (className) {
-        html += `<span class="token ${className}">${token.value}</span>`;
+    for (const token of new TokenIterator(text, true)) {
+      if (token.type in ttClasses) {
+        html += `<span class="token ${ttClasses[token.type]}">${token.value}</span>`;
       } else {
         html += token.value;
       }
-      token = tokens.next();
     }
     return html;
   }

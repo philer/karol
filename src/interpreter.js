@@ -94,11 +94,31 @@ export class TokenIterator {
     this.line = 1;
   }
 
-  // [Symbol.iterator]() {
-  //   return this;
-  // }
+  /**
+   * @return {Iterator} this
+   */
+  [Symbol.iterator]() {
+    return this;
+  }
 
+  /**
+   * Implement iterator protocol
+   * @return {Object}
+   */
   next() {
+    const token = this.nextToken();
+    if (token.type === EOF) {
+      return {done: true};
+    }
+    return {value: token, done: false};
+  }
+
+  /**
+   * Read the next token, forwarding the internal position
+   * accordingly.
+   * @return {Token}
+   */
+  nextToken() {
     // eat whitespace, stop when we're done.
     let whitespace = "";
     while (this.position < this.text.length
@@ -149,9 +169,7 @@ export class TokenIterator {
 
     // end of file
     if (this.position >= this.text.length) {
-      const eof = new Token(EOF, "");
-      eof.done = true;
-      return eof;
+      return new Token(EOF);
     }
 
     // found nothing useful
@@ -170,7 +188,7 @@ export class Parser {
   }
 
   forward() {
-    this.currentToken = this.tokens.next();
+    this.currentToken = this.tokens.nextToken();
   }
 
   eat(type) {

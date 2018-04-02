@@ -1,42 +1,45 @@
 import {TokenIterator, TokenTypes as TT} from "./interpreter.js";
 
-const tokenTypeClassNames = {
+/**
+ * Map TokenTypes to css class names
+ */
+const ttClasses = Object.create(null);
 
-  [TT.IDENTIFIER]: "identifier",
+ttClasses[TT.IDENTIFIER] = "identifier";
+ttClasses[TT.INTEGER] =  "number";
+[
+  TT.NOT,
+  TT.IF,
+  TT.THEN,
+  TT.ELSE,
+  TT.WHILE,
+  TT.DO,
+  TT.REPEAT,
+  TT.TIMES,
+  TT.PROGRAM,
+  TT.ROUTINE,
+].forEach(tt => ttClasses[tt] = "keyword");
+[
+  TT.LPAREN,
+  TT.RPAREN,
+  TT.DOT,
+  TT.ASTERISC,
+].forEach(tt => ttClasses[tt] = "punctuation");
 
-  [TT.INTEGER]: "number",
 
-  [TT.NOT]: "keyword",
-  [TT.IF]: "keyword",
-  [TT.THEN]: "keyword",
-  [TT.ELSE]: "keyword",
-  [TT.WHILE]: "keyword",
-  [TT.DO]: "keyword",
-  [TT.REPEAT]: "keyword",
-  [TT.TIMES]: "keyword",
-  [TT.PROGRAM]: "keyword",
-  [TT.ROUTINE]: "keyword",
-
-  [TT.LPAREN]: "punctuation",
-  [TT.RPAREN]: "punctuation",
-  [TT.DOT]: "punctuation",
-  [TT.ASTERISC]: "punctuation",
-  [TT.WHITESPACE]: null,
-  [TT.EOF]: null,
-};
-
+/**
+ * Add syntax highlighting HTML tags to given code snippet.
+ * @param  {String} text code
+ * @return {String}      code with tokens wrapped in HTML tags
+ */
 export default function highlight(text) {
   let html = "";
-  const tokens = new TokenIterator(text, true);
-  let token = tokens.next();
-  while (!token.done) {
-    const className = tokenTypeClassNames[token.type];
-    if (className) {
-      html += `<span class="token ${className}">${token.value}</span>`;
+  for (const token of new TokenIterator(text, true)) {
+    if (token.type in ttClasses) {
+      html += `<span class="token ${ttClasses[token.type]}">${token.value}</span>`;
     } else {
       html += token.value;
     }
-    token = tokens.next();
   }
   return html;
 }
