@@ -11,7 +11,6 @@ While editing in `src/` use `yarn watch` for automatic bundling.
 * schrittweise, pause
 * langsam/schnell/instant anweisungen
 * linenumbers, "debugger"
-* syntax highlighting (?)
 
 * save & load (program & world)
 
@@ -35,4 +34,4 @@ Required APIs:
 
 * canvas: IE9+
 
-* fetch IE14+ (polyfilled?)
+* fetch: IE14+ (polyfilled?)

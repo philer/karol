@@ -1,8 +1,3 @@
-/**
- * Basic premise:
- * Convert (compile/transpile) player code into safely executable JS.
- */
-
 // token types
 const IDENTIFIER = "IDENTIFIER";
 const INTEGER = "INTEGER";
@@ -344,7 +339,6 @@ export class Interpreter {
   /**
    * Create a new program iteration
    * @param  {RunTime} runtime  simulated machine/world
-   * @param  {Object} nativeSymbols mapping of identifiers to functions
    */
   constructor(runtime) {
     this.runtime = runtime;
