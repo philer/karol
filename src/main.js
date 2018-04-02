@@ -1,9 +1,10 @@
 import * as graphics from "./graphics.js";
 import * as simulation from "./simulation.js";
 import {World} from "./world.js";
+import editor from "./editor.js";
 import {Interpreter} from "./interpreter.js";
 
-import {fetchJson} from "./util.js";
+import {byId, fetchJson} from "./util.js";
 import {readKdwFile} from "./files.js";
 
 
@@ -23,8 +24,6 @@ const keyMap = {
 };
 
 
-const byId = document.getElementById.bind(document);
-const editor = byId("editor");
 const widthInput = byId("width-input");
 const lengthInput = byId("length-input");
 const heightInput = byId("height-input");

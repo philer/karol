@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <title>Karol</title>
     <link rel="icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/syntax-highlighting.css">
   </head>
   <body>
 
@@ -13,7 +14,10 @@
         <h2>Code</h2>
       </header>
       <div class="editor-container">
-        <textarea id="editor" spellcheck="false"></textarea>
+        <div class="editor-scrollbox">
+          <textarea id="editor" spellcheck="false"></textarea>
+          <code id="editor-highlight"></code>
+        </div>
       </div>
       <form class="editor-buttons">
         <button id="run-button">Run</button>

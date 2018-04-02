@@ -27,3 +27,12 @@ While editing in `src/` use `yarn watch` for automatic bundling.
 
 + help
 + better steve
+
+
+## Compatibility
+
+Required APIs:
+
+* canvas: IE9+
+
+* fetch IE14+ (polyfilled?)

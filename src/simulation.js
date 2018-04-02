@@ -31,7 +31,7 @@ export function setWorld(newWorld) {
 }
 
 export async function execute(identifier, ignore_delay=false) {
-  const methodName = nativeSymbols[identifier];
+  const methodName = nativeSymbols[identifier.toLowerCase()];
   if (!methodName) {
     throw new Error(`RunTime Error: ${identifier} is not defined.`);
   }
@@ -44,7 +44,7 @@ export async function execute(identifier, ignore_delay=false) {
 }
 
 export function evaluate(identifier) {
-  const methodName = nativeSymbols[identifier];
+  const methodName = nativeSymbols[identifier.toLowerCase()];
   if (!methodName) {
     throw new Error(`RunTime Error: ${identifier} is not defined.`);
   }

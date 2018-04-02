@@ -23,7 +23,16 @@ const RPAREN = "RPAREN";
 const DOT = "DOT";
 const ASTERISC = "ASTERISC";
 
+const WHITESPACE = "WHITESPACE";
 const EOF = "EOF";
+
+export const TokenTypes = Object.freeze({
+  IDENTIFIER, INTEGER, NOT,
+  IF, THEN, ELSE, WHILE, DO, REPEAT, TIMES,
+  PROGRAM, ROUTINE,
+  LPAREN, RPAREN, DOT, ASTERISC,
+  WHITESPACE, EOF,
+});
 
 class Token {
   constructor(type, value) {
@@ -35,51 +44,52 @@ class Token {
   }
 }
 
-const keywordTokens = {
-  "wenn":       new Token(IF, "wenn"),
-  "if":         new Token(IF, "if"),
-  "dann":       new Token(THEN, "dann"),
-  "then":       new Token(THEN, "then"),
-  "sonst":      new Token(ELSE, "sonst"),
-  "else":       new Token(ELSE, "else"),
-  "solange":    new Token(WHILE, "solange"),
-  "while":      new Token(WHILE, "while"),
-  "tue":        new Token(DO, "tue"),
-  "do":         new Token(DO, "do"),
-  "nicht":      new Token(NOT, "nicht"),
-  "not":        new Token(NOT, "not"),
-  "wiederhole": new Token(REPEAT, "wiederhole"),
-  "repeat":     new Token(REPEAT, "repeat"),
-  "mal":        new Token(TIMES, "mal"),
-  "times":      new Token(TIMES, "times"),
-  "programm":   new Token(PROGRAM, "programm"),
-  "program":    new Token(PROGRAM, "program"),
-  "anweisung":  new Token(ROUTINE, "anweisung"),
-  "routine":    new Token(ROUTINE, "routine"),
+const keywordTokenTypes = {
+  "wenn":       IF,
+  "if":         IF,
+  "dann":       THEN,
+  "then":       THEN,
+  "sonst":      ELSE,
+  "else":       ELSE,
+  "solange":    WHILE,
+  "while":      WHILE,
+  "tue":        DO,
+  "do":         DO,
+  "nicht":      NOT,
+  "not":        NOT,
+  "wiederhole": REPEAT,
+  "repeat":     REPEAT,
+  "mal":        TIMES,
+  "times":      TIMES,
+  "programm":   PROGRAM,
+  "program":    PROGRAM,
+  "anweisung":  ROUTINE,
+  "routine":    ROUTINE,
 };
-const keywords = Object.keys(keywordTokens);
+const keywords = Object.keys(keywordTokenTypes);
 
-const symbolTokens = {
-  "(": new Token(LPAREN, "("),
-  ")": new Token(RPAREN, ")"),
-  ".": new Token(DOT, "."),
-  "*": new Token(ASTERISC, "*"),
+const symbolTokenTypes = {
+  "(": LPAREN,
+  ")": RPAREN,
+  ".": DOT,
+  "*": ASTERISC,
 };
-const symbols = Object.keys(symbolTokens);
+const symbols = Object.keys(symbolTokenTypes);
 
 
 
 const reSpace = /\s/;
 const reDigit = /[0-9]/;
-const reLetter = /[A-Za-z_]/;
+const reLetter = /[A-Za-z_]/i;
 
 /**
  * Iterable lexer
  */
 export class TokenIterator {
 
-  constructor(text) {
-    this.text = text.toLowerCase();   // case insensitive -.-
+  constructor(text, includeWhitespace=false) {
+    this.text = text;
+    this.includeWhitespace = includeWhitespace;
     this.position = 0;
     this.line = 1;
   }
@@ -90,19 +100,24 @@ export class TokenIterator {
 
   next() {
     // eat whitespace, stop when we're done.
+    let whitespace = "";
     while (this.position < this.text.length
            && reSpace.test(this.text[this.position])) {
+      whitespace += this.text[this.position];
       if (this.text[this.position] === "\n") {
         this.line++;
       }
       this.position++;
+    }
+    if (whitespace.length && this.includeWhitespace) {
+      return new Token(WHITESPACE, whitespace);
     }
 
     // read special character token
     const symbol = this.text[this.position];
     if (symbols.includes(symbol)) {
       this.position++;
-      return symbolTokens[symbol];
+      return new Token(symbolTokenTypes[symbol], symbol);
     }
 
     // read integer token
@@ -124,8 +139,9 @@ export class TokenIterator {
       this.position++;
     }
     if (word.length) {
-      if (keywords.includes(word)) {
-        return keywordTokens[word];
+      const lowercase = word.toLowerCase();
+      if (keywords.includes(lowercase)) {
+        return new Token(keywordTokenTypes[lowercase], word);
       } else {
         return new Token(IDENTIFIER, word);
       }
@@ -288,7 +304,9 @@ export class Parser {
         this.eat(ROUTINE);
         return statement;
     }
-    throw new Error("Error while parsing on line "
+    throw new Error("Error while parsing token "
+                    + this.currentToken
+                    + " on line "
                     + this.tokens.line
                     + ". I have no idea what happened.");
   }

@@ -1,0 +1,43 @@
+.token.keyword {
+    color: #06e;
+    font-weight: bold;
+}
+.token.identifier {
+    color: green;
+}
+.token.punctuation {
+    color: #652;
+}
+.token.number {
+    color: #a0f;
+}
+
+textarea#editor::-moz-selection {
+    background-color: #999;
+}
+textarea#editor::selection {
+    background-color: #999;
+}
+
+
+/*** DARK ***/
+/*
+.editor-container {
+    background-color: #404038;
+    border-width: 0;
+    box-shadow: 0 0 3px rgba(0, 0, 0, .25);
+}
+.token.keyword {
+    color: #6cf;
+    font-weight: bold;
+}
+.token.identifier {
+    color: #8f8;
+}
+.token.punctuation {
+    color: #fec;
+}
+.token.number {
+    color: #f8f;
+}
+/**/

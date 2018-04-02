@@ -64,22 +64,69 @@ body {
   flex-direction: column;
   justify-content: stretch;
 }
+
 .editor-container {
+  position: relative;
   flex-grow: 1;
   margin: .5em 0;
-  padding: 1em;
-  border-radius: 3px;
+  background-color: white;
   border: 1px solid #ddd;
+  border-radius: 3px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, .1)
             , 0 0 2px rgba(0, 0, 0, .1);
 }
-textarea#editor {
-  font-family: monospace;
-  resize: none;
-  border: 0 transparent none;
+.editor-scrollbox {
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
   width: 100%;
+
+  font-size: 14px;
+  font-family:  Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
+#editor-highlight, textarea#editor {
+  font-size: inherit;
+  font-family: inherit;
+  display: block;
+  padding: 1em;
+  border: none;
+  line-height: 1.2em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  tab-size: 4;
+  background: transparent;
+}
+textarea#editor {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  margin: 0; /* necessary to prevent ugly offset */
+  border-width: 0;
+  outline-width: 0;
+  resize: none;
+
+  /* caret-color not supported in IE, so we can't hide the text completely
+     via color:transparent. */
+  opacity: .5;
+  /*color: rgba(0, 0, 0, .4);*/
+  /*color: transparent;*/
+  /*caret-color: black;*/
+  /*text-shadow: 0 0 1px white;*/
+}
+#editor-highlight {
+  position: relative;
+  z-index: 2;
+  min-height: 100%;
+  pointer-events: none;
+  overflow: auto;
+  padding-bottom: 2.2em; /* one extra line-height */
+  border-bottom: 1px solid transparent;
+}
+
 .editor-buttons {
   display: flex;
 }

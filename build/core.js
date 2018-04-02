@@ -153,6 +153,11 @@
   }
 
   /**
+   * Convenience abbreviation of document.getElementById
+   */
+  const byId = document.getElementById.bind(document);
+
+  /**
    * Wrapper for fetch API for json files.
    * @param  {string} path
    * @return {Promise}
@@ -313,9 +318,9 @@
     }
     async load() {
       this._image = await loadImage(this.imagePath);
-      const scale = tileWidth / img.width;
+      const scale = tileWidth / this._image.width;
       this._scaledWidth = tileWidth;
-      this._scaledHeight = scale * img.height;
+      this._scaledHeight = scale * this._image.height;
       this.height = this._scaledHeight - tileDepth;
     }
     draw(ctx, x, y) {
@@ -435,6 +440,64 @@
     }
   }
 
+  const nativeSymbols = {
+    "linksdrehen":   "turnLeft",
+    "rechtsdrehen":  "turnRight",
+    "schritt":       "step",
+    "schrittzurück": "stepBackwards",
+    "hinlegen":      "placeBlock",
+    "aufheben":      "takeBlock",
+    "markesetzen":   "placeMark",
+    "markelöschen":  "takeMark",
+
+    "istwand":       "isLookingAtEdge",
+  };
+
+  let world;
+  let delay_ms = 100;
+
+  function setSpeed(speed) {
+    delay_ms = Math.pow(10, 4 - speed);
+  }
+
+  function redraw() {
+    render(world);
+  }
+
+  function setWorld(newWorld) {
+    world = newWorld;
+    redraw();
+  }
+
+  async function execute(identifier, ignore_delay=false) {
+    const methodName = nativeSymbols[identifier.toLowerCase()];
+    if (!methodName) {
+      throw new Error(`RunTime Error: ${identifier} is not defined.`);
+    }
+    world[methodName]();
+    redraw();
+
+    if (!ignore_delay) {
+      await sleep(delay_ms);
+    }
+  }
+
+  function evaluate(identifier) {
+    const methodName = nativeSymbols[identifier.toLowerCase()];
+    if (!methodName) {
+      throw new Error(`RunTime Error: ${identifier} is not defined.`);
+    }
+    return world[methodName]();
+  }
+
+  var simulation = /*#__PURE__*/Object.freeze({
+    setSpeed: setSpeed,
+    redraw: redraw,
+    setWorld: setWorld,
+    execute: execute,
+    evaluate: evaluate
+  });
+
   class World {
 
     constructor(width, length, height, seed, player, tiles) {
@@ -553,64 +616,6 @@
     }
   }
 
-  const nativeSymbols = {
-    "linksdrehen":   "turnLeft",
-    "rechtsdrehen":  "turnRight",
-    "schritt":       "step",
-    "schrittzurück": "stepBackwards",
-    "hinlegen":      "placeBlock",
-    "aufheben":      "takeBlock",
-    "markesetzen":   "placeMark",
-    "markelöschen":  "takeMark",
-
-    "istwand":       "isLookingAtEdge",
-  };
-
-  let world;
-  let delay_ms = 100;
-
-  function setSpeed(speed) {
-    delay_ms = Math.pow(10, 4 - speed);
-  }
-
-  function redraw() {
-    render(world);
-  }
-
-  function setWorld(newWorld) {
-    world = newWorld;
-    redraw();
-  }
-
-  async function execute(identifier, ignore_delay=false) {
-    const methodName = nativeSymbols[identifier];
-    if (!methodName) {
-      throw new Error(`RunTime Error: ${identifier} is not defined.`);
-    }
-    world[methodName]();
-    redraw();
-
-    if (!ignore_delay) {
-      await sleep(delay_ms);
-    }
-  }
-
-  function evaluate(identifier) {
-    const methodName = nativeSymbols[identifier];
-    if (!methodName) {
-      throw new Error(`RunTime Error: ${identifier} is not defined.`);
-    }
-    return world[methodName]();
-  }
-
-  var simulation = /*#__PURE__*/Object.freeze({
-    setSpeed: setSpeed,
-    redraw: redraw,
-    setWorld: setWorld,
-    execute: execute,
-    evaluate: evaluate
-  });
-
   /**
    * Basic premise:
    * Convert (compile/transpile) player code into safely executable JS.
@@ -636,7 +641,16 @@
   const DOT = "DOT";
   const ASTERISC = "ASTERISC";
 
+  const WHITESPACE = "WHITESPACE";
   const EOF = "EOF";
+
+  const TokenTypes = Object.freeze({
+    IDENTIFIER, INTEGER, NOT,
+    IF, THEN, ELSE, WHILE, DO, REPEAT, TIMES,
+    PROGRAM, ROUTINE,
+    LPAREN, RPAREN, DOT, ASTERISC,
+    WHITESPACE, EOF,
+  });
 
   class Token {
     constructor(type, value) {
@@ -648,51 +662,52 @@
     }
   }
 
-  const keywordTokens = {
-    "wenn":       new Token(IF, "wenn"),
-    "if":         new Token(IF, "if"),
-    "dann":       new Token(THEN, "dann"),
-    "then":       new Token(THEN, "then"),
-    "sonst":      new Token(ELSE, "sonst"),
-    "else":       new Token(ELSE, "else"),
-    "solange":    new Token(WHILE, "solange"),
-    "while":      new Token(WHILE, "while"),
-    "tue":        new Token(DO, "tue"),
-    "do":         new Token(DO, "do"),
-    "nicht":      new Token(NOT, "nicht"),
-    "not":        new Token(NOT, "not"),
-    "wiederhole": new Token(REPEAT, "wiederhole"),
-    "repeat":     new Token(REPEAT, "repeat"),
-    "mal":        new Token(TIMES, "mal"),
-    "times":      new Token(TIMES, "times"),
-    "programm":   new Token(PROGRAM, "programm"),
-    "program":    new Token(PROGRAM, "program"),
-    "anweisung":  new Token(ROUTINE, "anweisung"),
-    "routine":    new Token(ROUTINE, "routine"),
+  const keywordTokenTypes = {
+    "wenn":       IF,
+    "if":         IF,
+    "dann":       THEN,
+    "then":       THEN,
+    "sonst":      ELSE,
+    "else":       ELSE,
+    "solange":    WHILE,
+    "while":      WHILE,
+    "tue":        DO,
+    "do":         DO,
+    "nicht":      NOT,
+    "not":        NOT,
+    "wiederhole": REPEAT,
+    "repeat":     REPEAT,
+    "mal":        TIMES,
+    "times":      TIMES,
+    "programm":   PROGRAM,
+    "program":    PROGRAM,
+    "anweisung":  ROUTINE,
+    "routine":    ROUTINE,
   };
-  const keywords = Object.keys(keywordTokens);
+  const keywords = Object.keys(keywordTokenTypes);
 
-  const symbolTokens = {
-    "(": new Token(LPAREN, "("),
-    ")": new Token(RPAREN, ")"),
-    ".": new Token(DOT, "."),
-    "*": new Token(ASTERISC, "*"),
+  const symbolTokenTypes = {
+    "(": LPAREN,
+    ")": RPAREN,
+    ".": DOT,
+    "*": ASTERISC,
   };
-  const symbols = Object.keys(symbolTokens);
+  const symbols = Object.keys(symbolTokenTypes);
 
 
 
   const reSpace = /\s/;
   const reDigit = /[0-9]/;
-  const reLetter = /[A-Za-z_]/;
+  const reLetter = /[A-Za-z_]/i;
 
   /**
    * Iterable lexer
    */
   class TokenIterator {
 
-    constructor(text) {
-      this.text = text.toLowerCase();   // case insensitive -.-
+    constructor(text, includeWhitespace=false) {
+      this.text = text;
+      this.includeWhitespace = includeWhitespace;
       this.position = 0;
       this.line = 1;
     }
@@ -703,19 +718,24 @@
 
     next() {
       // eat whitespace, stop when we're done.
+      let whitespace = "";
       while (this.position < this.text.length
              && reSpace.test(this.text[this.position])) {
+        whitespace += this.text[this.position];
         if (this.text[this.position] === "\n") {
           this.line++;
         }
         this.position++;
+      }
+      if (whitespace.length && this.includeWhitespace) {
+        return new Token(WHITESPACE, whitespace);
       }
 
       // read special character token
       const symbol = this.text[this.position];
       if (symbols.includes(symbol)) {
         this.position++;
-        return symbolTokens[symbol];
+        return new Token(symbolTokenTypes[symbol], symbol);
       }
 
       // read integer token
@@ -737,8 +757,9 @@
         this.position++;
       }
       if (word.length) {
-        if (keywords.includes(word)) {
-          return keywordTokens[word];
+        const lowercase = word.toLowerCase();
+        if (keywords.includes(lowercase)) {
+          return new Token(keywordTokenTypes[lowercase], word);
         } else {
           return new Token(IDENTIFIER, word);
         }
@@ -901,7 +922,9 @@
           this.eat(ROUTINE);
           return statement;
       }
-      throw new Error("Error while parsing on line "
+      throw new Error("Error while parsing token "
+                      + this.currentToken
+                      + " on line "
                       + this.tokens.line
                       + ". I have no idea what happened.");
     }
@@ -998,6 +1021,73 @@
     }
   }
 
+  const tokenTypeClassNames = {
+
+    [TokenTypes.IDENTIFIER]: "identifier",
+
+    [TokenTypes.INTEGER]: "number",
+
+    [TokenTypes.NOT]: "keyword",
+    [TokenTypes.IF]: "keyword",
+    [TokenTypes.THEN]: "keyword",
+    [TokenTypes.ELSE]: "keyword",
+    [TokenTypes.WHILE]: "keyword",
+    [TokenTypes.DO]: "keyword",
+    [TokenTypes.REPEAT]: "keyword",
+    [TokenTypes.TIMES]: "keyword",
+    [TokenTypes.PROGRAM]: "keyword",
+    [TokenTypes.ROUTINE]: "keyword",
+
+    [TokenTypes.LPAREN]: "punctuation",
+    [TokenTypes.RPAREN]: "punctuation",
+    [TokenTypes.DOT]: "punctuation",
+    [TokenTypes.ASTERISC]: "punctuation",
+    [TokenTypes.WHITESPACE]: null,
+    [TokenTypes.EOF]: null,
+  };
+
+  function highlight(text) {
+    let html = "";
+    const tokens = new TokenIterator(text, true);
+    let token = tokens.next();
+    while (!token.done) {
+      const className = tokenTypeClassNames[token.type];
+      if (className) {
+        html += `<span class="token ${className}">${token.value}</span>`;
+      } else {
+        html += token.value;
+      }
+      token = tokens.next();
+    }
+    return html;
+  }
+
+  class Editor {
+
+    constructor() {
+      this.textarea = byId("editor");
+      this.highlighted = byId("editor-highlight");
+
+      this.textarea.addEventListener("input", this.update.bind(this));
+      //  more events: paste propertychange
+    }
+
+    get value() {
+      return this.textarea.value;
+    }
+    set value(text) {
+      this.textarea.value = text;
+      this.update();
+    }
+
+    update() {
+      this.highlighted.innerHTML = highlight(this.textarea.value);
+      this.textarea.style.height = this.highlighted.offsetHeight + "px";
+    }
+  }
+
+  var editor = new Editor();
+
   /**
    * Read a .kdw file
    * @param  {File} file DOM file (from input[type="filel"])
@@ -1069,8 +1159,6 @@
   };
 
 
-  const byId = document.getElementById.bind(document);
-  const editor = byId("editor");
   const widthInput = byId("width-input");
   const lengthInput = byId("length-input");
   const heightInput = byId("height-input");

@@ -1,3 +1,7 @@
+/**
+ * Convenience abbreviation of document.getElementById
+ */
+export const byId = document.getElementById.bind(document);
 
 /**
  * Wrapper for fetch API for json files.

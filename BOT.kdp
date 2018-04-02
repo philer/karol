@@ -1,8 +1,7 @@
-
-wiederhole 5 mal
-  schritt
-*wiederhole
-linksdrehen
+Wiederhole 5 mal
+  Schritt()
+*Wiederhole
+LinksDrehen()
 
 hinlegen
 schritt
