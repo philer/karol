@@ -25,6 +25,7 @@
     "browser": true
   },
   "globals": {
-    "Promise": true
+    "Promise": true,
+    "Symbol": true
   }
 }
