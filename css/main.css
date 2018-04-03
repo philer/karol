@@ -93,6 +93,7 @@ body {
   padding: 1em;
   border: none;
   line-height: 1.2em;
+  overflow: hidden; /* inconsistent scroll bars mess up the width */
   white-space: pre-wrap;
   word-wrap: break-word;
   tab-size: 4;
