@@ -36,14 +36,14 @@ body {
   overflow: auto;
 }
 .editor-panel {
-  width: 15em;
+  width: 20em;
   left: 0;
   top: 0;
   bottom: 0;
   border-right: 1px solid #ddd;
 }
 .world-panel {
-  left: 15em;
+  left: 20em;
   right: 0;
   top: 0;
   bottom: 0;
@@ -84,7 +84,7 @@ body {
   width: 100%;
 
   font-size: 14px;
-  line-height: 1.2em;
+  line-height: 1.25em;
   font-family:  Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 #editor-textarea, #editor-highlight {
@@ -96,7 +96,7 @@ body {
   line-height: inherit;
   overflow: hidden; /* inconsistent scroll bars mess up the width */
   white-space: pre-wrap;
-  word-wrap: break-word;
+  word-wrap: break-word; /* word-wrap  = overflow-wrap */
   tab-size: 4;
   background: transparent;
 }
@@ -105,7 +105,7 @@ body {
   left: 0;
   width: 100%;
   min-height: 100%;
-  padding: 1em;
+  padding-left: 3em; /* line numbers */
   margin: 0; /* necessary to prevent ugly offset */
   border-width: 0;
   outline-width: 0;
@@ -124,8 +124,26 @@ body {
   z-index: 2;
   min-height: 100%;
   pointer-events: none;
-  padding-bottom: 2.2em; /* one extra line-height */
+  padding-left: .5em; /* line numbers have extra padding */
+  /*padding-bottom: 2.2em;*/ /* one extra line-height */
   border-bottom: 1px solid transparent;
+}
+#editor-highlight .line {
+  display: flex;
+}
+#editor-highlight .lineno {
+  flex: 0 0 auto;
+  width: 2em;
+  padding-right: .5em;
+  margin-right: .5em;
+  border-right: 1px solid #ddd;
+  text-align: right;
+  word-wrap: normal; /* word-wrap  = overflow-wrap */
+  /*font-size: .8em;*/
+  color: grey;
+}
+#editor-highlight .line-content {
+  flex-grow: 1;
 }
 
 .editor-buttons {
