@@ -1006,7 +1006,11 @@
       const deferredCaretUpdate = () => setTimeout(updateCaret, 0);
       this.textarea.addEventListener("click", deferredCaretUpdate);
       this.textarea.addEventListener("input", deferredCaretUpdate);
+
+      // listening to both because chrome doesn't trigger keydown on arrow keys
+      // while firefox misplaces the cursor with keypress.
       this.textarea.addEventListener("keypress", deferredCaretUpdate);
+      this.textarea.addEventListener("keydown", deferredCaretUpdate);
 
       this.update();
       updateCaret();
