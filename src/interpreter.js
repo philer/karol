@@ -32,9 +32,11 @@ export const TokenTypes = Object.freeze({
 });
 
 class Token {
-  constructor(type, value) {
+  constructor(type, value, line, column) {
     this.type = type;
     this.value = value;
+    this.line = line;
+    this.column = column;
   }
   toString() {
     return this.type + "(" + this.value + ")";
@@ -89,6 +91,7 @@ export class TokenIterator {
     this.includeWhitespace = includeWhitespace;
     this.position = 0;
     this.line = 1;
+    this.column = 1;
   }
 
   /**
@@ -122,19 +125,20 @@ export class TokenIterator {
            && reSpace.test(this.text[this.position])) {
       whitespace += this.text[this.position];
       if (this.text[this.position] === "\n") {
+        this.column = 0;
         this.line++;
       }
-      this.position++;
+      this.position++; this.column++;
     }
     if (whitespace.length && this.includeWhitespace) {
-      return new Token(WHITESPACE, whitespace);
+      return new Token(WHITESPACE, whitespace, this.line, this.column);
     }
 
     // read special character token
     const symbol = this.text[this.position];
     if (symbols.includes(symbol)) {
-      this.position++;
-      return new Token(symbolTokenTypes[symbol], symbol);
+      this.position++; this.column++;
+      return new Token(symbolTokenTypes[symbol], symbol, this.line, this.column);
     }
 
     // read integer token
@@ -142,10 +146,10 @@ export class TokenIterator {
     while (this.position < this.text.length
            && reDigit.test(this.text[this.position])) {
       integer += this.text[this.position];
-      this.position++;
+      this.position++; this.column++;
     }
     if (integer.length) {
-      return new Token(INTEGER, +integer);
+      return new Token(INTEGER, +integer, this.line, this.column);
     }
 
     // read word token
@@ -153,20 +157,20 @@ export class TokenIterator {
     while (this.position < this.text.length
            && reLetter.test(this.text[this.position])) {
       word += this.text[this.position];
-      this.position++;
+      this.position++; this.column++;
     }
     if (word.length) {
       const lowercase = word.toLowerCase();
       if (keywords.includes(lowercase)) {
-        return new Token(keywordTokenTypes[lowercase], word);
+        return new Token(keywordTokenTypes[lowercase], word, this.line, this.column);
       } else {
-        return new Token(IDENTIFIER, word);
+        return new Token(IDENTIFIER, word, this.line, this.column);
       }
     }
 
     // end of file
     if (this.position >= this.text.length) {
-      return new Token(EOF);
+      return new Token(EOF, "", this.line, this.column);
     }
 
     // found nothing useful
@@ -265,7 +269,10 @@ export class Parser {
   }
 
   readStatement() {
-    const statement = {type: this.currentToken.type};
+    const statement = {
+      type: this.currentToken.type,
+      line: this.currentToken.line,
+    };
     switch (this.currentToken.type) {
       case IDENTIFIER:
         return this.readCall();
