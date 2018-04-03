@@ -4,7 +4,7 @@ import {byId} from "./util.js";
 class Editor {
 
   constructor() {
-    this.textarea = byId("editor");
+    this.textarea = byId("editor-textarea");
     this.highlighted = byId("editor-highlight");
 
     this.textarea.addEventListener("input", this.update.bind(this));

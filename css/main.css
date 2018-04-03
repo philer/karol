@@ -65,7 +65,7 @@ body {
   justify-content: stretch;
 }
 
-.editor-container {
+.editor {
   position: relative;
   flex-grow: 1;
   margin: .5em 0;
@@ -84,26 +84,27 @@ body {
   width: 100%;
 
   font-size: 14px;
+  line-height: 1.2em;
   font-family:  Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
-#editor-highlight, textarea#editor {
-  font-size: inherit;
-  font-family: inherit;
+#editor-textarea, #editor-highlight {
   display: block;
   padding: 1em;
   border: none;
-  line-height: 1.2em;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
   overflow: hidden; /* inconsistent scroll bars mess up the width */
   white-space: pre-wrap;
   word-wrap: break-word;
   tab-size: 4;
   background: transparent;
 }
-textarea#editor {
+#editor-textarea {
   position: absolute;
   left: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   padding: 1em;
   margin: 0; /* necessary to prevent ugly offset */
   border-width: 0;
@@ -123,7 +124,6 @@ textarea#editor {
   z-index: 2;
   min-height: 100%;
   pointer-events: none;
-  overflow: auto;
   padding-bottom: 2.2em; /* one extra line-height */
   border-bottom: 1px solid transparent;
 }

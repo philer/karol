@@ -12,10 +12,10 @@
     color: #a0f;
 }
 
-textarea#editor::-moz-selection {
+#editor-textarea::-moz-selection {
     background-color: #999;
 }
-textarea#editor::selection {
+#editor-textarea::selection {
     background-color: #999;
 }
 
