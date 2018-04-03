@@ -278,6 +278,7 @@ canvas#world-canvas {
   justify-content: center;
 }
 .world-output {
+  min-height: 2em;
   overflow-y: scroll;
   border-radius: 3px;
   border: 1px solid #ddd;
