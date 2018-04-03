@@ -49,12 +49,11 @@
   z-index: 1;
   pointer-events: none;
   padding-left: .5em; /* line numbers */
-  /*border-bottom: 1px solid transparent; /* necessary for some reason */
 }
 .editor-textarea {
   z-index: 0;
-  color: transparent;
-  /*color: rgba(255, 0, 0, .5);*/
+  /*opacity: 0;*/ /* hides selection as well -> TODO selection via JS */
+  color: transparent; /* doesn't hide cursor in IE/Edge */
   resize: none;
 }
 .editor-caret-layer {
