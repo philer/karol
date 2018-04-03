@@ -992,11 +992,14 @@
 
     constructor(root) {
       // this.root = root;
+      this.scrollbox = root.getElementsByClassName("editor-scrollbox")[0];
+
       this.textarea = root.getElementsByClassName("editor-textarea")[0];
       this.highlighted = root.getElementsByClassName("editor-highlight")[0];
-      this.scrollbox = root.getElementsByClassName("editor-scrollbox")[0];
-      this.caretLayer = root.getElementsByClassName("editor-caret-layer")[0];
-      this.caret = document.createElement("span");
+
+      const caretLayer = root.getElementsByClassName("editor-caret-layer")[0];
+      this.beforeCaret = caretLayer.appendChild(document.createElement("span"));
+      this.caret = caretLayer.appendChild(document.createElement("span"));
       this.caret.classList.add("editor-caret");
 
       this.textarea.addEventListener("input", this.update.bind(this));
@@ -1034,18 +1037,12 @@
     }
 
     updateCaret() {
-      this.caretLayer.innerHTML = this.textarea.value;
-      this.caretLayerText = this.caretLayer.firstChild;
-      if (this.caretLayerText) {
-        const offset = this.textarea.selectionDirection === "forward"
+      const offset = this.textarea.selectionDirection === "forward"
                      ? this.textarea.selectionEnd
                      : this.textarea.selectionStart;
-        const range = document.createRange();
-        range.setStart(this.caretLayerText, offset);
-        range.insertNode(this.caret);
-      } else {
-        this.caretLayer.appendChild(this.caret);
-      }
+      this.beforeCaret.innerHTML = this.textarea.value.slice(0, offset);
+      this.caret.classList.remove("blink");
+      requestAnimationFrame(() => this.caret.classList.add("blink"));
     }
 
     // gotoLine(lineno) {

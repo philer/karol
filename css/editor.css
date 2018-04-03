@@ -71,6 +71,8 @@
   display: inline;
   border: 1px solid white;
   margin: 0 -1px;
+}
+.editor-caret.blink {
   animation: caretBlink 1s linear infinite alternate;
   animation-delay: .5s;
 }
