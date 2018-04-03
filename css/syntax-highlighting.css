@@ -12,10 +12,10 @@
     color: #a0f;
 }
 
-#editor-textarea::-moz-selection {
+.editor-textarea::-moz-selection {
     background-color: #999;
 }
-#editor-textarea::selection {
+.editor-textarea::selection {
     background-color: #999;
 }
 
@@ -41,3 +41,46 @@
     color: #f8f;
 }
 /**/
+
+/*** Monokai ***/
+.editor {
+    color: #f8f8f2;
+    background: #272822;
+    /*text-shadow: 0 1px rgba(0, 0, 0, 0.3);*/
+}
+.editor-caret {
+    border-color: #f8f8f2;
+}
+.editor-textarea::-moz-selection {
+    background-color: #49483e;
+}
+.editor-textarea::selection {
+    background-color: #49483e;
+}
+.editor-highlight .line.current {
+  background-color: rgba(255, 255, 255, .1);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .2);
+}
+.editor .lineno {
+    border-color: #444;
+}
+.token.keyword {
+    color: #f92672; /* red-ish */
+    font-weight: normal;
+}
+.token.identifier {
+    color: #a6e22e; /* green */
+}
+.token.identifier.builtin {
+    color: #66d9ef;
+}
+.token.comment {
+    color: #75715e;
+}
+.token.punctuation {
+    color: #f8f8f2; /* white */
+}
+.token.boolean,
+.token.number {
+    color: #ae81ff; /* purple */
+}
