@@ -1,4 +1,5 @@
 import * as graphics from "./graphics.js";
+import editor from "./editor.js";
 import {sleep} from "./util.js";
 
 const nativeSymbols = {
@@ -30,7 +31,10 @@ export function setWorld(newWorld) {
   redraw();
 }
 
-export async function execute(identifier, ignore_delay=false) {
+export async function execute(identifier, ignore_delay=false, lineno=null) {
+  if (lineno !== null) {
+    editor.markLine(lineno);
+  }
   const methodName = nativeSymbols[identifier.toLowerCase()];
   if (!methodName) {
     throw new Error(`RunTime Error: ${identifier} is not defined.`);

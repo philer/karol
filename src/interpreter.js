@@ -243,6 +243,7 @@ export class Parser {
     const call = {
       type: IDENTIFIER,
       identifier: this.currentToken.value,
+      line: this.currentToken.line,
     };
     this.forward();
     if (this.currentToken.type === LPAREN) {
@@ -269,10 +270,7 @@ export class Parser {
   }
 
   readStatement() {
-    const statement = {
-      type: this.currentToken.type,
-      line: this.currentToken.line,
-    };
+    const statement = {type: this.currentToken.type};
     switch (this.currentToken.type) {
       case IDENTIFIER:
         return this.readCall();
@@ -398,7 +396,7 @@ export class Interpreter {
           await this.visitSequence(
                         this.routines[statement.identifier]);
         } else {
-          await this.runtime.execute(statement.identifier);
+          await this.runtime.execute(statement.identifier, false, statement.line);
         }
         break;
 

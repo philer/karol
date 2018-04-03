@@ -87,9 +87,9 @@ body {
   line-height: 1.25em;
   font-family:  Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
-#editor-textarea, #editor-highlight {
+.editor-textarea, .editor-highlight {
   display: block;
-  padding: 1em;
+  padding: .5em 1em;
   border: none;
   font-size: inherit;
   font-family: inherit;
@@ -100,7 +100,7 @@ body {
   tab-size: 4;
   background: transparent;
 }
-#editor-textarea {
+.editor-textarea {
   position: absolute;
   left: 0;
   width: 100%;
@@ -119,7 +119,7 @@ body {
   /*caret-color: black;*/
   /*text-shadow: 0 0 1px white;*/
 }
-#editor-highlight {
+.editor-highlight {
   position: relative;
   z-index: 2;
   min-height: 100%;
@@ -128,10 +128,26 @@ body {
   /*padding-bottom: 2.2em;*/ /* one extra line-height */
   border-bottom: 1px solid transparent;
 }
-#editor-highlight .line {
+.editor-highlight .line {
   display: flex;
+  border-radius: 2px;
 }
-#editor-highlight .lineno {
+.editor-highlight .line.current {
+  background-color: #eee;
+  box-shadow: 0 0 0 1px #ddd;
+}
+.editor-highlight .line:not(.current) {
+  transition: .1s background, .1s box-shadow;
+}
+.editor-highlight .line.current::before {
+  content: "➡";
+  position: relative;
+  left: -.5em;
+  font-weight: bold;
+  font-size: 2em;
+  width: 0;
+}
+.editor-highlight .lineno {
   flex: 0 0 auto;
   width: 2em;
   padding-right: .5em;
@@ -142,7 +158,7 @@ body {
   /*font-size: .8em;*/
   color: grey;
 }
-#editor-highlight .line-content {
+.editor-highlight .line-content {
   flex-grow: 1;
 }
 

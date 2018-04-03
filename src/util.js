@@ -1,7 +1,9 @@
 /**
- * Convenience abbreviation of document.getElementById
+ * Convenience abbreviations for document element getters
  */
 export const byId = document.getElementById.bind(document);
+export const byClass = document.getElementsByClassName.bind(document);
+export const byTag = document.getElementsByTagName.bind(document);
 
 /**
  * Load JSON. Fails for local installations.
