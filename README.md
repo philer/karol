@@ -7,20 +7,21 @@ While editing in `src/` use `yarn watch` for automatic bundling.
 
 ## TODO
 
-* anweisung (scopes)
-* schrittweise, pause
-* langsam/schnell/instant anweisungen
-* linenumbers, "debugger"
+* jump to current line
+* pause, step
+* fast/slow/instant
+* routine arguments
+* nested routines (scopes)
 
 * save & load (program & world)
 
-* sprache
+* localization
 
-* tile erweitern
+* extended tiles
 
-* flexibles layout
+* resizable layout
 
-* recording steps
+* recording
 
 * fullscreen, screenshot
 
