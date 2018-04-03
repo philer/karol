@@ -1162,6 +1162,8 @@
 
       this.textarea.addEventListener("input", this.update.bind(this));
       //  more events: paste propertychange
+
+      this.update();
     }
 
     get value() {
