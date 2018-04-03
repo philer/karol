@@ -4,11 +4,38 @@
 export const byId = document.getElementById.bind(document);
 
 /**
- * Wrapper for fetch API for json files.
- * @param  {string} path
+ * Load JSON. Fails for local installations.
+ *
+ * https://mathiasbynens.be/notes/xhr-responsetype-json
+ *
+ * @param  {string} url
  * @return {Promise}
  */
-export const fetchJson = path => fetch(path).then(response => response.json());
+export const getJSON = url => new Promise(function(resolve, reject) {
+  const xhr = new XMLHttpRequest();
+  xhr.open('get', url, true);
+  xhr.responseType = 'json';
+  xhr.onload = function() {
+    if (xhr.status == 200) {
+      resolve(xhr.response);
+    } else {
+      reject(xhr.status);
+    }
+  };
+  xhr.send();
+});
+
+
+export const resolveUrl = (function() {
+  if (URL) {
+    return url => (new URL(url, document.location)).href;
+  }
+  return function compatibleUrlResolver(url) {
+    const a = document.createElement("a");
+    a.href = url;
+    return a.href;
+  };
+})();
 
 /**
  * sleep function for use with await

@@ -4,7 +4,9 @@ import {World} from "./world.js";
 import editor from "./editor.js";
 import {Interpreter} from "./interpreter.js";
 
-import {byId, fetchJson} from "./util.js";
+import getConfig from "./config.js";
+
+import {byId} from "./util.js";
 import {readKdwFile} from "./files.js";
 
 
@@ -129,4 +131,4 @@ function init(/* cfg */) {
 
 }
 
-fetchJson("config.json").then(cfg => graphics.init(cfg).then(init));
+getConfig("config.js").then(cfg => graphics.init(cfg).then(init));

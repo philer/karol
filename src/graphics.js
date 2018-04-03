@@ -7,9 +7,9 @@
  * - multiple canvas layers
  */
 
+import getConfig from "./config.js";
 // import {Random} from "./util.js";
 import * as noise from "./perlin.js";
-import {fetchJson} from "./util.js";
 
 const DEFAULT_THEME_DIR = "img/simple/";
 
@@ -82,10 +82,10 @@ async function initSprites(cfg) {
   const playerThemeDir = (cfg.player_theme || cfg.tile_theme) + "/";
 
   const [tileTheme, playerTheme, defaultTheme] = await Promise.all([
-      tileThemeDir + "theme.json",
-      playerThemeDir + "theme.json",
-      DEFAULT_THEME_DIR + "theme.json",
-    ].map(fetchJson));
+      tileThemeDir + "theme.js",
+      playerThemeDir + "theme.js",
+      DEFAULT_THEME_DIR + "theme.js",
+    ].map(getConfig));
 
   const sizes = Object.assign({}, DEFAULT_SETTINGS, tileTheme);
   tileWidth      = sizes.tile_width;

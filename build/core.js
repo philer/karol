@@ -1,6 +1,76 @@
 (function () {
   'use strict';
 
+  /**
+   * Convenience abbreviation of document.getElementById
+   */
+  const byId = document.getElementById.bind(document);
+
+
+  const resolveUrl = (function() {
+    if (URL) {
+      return url => (new URL(url, document.location)).href;
+    }
+    return function compatibleUrlResolver(url) {
+      const a = document.createElement("a");
+      a.href = url;
+      return a.href;
+    };
+  })();
+
+  /**
+   * sleep function for use with await
+   * @param  {int} ms
+   * @return {Promise}
+   */
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+
+  /**
+   * Wrapper for Math.random to get ints
+   * @param  {int} min
+   * @param  {int} max
+   * @return {int}
+   */
+  const rand = (min, max) => Math.floor(Math.random() * Math.floor(max)) + min;
+
+  const cache = Object.create(null);
+
+  /**
+   * Global function will be called by JSONP style config files.
+   * TODO: May need to adjust the name to something less prone to collisions.
+   * @param  {mixed} data whatever the config file defines
+   */
+  window.config = function setConfigData(data) {
+    cache[document.currentScript.src] = data;
+  };
+
+  /**
+   * Load JSONP style configuration from .js files. This is necessary
+   * so we can load config files in local context (file://).
+   * @param  {String} url relative path to config .js file
+   * @return {Promise}
+   */
+  function get(url) {
+    url = resolveUrl(url);
+    if (url in cache) {
+      return Promise.resolve(cache[url]);
+    }
+    return new Promise(function(resolve, reject) {
+      const script = document.createElement("script");
+      script.onload = function() {
+        resolve(cache[script.src]);
+        script.remove();
+      };
+      script.onerror = function() {
+        reject();
+        script.remove();
+      };
+      document.head.appendChild(script);
+      script.src = url;
+    });
+  }
+
   /*
    * A speed-improved perlin and simplex noise algorithms for 2D.
    *
@@ -153,34 +223,6 @@
   }
 
   /**
-   * Convenience abbreviation of document.getElementById
-   */
-  const byId = document.getElementById.bind(document);
-
-  /**
-   * Wrapper for fetch API for json files.
-   * @param  {string} path
-   * @return {Promise}
-   */
-  const fetchJson = path => fetch(path).then(response => response.json());
-
-  /**
-   * sleep function for use with await
-   * @param  {int} ms
-   * @return {Promise}
-   */
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-
-  /**
-   * Wrapper for Math.random to get ints
-   * @param  {int} min
-   * @param  {int} max
-   * @return {int}
-   */
-  const rand = (min, max) => Math.floor(Math.random() * Math.floor(max)) + min;
-
-  /**
    * Basic isometric graphics inspired by Karol.
    *
    * Potential optimizations:
@@ -260,10 +302,10 @@
     const playerThemeDir = (cfg.player_theme || cfg.tile_theme) + "/";
 
     const [tileTheme, playerTheme, defaultTheme] = await Promise.all([
-        tileThemeDir + "theme.json",
-        playerThemeDir + "theme.json",
-        DEFAULT_THEME_DIR + "theme.json",
-      ].map(fetchJson));
+        tileThemeDir + "theme.js",
+        playerThemeDir + "theme.js",
+        DEFAULT_THEME_DIR + "theme.js",
+      ].map(get));
 
     const sizes = Object.assign({}, DEFAULT_SETTINGS, tileTheme);
     tileWidth      = sizes.tile_width;
@@ -616,7 +658,7 @@
     }
   }
 
-  const MAX_RECURSION_DEPTH = 1000;
+  const MAX_RECURSION_DEPTH = 10;
 
   // token types
   const IDENTIFIER = "IDENTIFIER";
@@ -1311,7 +1353,7 @@
 
   }
 
-  fetchJson("config.json").then(cfg => init(cfg).then(init$1));
+  get("config.js").then(cfg => init(cfg).then(init$1));
 
 }());
 //# sourceMappingURL=core.js.map

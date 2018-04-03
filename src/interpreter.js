@@ -1,4 +1,4 @@
-const MAX_RECURSION_DEPTH = 1000;
+const MAX_RECURSION_DEPTH = 10;
 
 // token types
 const IDENTIFIER = "IDENTIFIER";
