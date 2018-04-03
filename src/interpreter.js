@@ -174,10 +174,12 @@ export class TokenIterator {
     }
 
     // found nothing useful
-    throw new Error("Syntax Error on line "
-                    + this.line
-                    + ": Could not read next token at offset "
-                    + this.position);
+    throw new Error("Syntax Error: Could not read next token in line "
+                    + this.line + " column " + this.column + ".");
+  }
+
+  get remainingText() {
+    return this.text.slice(this.position);
   }
 }
 
@@ -337,11 +339,8 @@ export class Parser {
         this.eat(ROUTINE);
         return statement;
     }
-    throw new Error("Parse Error on line "
-                    + this.tokens.line
-                    + " while parsing token "
-                    + this.currentToken
-                    + ": I have no idea what happened.");
+    throw new Error("Parse Error on line " + this.tokens.line
+                    + ": Unexpected token " + this.currentToken + ".");
   }
 }
 

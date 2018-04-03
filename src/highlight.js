@@ -35,14 +35,19 @@ ttClasses[TT.INTEGER] =  "number";
 export default function highlight(text) {
   let html = "";
   let lineno = 1;
-  for (const token of new TokenIterator(text, true)) {
-    if (token.type in ttClasses) {
-      html += `<span class="token ${ttClasses[token.type]}">${token.value}</span>`;
-    } else {
-      html += token.value.replace(/\n/g, function() {
-        return `</span></span><span class="line"><span class="lineno">${++lineno}</span><span>`;
-      });
+  const tokens = new TokenIterator(text, true);
+  try {
+    for (const token of tokens) {
+      if (token.type in ttClasses) {
+        html += `<span class="token ${ttClasses[token.type]}">${token.value}</span>`;
+      } else {
+        html += token.value.replace(/\n/g, function() {
+          return `</span></span><span class="line"><span class="lineno">${++lineno}</span><span>`;
+        });
+      }
     }
+  } catch (err) {
+    html += tokens.remainingText;
   }
   return `<span class="line"><span class="lineno">1</span><span>${html}</span></span>`;
 }
