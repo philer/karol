@@ -106,9 +106,8 @@
   border-right: 1px solid #ddd;
   text-align: right;
   word-wrap: normal; /* word-wrap  = overflow-wrap */
-  /*font-size: .8em;*/
   color: grey;
 }
-.editor-highlight .line-content {
-  flex-grow: 1;
+.editor-highlight .lineno + span {
+  max-width: calc(100% - 2.5em);
 }
