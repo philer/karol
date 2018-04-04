@@ -46,20 +46,24 @@
   background: transparent;
 }
 .editor-highlight {
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
   padding-left: .5em; /* line numbers */
 }
 .editor-textarea {
   z-index: 0;
-  /*opacity: 0;*/ /* hides selection as well -> TODO selection via JS */
-  color: transparent; /* doesn't hide cursor in IE/Edge */
   resize: none;
+  opacity: 0;
 }
+
+
 .editor-caret-layer {
-  z-index: 2;
-  color: transparent;
+  /* Caret layer contains caret and selection.
+   * Selection should be underneath highlight layer (z-index),
+   * caret above. */
+  position: static;
   pointer-events: none;
+  color: transparent;
 }
 @keyframes caretBlink {
   0% { opacity: 1; }
@@ -68,17 +72,29 @@
   100% { opacity: 0; }
 }
 .editor-caret {
+  position: relative;
+  z-index: 100;
   display: inline;
   border: 1px solid white;
-  margin: 0 -1px;
+  border-width: 3px 1px;
+  margin: -3px -1px;
 }
 .editor-caret.blink {
   animation: caretBlink 1s linear infinite alternate;
   animation-delay: .5s;
 }
-.editor-textarea:not(:focus) ~ .editor-caret-layer {
+.editor-textarea:not(:focus) ~ .editor-caret-layer .editor-caret {
   display: none;
 }
+.editor-selection {
+  padding: 2px;
+  border-radius: 2px;
+}
+.editor-selection:empty {
+  display: none;
+}
+
+
 .editor-highlight .line {
   display: flex;
   border-radius: 2px;

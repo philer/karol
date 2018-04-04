@@ -998,17 +998,20 @@
                                      "gm");
 
       this.scrollbox = root.getElementsByClassName("editor-scrollbox")[0];
-
-      this.textarea = root.getElementsByClassName("editor-textarea")[0];
       this.highlighted = root.getElementsByClassName("editor-highlight")[0];
+      const textarea =  this.textarea
+                     = root.getElementsByClassName("editor-textarea")[0];
+      const caretLayer = this.caretLayer
+                       = root.getElementsByClassName("editor-caret-layer")[0];
 
-      const caretLayer = root.getElementsByClassName("editor-caret-layer")[0];
       this.beforeCaret = caretLayer.appendChild(document.createElement("span"));
       this.caret = caretLayer.appendChild(document.createElement("span"));
       this.caret.classList.add("editor-caret");
+      this.selection = caretLayer.appendChild(document.createElement("span"));
+      this.selection.classList.add("editor-selection");
 
       // chrome ignores keypress
-      this.textarea.addEventListener("keydown", evt => {
+      textarea.addEventListener("keydown", evt => {
         if (evt.key === "Tab" || evt.keyCode === 9) {
            evt.preventDefault();
            if (evt.shiftKey) {
@@ -1019,21 +1022,26 @@
         }
       });
 
-      this.textarea.addEventListener("input", this.update.bind(this));
+      textarea.addEventListener("input", this.update.bind(this));
       //  more events: paste propertychange
 
       const updateCaret = this.updateCaret.bind(this);
       const deferredCaretUpdate = () => setTimeout(updateCaret, 0);
-
-      // Split mousedown and mouseup since selection may not trigger click
-      // and select may not be available.
-      this.textarea.addEventListener("mousedown", deferredCaretUpdate);
-      this.textarea.addEventListener("mouseup", deferredCaretUpdate);
-
       // Listening to both because chrome doesn't trigger keydown on arrow keys
       // while firefox misplaces the cursor with keypress.
-      this.textarea.addEventListener("keypress", deferredCaretUpdate);
-      this.textarea.addEventListener("keydown", deferredCaretUpdate);
+      textarea.addEventListener("keypress", deferredCaretUpdate);
+      textarea.addEventListener("keydown", deferredCaretUpdate);
+
+      // The selectionchange event is not supported on textarea, for some reason.
+      // Instead we keep track of mouse movement while the button is down.
+      textarea.addEventListener("mousedown", function() {
+        this.addEventListener("mousemove", deferredCaretUpdate);
+        deferredCaretUpdate();
+      });
+      textarea.addEventListener("mouseup", function() {
+        this.removeEventListener("mousemove", deferredCaretUpdate);
+        deferredCaretUpdate();
+      });
 
       this.update();
       // updateCaret();
@@ -1054,10 +1062,16 @@
     }
 
     updateCaret() {
-      const offset = this.textarea.selectionDirection === "forward"
-                     ? this.textarea.selectionEnd
-                     : this.textarea.selectionStart;
-      this.beforeCaret.innerHTML = this.textarea.value.slice(0, offset);
+      const {value, selectionDirection, selectionEnd, selectionStart} = this.textarea;
+      // const offset = selectionDirection === "forward" ? selectionEnd : selectionStart;
+      // this.beforeCaret.innerHTML = this.textarea.value.slice(0, offset);
+      this.beforeCaret.innerHTML = value.slice(0, selectionStart);
+
+      // selection may be empty
+      this.selection.innerHTML = value.slice(selectionStart, selectionEnd);
+      this.caret.insertAdjacentElement(selectionDirection === "forward"
+                                          ? "beforebegin" : "afterend",
+                                       this.selection);
 
       // restart animation
       this.caret.classList.remove("blink");
@@ -1080,10 +1094,7 @@
 
 
     indent() {
-      const {value,
-             selectionStart,
-             selectionEnd,
-             selectionDirection} = this.textarea;
+      const {value, selectionStart, selectionEnd, selectionDirection} = this.textarea;
       const selection = value.slice(selectionStart, selectionEnd);
 
       if (selection.includes("\n")) {
@@ -1125,10 +1136,7 @@
     }
 
     unindent() {
-      const {value,
-             selectionStart,
-             selectionEnd,
-             selectionDirection} = this.textarea;
+      const {value, selectionStart, selectionEnd, selectionDirection} = this.textarea;
 
       const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
       let lastLineEnd = value.indexOf("\n", selectionEnd);
