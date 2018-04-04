@@ -42,7 +42,9 @@ export default function highlight(text) {
       if (token.type in ttClasses) {
         html += `<span class="token ${ttClasses[token.type]}">${token.value}</span>`;
       } else {
-        html += token.value.replace(/\n/g, lineSep);
+        html += token.value.replace(/ /g, "·")
+                           // .replace(/\t/g, "––––")
+                           .replace(/\n/g, lineSep);
       }
     }
   } catch (err) {

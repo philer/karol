@@ -44,7 +44,8 @@
 
 /*** Monokai ***/
 .editor {
-    color: #f8f8f2;
+    /*color: #f8f8f2;*/
+    color: #575852;
     background: #272822;
     /*text-shadow: 0 1px rgba(0, 0, 0, 0.3);*/
 }
