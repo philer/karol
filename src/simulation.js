@@ -98,7 +98,7 @@ export async function step() {
  * @param  {int}     lineno      number of code line
  * @return {Promise}
  */
-export async function execute(identifier, ignoreDelay=false, lineno=null) {
+async function execute(identifier, ignoreDelay=false, lineno=null) {
   if (!running) {
     await unpausePromise;
   }
@@ -112,6 +112,7 @@ export async function execute(identifier, ignoreDelay=false, lineno=null) {
     await sleep(delay);
   }
 }
+export {execute};  // babel doesn't hoist properly
 
 /**
  * Execute a single native command (aka. method) and return
