@@ -1,17 +1,9 @@
 .editor {
   position: relative;
-  flex-grow: 1;
-  margin: .5em 0;
 
   font-size: 14px;
   line-height: 1.25em;
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, .1)
-            , 0 0 2px rgba(0, 0, 0, .1);
 }
 .editor-scrollbox {
   overflow: auto;

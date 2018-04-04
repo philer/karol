@@ -20,13 +20,6 @@
     };
   })();
 
-  /**
-   * sleep function for use with await
-   * @param  {int} ms
-   * @return {Promise}
-   */
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
 
   /**
    * Wrapper for Math.random to get ints
@@ -1181,38 +1174,102 @@
     "istwand":       "isLookingAtEdge",
   };
 
+  const interpreter = new Interpreter({execute, evaluate});
+
   let world;
-  let delay_ms = 100;
+  let delay = 100;
+  let useDelay = true;
+  let running = true;
+  let unpausePromise = Promise.resolve();
+  let unpauseResolve = function() {};
+  let interruptSleep;
 
-  function setSpeed(speed) {
-    delay_ms = Math.pow(10, 4 - speed);
-  }
+  const sleep$1 = ms => new Promise(function(resolve) {
+    interruptSleep = resolve;
+    setTimeout(resolve, ms);
+  });
 
-  function redraw() {
-    render(world);
-  }
 
   function setWorld(newWorld) {
     world = newWorld;
     redraw();
   }
 
-  async function execute(identifier, ignore_delay=false, lineno=null) {
-    if (lineno !== null) {
-      editor.markLine(lineno);
-    }
-    const methodName = nativeSymbols[identifier.toLowerCase()];
-    if (!methodName) {
-      throw new Error(`RunTime Error: ${identifier} is not defined.`);
-    }
-    world[methodName]();
-    redraw();
+  /**
+   * Trigger graphics update
+   */
+  function redraw() {
+    render(world);
+  }
 
-    if (!ignore_delay) {
-      await sleep(delay_ms);
+  /**
+   * Set delay between individual steps during code execution.
+   * @param {int} newDelay
+   */
+  function setDelay(newDelay) {
+    delay = newDelay;
+  }
+
+  function pause() {
+    if (running) {
+      running = false;
+      unpausePromise = new Promise(resolve => unpauseResolve = resolve);
     }
   }
 
+  function unpause() {
+    running = true;
+    unpauseResolve();
+  }
+
+  /**
+   * Perform a single step in the currently running code.
+   */
+  async function step() {
+    if (running) {
+      interruptSleep();
+    } else {
+      const _useDelay = useDelay;
+      useDelay = false;
+      unpause();
+      await unpausePromise;
+      pause();
+      useDelay = _useDelay;
+    }
+  }
+
+  /**
+   * Execute a single native command (aka. method).
+   * Waits until the simulation is unpaused (if necessary)
+   * and after the execution waits for a specified delay
+   * (unless suppressed).
+   *
+   * @param  {string}  identifier  name of the builtin
+   * @param  {Boolean} ignoreDelay finish immediately
+   * @param  {int}     lineno      number of code line
+   * @return {Promise}
+   */
+  async function execute(identifier, ignoreDelay=false, lineno=null) {
+    if (!running) {
+      await unpausePromise;
+    }
+    if (lineno !== null) {
+      // TODO should simulation know editor?
+      editor.markLine(lineno);
+    }
+    evaluate(identifier);
+    redraw();
+    if (useDelay && !ignoreDelay) {
+      await sleep$1(delay);
+    }
+  }
+
+  /**
+   * Execute a single native command (aka. method) and return
+   * the result.
+   * @param  {string} identifier name of the builtin
+   * @return {mixed}             return value of the builtin
+   */
   function evaluate(identifier) {
     const methodName = nativeSymbols[identifier.toLowerCase()];
     if (!methodName) {
@@ -1221,13 +1278,22 @@
     return world[methodName]();
   }
 
-  var simulation = /*#__PURE__*/Object.freeze({
-    setSpeed: setSpeed,
-    redraw: redraw,
-    setWorld: setWorld,
-    execute: execute,
-    evaluate: evaluate
-  });
+  /**
+   * Execute a program given as text
+   * @param  {String} code
+   * @return {Promise}
+   */
+  async function run(code) {
+    useDelay = true;
+    unpause();
+    await interpreter.run(code);
+  }
+
+  function stop() {
+    useDelay = false;
+    interpreter.interrupt();
+    interruptSleep();
+  }
 
   class World {
 
@@ -1461,9 +1527,9 @@
     showHeightNoise(!showFlatWorldCheckbox.checked);
 
     simSpeedInput.addEventListener("change", function() {
-      setSpeed(+simSpeedInput.value);
+      setDelay(Math.pow(10, 4 - simSpeedInput.value));
     });
-    setSpeed(+simSpeedInput.value);
+    setDelay(Math.pow(10, 4 - simSpeedInput.value));
 
     let pending = false;
 
@@ -1490,28 +1556,66 @@
       }
     });
 
-    const interpreter = new Interpreter(simulation);
+    const runButton = byId("run-button");
+    const stopButton = byId("stop-button");
+    const stepButton = byId("step-button");
+    const unpauseButton = byId("unpause-button");
+    const pauseButton = byId("pause-button");
 
-    byId("run-button").addEventListener("click", async function(evt) {
+    const enable = (...btns) => btns.map(
+                       btn => btn.removeAttribute("disabled"));
+    const disable = (...btns) => btns.map(
+                        btn => btn.setAttribute("disabled", "disabled"));
+
+    disable(stopButton);
+    disable(stepButton);
+    disable(pauseButton);
+    disable(unpauseButton);
+
+    runButton.addEventListener("click", async function(evt) {
       evt.preventDefault();
-      if (pending) return;
-      pending = true;
+      disable(runButton);
+      enable(stopButton, stepButton, pauseButton);
+
       statusOutput.innerHTML = "";
       statusOutput.classList.remove("status-error");
+      statusOutput.innerHTML = "RUNNING.";
       try {
-        await interpreter.run(editor.value);
+        await run(editor.value);
       } catch (err) {
         statusOutput.innerHTML = err.message;
         statusOutput.classList.add("status-error");
       } finally {
-          pending = false;
-        }
+        enable(runButton);
+        disable(stopButton, stepButton, pauseButton, unpauseButton);
+      }
     });
 
-    byId("stop-button").addEventListener("click", function(evt) {
+    stopButton.addEventListener("click", function(evt) {
       evt.preventDefault();
-      interpreter.interrupt();
+      stop();
       statusOutput.innerHTML = "STOPPED.";
+    });
+
+    stepButton.addEventListener("click", function(evt) {
+      evt.preventDefault();
+      step();
+    });
+
+    pauseButton.addEventListener("click", function(evt) {
+      evt.preventDefault();
+      pause();
+      statusOutput.innerHTML = "PAUSED.";
+      disable(pauseButton);
+      enable(unpauseButton);
+    });
+
+    unpauseButton.addEventListener("click", function(evt) {
+      evt.preventDefault();
+      unpause();
+      statusOutput.innerHTML = "RUNNING.";
+      disable(unpauseButton);
+      enable(pauseButton);
     });
 
     resetSimulation();

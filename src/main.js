@@ -2,7 +2,6 @@ import * as graphics from "./graphics.js";
 import * as simulation from "./simulation.js";
 import {World} from "./world.js";
 import editor from "./editor.js";
-import {Interpreter} from "./interpreter.js";
 
 import getConfig from "./config.js";
 
@@ -69,9 +68,9 @@ function init(/* cfg */) {
   graphics.showHeightNoise(!showFlatWorldCheckbox.checked);
 
   simSpeedInput.addEventListener("change", function() {
-    simulation.setSpeed(+simSpeedInput.value);
+    simulation.setDelay(Math.pow(10, 4 - simSpeedInput.value));
   });
-  simulation.setSpeed(+simSpeedInput.value);
+  simulation.setDelay(Math.pow(10, 4 - simSpeedInput.value));
 
   let pending = false;
 
@@ -98,28 +97,66 @@ function init(/* cfg */) {
     }
   });
 
-  const interpreter = new Interpreter(simulation);
+  const runButton = byId("run-button");
+  const stopButton = byId("stop-button");
+  const stepButton = byId("step-button");
+  const unpauseButton = byId("unpause-button");
+  const pauseButton = byId("pause-button");
 
-  byId("run-button").addEventListener("click", async function(evt) {
+  const enable = (...btns) => btns.map(
+                     btn => btn.removeAttribute("disabled"));
+  const disable = (...btns) => btns.map(
+                      btn => btn.setAttribute("disabled", "disabled"));
+
+  disable(stopButton);
+  disable(stepButton);
+  disable(pauseButton);
+  disable(unpauseButton);
+
+  runButton.addEventListener("click", async function(evt) {
     evt.preventDefault();
-    if (pending) return;
-    pending = true;
+    disable(runButton);
+    enable(stopButton, stepButton, pauseButton);
+
     statusOutput.innerHTML = "";
     statusOutput.classList.remove("status-error");
+    statusOutput.innerHTML = "RUNNING.";
     try {
-      await interpreter.run(editor.value);
+      await simulation.run(editor.value);
     } catch (err) {
       statusOutput.innerHTML = err.message;
       statusOutput.classList.add("status-error");
     } finally {
-        pending = false;
-      }
+      enable(runButton);
+      disable(stopButton, stepButton, pauseButton, unpauseButton);
+    }
   });
 
-  byId("stop-button").addEventListener("click", function(evt) {
+  stopButton.addEventListener("click", function(evt) {
     evt.preventDefault();
-    interpreter.interrupt();
+    simulation.stop();
     statusOutput.innerHTML = "STOPPED.";
+  });
+
+  stepButton.addEventListener("click", function(evt) {
+    evt.preventDefault();
+    simulation.step();
+  });
+
+  pauseButton.addEventListener("click", function(evt) {
+    evt.preventDefault();
+    simulation.pause();
+    statusOutput.innerHTML = "PAUSED.";
+    disable(pauseButton);
+    enable(unpauseButton);
+  });
+
+  unpauseButton.addEventListener("click", function(evt) {
+    evt.preventDefault();
+    simulation.unpause();
+    statusOutput.innerHTML = "RUNNING.";
+    disable(unpauseButton);
+    enable(pauseButton);
   });
 
   resetSimulation();

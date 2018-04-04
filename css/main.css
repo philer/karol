@@ -6,6 +6,34 @@
 button::-moz-focus-inner {
   border: 0;
 }
+button, input[type="file"] {
+  position: relative;
+  margin: .25em 0;
+  padding: 0 1em;
+  line-height: 2em;
+  background: white;
+  border-radius: 3px;
+  color: #444;
+  background: #e8e8e8;
+  text-shadow: 1px 1px 0px white;
+  border: 1px solid #d0d0d0;
+  border-color: #fff #d8d8d8 #ccc #f5f5f5;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, .2),
+              inset -1px -2px 1em rgba(0, 0, 0, .05);
+  cursor: pointer;
+  transition: .2s background, .2s box-shadow, .2s text-shadow;
+  outline: none;
+}
+button:not(:disabled):hover {
+  z-index: 1;
+  background-color: #fff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, .2),
+              inset -1px -2px 1em rgba(0, 0, 0, .1);
+}
+button:disabled {
+  color: #aaa;
+  cursor: default;
+}
 
 
 html {
@@ -66,36 +94,39 @@ body {
   flex-direction: column;
   justify-content: stretch;
 }
-.editor-buttons {
+.editor-wrapper {
+  flex: 1 1 auto;
   display: flex;
-}
-button, input[type="file"] {
-  margin: .25em 0;
-  padding: 0 1em;
-  line-height: 2em;
-  background: white;
+  flex-direction: column;
+  justify-content: stretch;
+  margin-top: .5em;
+  background-color: white;
+  border: 1px solid #ddd;
   border-radius: 3px;
-  background: #e8e8e8;
-  text-shadow: 1px 1px 0px white;
-  border: 1px solid #d0d0d0;
-  border-color: #fff #d8d8d8 #ccc #f5f5f5;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, .2),
-              inset -1px -2px 1em rgba(0, 0, 0, .05);
-  cursor: pointer;
-  transition: .2s background, .2s box-shadow, .2s text-shadow;
-  outline: none;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, .1)
+            , 0 0 2px rgba(0, 0, 0, .1);
 }
-button:hover {
-  background-color: #fff;
-  box-shadow: 0 0 6px rgba(0, 0, 0, .2),
-              inset -1px -2px 1em rgba(0, 0, 0, .1);
-}
-#run-button {
+.editor {
   flex: 1 1 auto;
 }
-#stop-button {
-  flex: 0 0 auto;
-  margin-left: .5em;
+.editor-buttons {
+  display: flex;
+  padding: 3px 4px 4px 3px;
+}
+.editor-buttons button {
+  margin: 0;
+  flex:  1 1 auto;
+}
+#run-button {
+  margin-right: .5em;
+}
+#unpause-button,
+#pause-button,
+#step-button,
+#stop-button
+{
+  flex: 0 0 0;
+  padding: 0 .75em;
 }
 
 /** world **/
