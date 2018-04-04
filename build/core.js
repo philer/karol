@@ -993,7 +993,6 @@
   class Editor {
 
     constructor(root, indentation="    ") {
-      // this.root = root;
       this.indentation = indentation;
       this.unindenRegex = new RegExp("^" + indentation.split("").join("?") + "?",
                                      "gm");
@@ -1008,8 +1007,9 @@
       this.caret = caretLayer.appendChild(document.createElement("span"));
       this.caret.classList.add("editor-caret");
 
-      this.textarea.addEventListener("keypress", evt => {
-        if (evt.keyCode === 9) {
+      // chrome ignores keypress
+      this.textarea.addEventListener("keydown", evt => {
+        if (evt.key === "Tab" || evt.keyCode === 9) {
            evt.preventDefault();
            if (evt.shiftKey) {
              this.unindent();
@@ -1024,7 +1024,6 @@
 
       const updateCaret = this.updateCaret.bind(this);
       const deferredCaretUpdate = () => setTimeout(updateCaret, 0);
-      this.textarea.addEventListener("input", deferredCaretUpdate);
 
       // Split mousedown and mouseup since selection may not trigger click
       // and select may not be available.
@@ -1037,7 +1036,7 @@
       this.textarea.addEventListener("keydown", deferredCaretUpdate);
 
       this.update();
-      updateCaret();
+      // updateCaret();
     }
 
     get value() {
@@ -1051,6 +1050,7 @@
     update() {
       this.highlighted.innerHTML = highlight(this.textarea.value);
       this.textarea.style.height = this.highlighted.offsetHeight + "px";
+      this.updateCaret();
     }
 
     updateCaret() {
@@ -1058,6 +1058,8 @@
                      ? this.textarea.selectionEnd
                      : this.textarea.selectionStart;
       this.beforeCaret.innerHTML = this.textarea.value.slice(0, offset);
+
+      // restart animation
       this.caret.classList.remove("blink");
       requestAnimationFrame(() => this.caret.classList.add("blink"));
     }
