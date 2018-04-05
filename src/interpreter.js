@@ -193,6 +193,9 @@ export class TokenIterator {
       // multi-line comment
       if (token === "{") {
         this.position = this.text.indexOf("}", start) + 1;
+        if (this.position < start) { // open comment
+          this.position = this.text.length;
+        }
         this.column += this.position - start;
         if (this.yieldComments) {
           return new Token(COMMENT, this.text.slice(start, this.position),
