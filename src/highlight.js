@@ -7,23 +7,19 @@ const ttClasses = Object.create(null);
 
 ttClasses[TT.IDENTIFIER] = "identifier";
 ttClasses[TT.INTEGER] =  "number";
+ttClasses[TT.COMMENT] = "comment";
 [
   TT.NOT,
-  TT.IF,
-  TT.THEN,
-  TT.ELSE,
-  TT.WHILE,
-  TT.DO,
-  TT.REPEAT,
-  TT.TIMES,
-  TT.PROGRAM,
-  TT.ROUTINE,
+  TT.IF, TT.THEN, TT.ELSE,
+  TT.WHILE, TT.DO, TT.REPEAT, TT.TIMES,
+  TT.PROGRAM, TT.ROUTINE,
 ].forEach(tt => ttClasses[tt] = "keyword");
 [
-  TT.LPAREN,
-  TT.RPAREN,
-  TT.DOT,
-  TT.ASTERISC,
+  TT.LPAREN, TT.RPAREN, TT.LBRACKET, TT.RBRACKET, TT.LBRACE, TT.RBRACE,
+  TT.LESS, TT.GREATER, TT.EQUALS,
+  TT.ASTERISC, TT.SLASH, TT.HYPHENMINUS, TT.PLUS,
+  TT.DOT, TT.COMMA, TT.COLON, TT.SEMI,
+  TT.SINGLEQUOTE, TT.DOUBLEQUOTE,
 ].forEach(tt => ttClasses[tt] = "punctuation");
 
 
@@ -36,7 +32,7 @@ export default function highlight(text) {
   let html = "";
   let lineno = 1;
   const lineSep = () => `</span></span><span class="line"><span class="lineno">${++lineno}</span><span>`;
-  const tokens = new TokenIterator(text, true);
+  const tokens = new TokenIterator(text, true, true);
   try {
     for (const token of tokens) {
       if (token.type in ttClasses) {

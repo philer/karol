@@ -68,6 +68,21 @@ export const domReady = document.readyState === "loading"
                           : Promise.resolve();
 
 /**
+ * Count how many times a character appears in a string.
+ * @param  {String} char
+ * @param  {String} str
+ * @return {int}
+ */
+export function countOccurences(char, str) {
+  let count = 0;
+  str.replace(char, function() {
+    count++;
+    return char;
+  });
+  return count;
+}
+
+/**
  * Wrapper for Math.random to get ints
  * @param  {int} min
  * @param  {int} max

@@ -17,18 +17,38 @@ const ROUTINE = "ROUTINE";
 
 const LPAREN = "LPAREN";
 const RPAREN = "RPAREN";
-const DOT = "DOT";
+const LBRACKET = "LBRACKET";
+const RBRACKET = "RBRACKET";
+const LBRACE = "LBRACE";
+const RBRACE = "RBRACE";
+const LESS = "LESS";
+const GREATER = "GREATER";
+const EQUALS = "EQUALS";
 const ASTERISC = "ASTERISC";
+const SLASH = "SLASH";
+const HYPHENMINUS = "HYPHENMINUS";
+const PLUS = "PLUS";
+const DOT = "DOT";
+const COMMA = "COMMA";
+const COLON = "COLON";
+const SEMI = "SEMI";
+const SINGLEQUOTE = "SINGLEQUOTE";
+const DOUBLEQUOTE = "DOUBLEQUOTE";
 
 const WHITESPACE = "WHITESPACE";
+const COMMENT = "COMMENT";
 const EOF = "EOF";
 
 export const TokenTypes = Object.freeze({
   IDENTIFIER, INTEGER, NOT,
   IF, THEN, ELSE, WHILE, DO, REPEAT, TIMES,
   PROGRAM, ROUTINE,
-  LPAREN, RPAREN, DOT, ASTERISC,
-  WHITESPACE, EOF,
+  LPAREN, RPAREN, LBRACKET, RBRACKET, LBRACE, RBRACE,
+  LESS, GREATER, EQUALS,
+  ASTERISC, SLASH, HYPHENMINUS, PLUS,
+  DOT, COMMA, COLON, SEMI,
+  SINGLEQUOTE, DOUBLEQUOTE,
+  WHITESPACE, COMMENT, EOF,
 });
 
 class Token {
@@ -65,33 +85,47 @@ const keywordTokenTypes = {
   "anweisung":  ROUTINE,
   "routine":    ROUTINE,
 };
-const keywords = Object.keys(keywordTokenTypes);
-
 const symbolTokenTypes = {
   "(": LPAREN,
   ")": RPAREN,
-  ".": DOT,
+  "[": LBRACKET,
+  "]": RBRACKET,
+  "{": LBRACE,
+  "}": RBRACE,
+  "<": LESS,
+  ">": GREATER,
+  "=": EQUALS,
   "*": ASTERISC,
+  "/": SLASH,
+  "-": HYPHENMINUS,
+  "+": PLUS,
+  ".": DOT,
+  ",": COMMA,
+  ":": COLON,
+  ";": SEMI,
+  "'": SINGLEQUOTE,
+  '"': DOUBLEQUOTE,
 };
-const symbols = Object.keys(symbolTokenTypes);
-
+const symbols = new Set(Object.keys(symbolTokenTypes));
 
 
 const reSpace = /\s/;
 const reDigit = /[0-9]/;
-const reLetter = /[A-Za-z_]/i;
+const reLetter = /[A-Za-z0-9_]/i;
 
 /**
  * Iterable lexer
  */
 export class TokenIterator {
 
-  constructor(text, includeWhitespace=false) {
+  constructor(text, yieldWhitespace=false, yieldComments=false) {
     this.text = text;
-    this.includeWhitespace = includeWhitespace;
+    this.yieldWhitespace = yieldWhitespace;
+    this.yieldComments = yieldComments;
     this.position = 0;
     this.line = 1;
     this.column = 1;
+    this.eof = false;
   }
 
   /**
@@ -119,63 +153,94 @@ export class TokenIterator {
    * @return {Token}
    */
   nextToken() {
-    // eat whitespace, stop when we're done.
-    let whitespace = "";
-    while (this.position < this.text.length
-           && reSpace.test(this.text[this.position])) {
-      whitespace += this.text[this.position];
-      if (this.text[this.position] === "\n") {
-        this.column = 0;
-        this.line++;
+    let token, start;
+
+    // eat optional tokens
+    do {
+      const {column, line} = this;
+      start = this.position;
+      token = "";
+
+      // whitespace
+      while (this.position < this.text.length
+             && reSpace.test(this.text[this.position])) {
+        token += this.text[this.position];
+        if (this.text[this.position] === "\n") {
+          this.column = 0;
+          this.line++;
+        }
+        this.position++; this.column++;
       }
-      this.position++; this.column++;
-    }
-    if (whitespace.length && this.includeWhitespace) {
-      return new Token(WHITESPACE, whitespace, this.line, this.column);
-    }
-
-    // read special character token
-    const symbol = this.text[this.position];
-    if (symbols.includes(symbol)) {
-      this.position++; this.column++;
-      return new Token(symbolTokenTypes[symbol], symbol, this.line, this.column);
-    }
-
-    // read integer token
-    let integer = "";
-    while (this.position < this.text.length
-           && reDigit.test(this.text[this.position])) {
-      integer += this.text[this.position];
-      this.position++; this.column++;
-    }
-    if (integer.length) {
-      return new Token(INTEGER, +integer, this.line, this.column);
-    }
-
-    // read word token
-    let word = "";
-    while (this.position < this.text.length
-           && reLetter.test(this.text[this.position])) {
-      word += this.text[this.position];
-      this.position++; this.column++;
-    }
-    if (word.length) {
-      const lowercase = word.toLowerCase();
-      if (keywords.includes(lowercase)) {
-        return new Token(keywordTokenTypes[lowercase], word, this.line, this.column);
-      } else {
-        return new Token(IDENTIFIER, word, this.line, this.column);
+      if (token.length) {
+        if (this.yieldWhitespace) {
+          return new Token(WHITESPACE, token, line, column);
+        }
+        continue;
       }
+
+      token = this.text[this.position];
+
+      // single-line comment
+      if (token + this.text[start + 1] === "//") {
+        this.position = this.text.indexOf("\n", start);
+        this.column += this.position - start;
+        if (this.yieldComments) {
+          return new Token(COMMENT, this.text.slice(start, this.position),
+                           line, column);
+        }
+        continue;
+      }
+      // multi-line comment
+      if (token === "{") {
+        this.position = this.text.indexOf("}", start) + 1;
+        this.column += this.position - start;
+        if (this.yieldComments) {
+          return new Token(COMMENT, this.text.slice(start, this.position),
+                           line, column);
+        }
+        continue;
+      }
+    } while (start < this.position);
+
+    const {column, line} = this;
+
+    // special character
+    token = this.text[this.position];
+    if (symbols.has(token)) {
+      this.position++; this.column++;
+      return new Token(symbolTokenTypes[token], token, line, column);
+    }
+
+    // integer
+    token = this.readWhile(reDigit);
+    if (token.length) {
+      return new Token(INTEGER, +token, line, column);
+    }
+
+    // word (identifier / keyword)
+    token = this.readWhile(reLetter);
+    if (token.length) {
+      return new Token(keywordTokenTypes[token.toLowerCase()] || IDENTIFIER,
+                       token, line, column);
     }
 
     // end of file
     if (this.position >= this.text.length) {
-      return new Token(EOF, "", this.line, this.column);
+      return new Token(EOF, "", line, column);
     }
 
     // found nothing useful
-    throw new Error("Syntax Error: Could not read next token in line "
-                    + this.line + " column " + this.column + ".");
+    throw new Error(`Syntax Error: Could not read next token in line ${line} column ${column}.`);
+  }
+
+  readWhile(regex) {
+    let token = "";
+    while (this.position < this.text.length
+           && regex.test(this.text[this.position])) {
+      token += this.text[this.position];
+      this.position++; this.column++;
+    }
+    return token;
   }
 
   get remainingText() {

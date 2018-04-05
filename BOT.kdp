@@ -1,4 +1,7 @@
+{ Legt das Wort BOT }
+
 anweisung buchstabe_B
+    // Strich senkrecht
     hinlegen
     schritt
     linksdrehen
@@ -6,6 +9,7 @@ anweisung buchstabe_B
         hinlegen
         schritt
     *wiederhole
+    // Bäuche
     rechtsdrehen
     hinlegen schritt
     hinlegen schritt
