@@ -7,6 +7,17 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/editor.css">
     <link rel="stylesheet" href="css/syntax-highlighting.css">
+
+    <!-- <script async src="build/core.js"></script> -->
+    <script>
+      /* ES6 feature detection. Source: github.com/bevacqua/sixflix */
+      try {
+        eval('class ಠ_ಠ extends Array{constructor(j=`a`,...c){const q=(({u: e})=>{return {[`${c}`]:Symbol(j)};})({});super(j,q,...c)}}new Promise(f=>{const a=function*(){return "\\u{20BB7}".match(/./u)[0].length===2||!0};for (let z of a()){const [x,y,w,k]=[new Set(),new WeakSet(),new Map(), new WeakMap()];break}f(new Proxy({},{get:(h,i) =>i in h ?h[i]:"j".repeat(0o2)}))}).then(t => new ಠ_ಠ(t.d))');
+        document.write('<script async src="build/core.min.js"></scr'+'ipt>');
+      } catch(e) {
+        document.write('<script async src="build/core-old-browsers.min.js"></scr'+'ipt>');
+      }
+    </script>
   </head>
   <body>
 
@@ -19,7 +30,7 @@
           <button id="program-load-button" disabled="disabled">Save</button>
           <button id="program-save-button" disabled="disabled">Load</button>
         </div>
-        <div class="editor">
+        <div id="editor" class="editor">
           <div class="editor-scrollbox">
             <code class="editor-highlight"></code>
             <textarea class="editor-textarea" spellcheck="false"></textarea>
@@ -92,19 +103,7 @@
 
       <div class="world-output">
         <p id="status-text"></p>
-        <!-- <pre id="debug-text"></pre> -->
       </div>
     </section>
-
-    <script>
-/* ES6 feature detection. Source: github.com/bevacqua/sixflix */
-try {
-  eval('class ಠ_ಠ extends Array{constructor(j=`a`,...c){const q=(({u: e})=>{return {[`${c}`]:Symbol(j)};})({});super(j,q,...c)}}new Promise(f=>{const a=function*(){return "\\u{20BB7}".match(/./u)[0].length===2||!0};for (let z of a()){const [x,y,w,k]=[new Set(),new WeakSet(),new Map(), new WeakMap()];break}f(new Proxy({},{get:(h,i) =>i in h ?h[i]:"j".repeat(0o2)}))}).then(t => new ಠ_ಠ(t.d))');
-  document.write('<script src="build/core.min.js"></scr'+'ipt>');
-} catch(e) {
-  document.write('<script src="build/core-old-browsers.min.js"></scr'+'ipt>');
-}
-    </script>
-    <!-- <script src="build/core.js"></script> -->
   </body>
 </html>

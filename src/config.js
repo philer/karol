@@ -8,7 +8,7 @@ const cache = Object.create(null);
  * @param  {mixed} data whatever the config file defines
  */
 window.config = function setConfigData(data) {
-  cache[document.currentScript.src] = data;
+  cache[document.currentScript.src] = Object.freeze(data);
 };
 
 /**
@@ -17,7 +17,7 @@ window.config = function setConfigData(data) {
  * @param  {String} url relative path to config .js file
  * @return {Promise}
  */
-export default function get(url) {
+export function get(url="config.js") {
   url = resolveUrl(url);
   if (url in cache) {
     return Promise.resolve(cache[url]);
@@ -36,4 +36,3 @@ export default function get(url) {
     script.src = url;
   });
 }
-

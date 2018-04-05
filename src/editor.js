@@ -1,7 +1,6 @@
 import highlight from "./highlight.js";
-import {byClass} from "./util.js";
 
-class Editor {
+export class Editor {
 
   constructor(root, indentation="    ") {
     this.indentation = indentation;
@@ -99,7 +98,10 @@ class Editor {
     for (const line of this.highlighted.getElementsByClassName("current")) {
       line.classList.remove("current");
     }
-    this.highlighted.children[lineno - 1].classList.add("current");
+    const line = this.highlighted.children[lineno - 1];
+    if (line) {
+      line.classList.add("current");
+    }
     // this.gotoLine(lineno);
   }
 
@@ -176,5 +178,3 @@ class Editor {
     this.update();
   }
 }
-
-export default new Editor(byClass("editor")[0]);

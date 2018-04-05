@@ -7,8 +7,8 @@
  * - multiple canvas layers
  */
 
-import getConfig from "./config.js";
-// import {Random} from "./util.js";
+import * as config from "./config.js";
+import {domReady} from "./util.js";
 import * as noise from "./perlin.js";
 
 const DEFAULT_THEME_DIR = "img/simple/";
@@ -55,8 +55,11 @@ export function showHeightNoise(show=true) {
  * Initialize the module. Loads graphics.
  * @return {Promise}
  */
-export function init(cfg) {
-  return Promise.all([initSprites(cfg), initCanvas()]);
+export async function init() {
+  await Promise.all([
+    initSprites(await config.get()),
+    initCanvas(),
+  ]);
 }
 
 /**
@@ -64,6 +67,7 @@ export function init(cfg) {
  * @return {Promise}
  */
 async function initCanvas() {
+  await domReady;
   canvas = document.getElementById("world-canvas");
   ctx = canvas.getContext("2d");
   ctx.mozImageSmoothingEnabled = false;
@@ -85,7 +89,7 @@ async function initSprites(cfg) {
       tileThemeDir + "theme.js",
       playerThemeDir + "theme.js",
       DEFAULT_THEME_DIR + "theme.js",
-    ].map(getConfig));
+    ].map(config.get));
 
   const sizes = Object.assign({}, DEFAULT_SETTINGS, tileTheme);
   tileWidth      = sizes.tile_width;

@@ -1,4 +1,10 @@
 /**
+ * "No Operation" empty function - does nothing.
+ * @return {undefined}
+ */
+export function noop() {}
+
+/**
  * Convenience abbreviations for document element getters
  */
 export const byId = document.getElementById.bind(document);
@@ -46,6 +52,20 @@ export const resolveUrl = (function() {
  */
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+/**
+ * Await a global event
+ * @param  {String} evt event name
+ * @return {Promise}
+ */
+export const event = evt => new Promise(resolve => addEventListener(evt, resolve));
+
+/**
+ * Promise fulfilled on DOMContentLoaded
+ * @type {Promise}
+ */
+export const domReady = document.readyState === "loading"
+                          ? event("DOMContentLoaded")
+                          : Promise.resolve();
 
 /**
  * Wrapper for Math.random to get ints

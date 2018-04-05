@@ -1,6 +1,8 @@
-import * as graphics from "./graphics.js";
-import editor from "./editor.js";
+import {World} from "./world.js";
 import {Interpreter} from "./interpreter.js";
+import * as graphics from "./graphics.js";
+
+import {noop} from "./util.js";
 
 const nativeSymbols = {
   "linksdrehen":   "turnLeft",
@@ -20,10 +22,12 @@ const interpreter = new Interpreter({execute, evaluate});
 let world;
 let delay = 100;
 let useDelay = true;
-let running = true;
+let running = false;
+let paused = false;
 let unpausePromise = Promise.resolve();
-let unpauseResolve = function() {};
-let interruptSleep;
+let unpauseResolve = noop;
+let interruptSleep = noop;
+let execCallback = noop;
 
 const sleep = ms => new Promise(function(resolve) {
   interruptSleep = resolve;
@@ -34,6 +38,18 @@ const sleep = ms => new Promise(function(resolve) {
 export function setWorld(newWorld) {
   world = newWorld;
   redraw();
+}
+
+export function setWorldDimensions(width, length, height) {
+  setWorld(new World(width, length, height));
+}
+
+export function isRunning() {
+  return running;
+}
+
+export function isPaused() {
+  return paused;
 }
 
 /**
@@ -51,44 +67,51 @@ export function setDelay(newDelay) {
   delay = newDelay;
 }
 
+export function onExecute(fn) {
+  execCallback = fn;
+}
+
 export function pause() {
-  if (running) {
-    running = false;
+  if (!paused) {
+    paused = true;
     unpausePromise = new Promise(resolve => unpauseResolve = resolve);
   }
 }
 
 export function unpause() {
-  running = true;
-  unpauseResolve();
-}
-
-export function isPaused() {
-  return !running;
+  if (paused) {
+    paused = false;
+    interruptSleep();
+    unpauseResolve();
+  }
 }
 
 export function togglePause() {
-  (running ? pause : unpause)();
+  (paused ? pause : unpause)();
 }
 
 /**
  * Perform a single step in the currently running code.
  */
 export async function step() {
-  if (running) {
-    interruptSleep();
-  } else {
+  if (!running) {
+    return;
+  }
+  if (paused) {
     const _useDelay = useDelay;
     useDelay = false;
     unpause();
     await unpausePromise;
     pause();
     useDelay = _useDelay;
+  } else {
+    interruptSleep();
   }
 }
 
 /**
  * Execute a single native command (aka. method).
+ * This method is called by a running program.
  * Waits until the simulation is unpaused (if necessary)
  * and after the execution waits for a specified delay
  * (unless suppressed).
@@ -98,21 +121,30 @@ export async function step() {
  * @param  {int}     lineno      number of code line
  * @return {Promise}
  */
-async function execute(identifier, ignoreDelay=false, lineno=null) {
+async function execute(identifier, lineno=null) {
+  await unpausePromise;
   if (!running) {
-    await unpausePromise;
+    return;
   }
-  if (lineno !== null) {
-    // TODO should simulation know editor?
-    editor.markLine(lineno);
-  }
+  execCallback(identifier, lineno);
   evaluate(identifier);
   redraw();
-  if (useDelay && !ignoreDelay) {
+  if (useDelay) {
     await sleep(delay);
   }
 }
-export {execute};  // babel doesn't hoist properly
+
+/**
+ * Execute a single native command (aka. method) and
+ * redraw. Use this for commands that have a visual effect
+ * on the world view.
+ * @param  {String} indentifier
+ * @return {undefined}
+ */
+export function runCommand(indentifier) {
+  evaluate(indentifier);
+  redraw();
+}
 
 /**
  * Execute a single native command (aka. method) and return
@@ -135,12 +167,14 @@ export function evaluate(identifier) {
  */
 export async function run(code) {
   useDelay = true;
+  running = true;
   unpause();
   await interpreter.run(code);
 }
 
 export function stop() {
-  useDelay = false;
   interpreter.interrupt();
-  interruptSleep();
+  running = false;
+  useDelay = false;
+  unpause();
 }

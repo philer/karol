@@ -395,7 +395,7 @@ export class Interpreter {
           await this.visitSequence(
                         this.routines[statement.identifier]);
         } else {
-          await this.runtime.execute(statement.identifier, false, statement.line);
+          await this.runtime.execute(statement.identifier, statement.line);
         }
         break;
 
