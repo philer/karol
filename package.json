@@ -6,10 +6,10 @@
   "author": "Philipp Miller",
   "license": "MIT",
   "scripts": {
-    "build": "rollup -c rollup.config.js",
-    "watch": "rollup -c rollup.config.js --watch",
-    "dist": "NODE_ENV=production rollup -c rollup.config.js",
-    "lint": "eslint src/* --cache --cache-location /tmp/ --format node_modules/eslint-friendly-formatter"
+    "build": "rollup -c",
+    "watch": "rollup -c --watch",
+    "dist": "NODE_ENV=production rollup -c",
+    "lint": "eslint src/* --cache --format node_modules/eslint-friendly-formatter"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

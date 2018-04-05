@@ -1,3 +1,4 @@
+import * as config from "./config.js";
 import * as graphics from "./graphics.js";
 import * as simulation from "./simulation.js";
 import {Editor} from "./editor.js";
@@ -174,8 +175,12 @@ function initEditorButtons() {
 }
 
 
+
 /*** MAIN INIT ***/
 (async function init() {
+  const editorTheme = (await config.get()).editor_theme || "bright";
+  byId("editor-theme-stylesheet").href = `css/editor-theme-${editorTheme}.css`;
+
   await Promise.all([
     graphics.init(),
     domReady,

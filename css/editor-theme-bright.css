@@ -1,0 +1,46 @@
+/***************************
+ *** bright color scheme ***
+ ***************************/
+
+.editor {
+    background: white;
+    color: #ccc; /* whitespace color */
+}
+.editor-caret {
+    border-color: black;
+}
+.editor-selection {
+  background-color: #e1e1e1;
+}
+.editor-textarea:not(:focus) ~ .editor-caret-layer .editor-selection {
+    background-color: #efefef;
+}
+.editor-highlight .line.current {
+  background-color: #eee;
+  box-shadow: 0 0 0 1px #ddd;
+}
+.editor-highlight .line.current::before {
+    color: #666; /* arrow */
+}
+
+.editor .lineno {
+    border-color: #ddd;
+}
+
+.token.keyword {
+    color: #06e;
+    font-weight: bold;
+}
+.token.identifier {
+    color: #272;
+}
+.token.comment {
+    color: #888;
+    font-style: italic;
+}
+.token.punctuation {
+    color: #653;
+}
+.token.number {
+    color: #a0f;
+}
