@@ -19,7 +19,7 @@ body {
   left: .5em;
   right: .5em;
   bottom: .5em;
-  background-color: #eff9ff;
+  background-color: #f7f7f7;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
@@ -120,7 +120,7 @@ i.fa { /* prevent page load flicker */
   display: flex;
   align-items: center;
   padding: 0 .25em;
-  color: #147;
+  color: #444;
   text-shadow: 1px 1px 0 white;
 }
 .panel > header > h2 {
@@ -137,7 +137,7 @@ i.fa { /* prevent page load flicker */
   display: inline-block;
   vertical-align: middle;
   border: 1px solid white;
-  border-color: #cfe9f0 white white #cfe9f0;
+  border-color: #ddd white white #ddd;
 }
 .panel > header::before {
   width: 2em;
