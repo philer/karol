@@ -1,3 +1,5 @@
+import {Exception} from "./localization.js";
+
 const MAX_RECURSION_DEPTH = 10;
 
 // token types
@@ -233,7 +235,7 @@ export class TokenIterator {
     }
 
     // found nothing useful
-    throw new Error(`Syntax Error: Could not read next token in line ${line} column ${column}.`);
+    throw new Exception("error.parser.token_read", {line, column});
   }
 
   readWhile(regex) {
@@ -265,10 +267,12 @@ export class Parser {
 
   eat(type) {
     if (this.currentToken.type !== type) {
-      throw new Error("Syntax Error on line "
-                      + this.tokens.line
-                      + ": Unexpected token " + this.currentToken
-                      + ", was expecting " + type + ".");
+      throw new Exception("error.parser.unexpected_token_instead", {
+        token: this.currentToken,
+        line: this.currentToken.line,
+        column: this.currentToken.column,
+        expected: type,
+      });
     }
     this.forward();
   }
@@ -279,11 +283,12 @@ export class Parser {
       this.forward();
       return value;
     }
-    throw new Error("Syntax Error on line "
-                    + this.tokens.line
-                    + ": Unexpected token "
-                    + this.currentToken
-                    + ". Expected any of " + validTypes);
+    throw new Exception("error.parser.unexpected_token_instead", {
+        token: this.currentToken,
+        line: this.currentToken.line,
+        column: this.currentToken.column,
+        expected: validTypes,
+      });
   }
 
   readExpression() {
@@ -384,9 +389,8 @@ export class Parser {
 
       case PROGRAM:
         if (this.depth > 1) {
-          throw new Error("Parse Error on line "
-                          + this.tokens.line
-                          + ": Can't define program in nested context.");
+          throw new Exception("error.parser.nested_program_definition",
+                              this.tokens.line);
         }
         this.forward();
         statement.sequence = this.readSequence();
@@ -396,9 +400,8 @@ export class Parser {
 
       case ROUTINE:
         if (this.depth > 1) {
-          throw new Error("Parse Error on line "
-                          + this.tokens.line
-                          + ": Can't define routine in nested context.");
+          throw new Exception("error.parser.nested_program_definition",
+                              this.tokens.line);
         }
         this.forward();
         statement.identifier = this.readToken(IDENTIFIER);
@@ -407,8 +410,11 @@ export class Parser {
         this.eat(ROUTINE);
         return statement;
     }
-    throw new Error("Parse Error on line " + this.tokens.line
-                    + ": Unexpected token " + this.currentToken + ".");
+    throw new Exception("error.parser.unexpected_token", {
+      token: this.currentToken,
+      line: this.currentToken.line,
+      column: this.currentToken.column,
+    });
   }
 }
 
@@ -458,12 +464,12 @@ export class Interpreter {
     switch (statement.type) {
       case IDENTIFIER:
         if (this._interrupted) {
-          // throw new Error("INTERRUPTED");
           return;
         }
         if (statement.identifier in this.routines) {
           if (this.depth > MAX_RECURSION_DEPTH) {
-            throw new Error("RunTime Error: Maximum recursion depth (" + MAX_RECURSION_DEPTH + ") exceeded.");
+            throw new Exception("error.runtime.max_recursion_depth_exceeded",
+                                MAX_RECURSION_DEPTH);
           }
           await this.visitSequence(
                         this.routines[statement.identifier]);
@@ -503,7 +509,8 @@ export class Interpreter {
         break;
 
       default:
-        throw new Error(`Unimplemented statement type ${statement.type}`);
+        throw new Exception("error.runtime.unimplemented_statement_type",
+                            statement.type);
     }
   }
 
@@ -519,7 +526,8 @@ export class Interpreter {
         return ! await this.visitExpression(expression.expression);
 
       default:
-        throw new Error("Unimplemented expression type");
+        throw new Exception("error.runtime.unimplemented_expression_type",
+                            expression.type);
     }
   }
 }

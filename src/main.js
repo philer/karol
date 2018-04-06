@@ -1,4 +1,5 @@
 import * as config from "./config.js";
+import {translate as t, Exception} from "./localization.js";
 import * as graphics from "./graphics.js";
 import * as simulation from "./simulation.js";
 import {Editor} from "./editor.js";
@@ -6,7 +7,6 @@ import {Editor} from "./editor.js";
 import {domReady, byId} from "./util.js";
 import {readKdwFile} from "./files.js";
 
-import "./localization.js";
 import "./icons.js";
 
 const keyMap = {
@@ -123,7 +123,12 @@ function initWorldControls() {
       try {
         await simulation.runCommand(action);
       } catch (err) {
-        error(err.message);
+        if (err instanceof Exception) {
+          error(err.translatedMessage);
+        } else {
+          error(err.message);
+          console.error(err);
+        }
       }
     }
   });
@@ -142,9 +147,19 @@ function initEditorButtons() {
   on("click", runButton, async function() {
     disable(runButton);
     enable(stopButton, stepButton, pauseButton);
-    info("RUNNING...");
-    const interrupted = await simulation.run(editor.value);
-    info(interrupted ? "STOPPED" : "DONE");
+    info(t("program.message.running"));
+    try {
+      const interrupted = await simulation.run(editor.value);
+      info(t(interrupted ? "program.message.canceled"
+                         : "program.message.finished"));
+    } catch (err) {
+      if (err instanceof Exception) {
+        error(err.translatedMessage);
+      } else {
+        error(err.message);
+        console.error(err);
+      }
+    }
     enable(runButton);
     disable(stopButton, stepButton, pauseButton, unpauseButton);
     editor.markLine();
@@ -160,14 +175,14 @@ function initEditorButtons() {
 
   on("click", pauseButton, function() {
     simulation.pause();
-    info("PAUSED");
+    info(t("program.message.paused"));
     disable(pauseButton);
     enable(unpauseButton);
   });
 
   on("click", unpauseButton, function() {
     simulation.unpause();
-    info("RUNNING...");
+    info(t("program.message.running"));
     disable(unpauseButton);
     enable(pauseButton);
   });

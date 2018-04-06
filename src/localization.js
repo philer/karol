@@ -3,6 +3,8 @@ import {domReady} from "./util.js";
 
 const DATA_ATTRIBUTE_SUFFIX = "i18t";
 
+const INTERPOLATION_REGEX = /\{([^}]*?)\}/g;
+
 let locale;
 let translations;
 
@@ -38,16 +40,54 @@ async function translateDOM() {
  * @param  {String} variable a key - nested keys may be separated by commas.
  * @return {mixed}
  */
-export function translate(variable) {
-  let subtree = translations;
+export function translate(variable, ...values) {
+  let result = translations;
   for (const key of variable.split(".")) {
-    subtree = subtree[key];
-    if (subtree === undefined) {
+    result = result[key];
+    if (result === undefined) {
       console.warn(`Could not resolve localization variable ${variable}`);
       return variable;
     }
   }
-  return subtree;
+  if (typeof result === "string") {
+    return values.length ? interpolate(result, ...values) : result;
+  } else {
+    return JSON.stringify(result);
+  }
+}
+
+/**
+ * Subsitute values into a string. Inspired by Python's str.format method.
+ * @param  {string} string
+ * @param  {iterable|object} values
+ * @return {string}
+ */
+function interpolate(string, ...values) {
+  if (values.length === 1 && typeof values[0] === "object") {
+    values = values[0];
+  }
+  let iter = (typeof values[Symbol.iterator] === "function"
+              ? values : [])[Symbol.iterator]();
+  return string.replace(INTERPOLATION_REGEX,
+                        (_, key) => key ? values[key]
+                                        : iter.next().value);
+}
+
+/**
+ * Errors for our programming environment.
+ * These do not inherit from JS's own Error as they do not need
+ * to reveal details of the interpreter/runtime internals.
+ *
+ * Offers translation & interpolation.
+ */
+export class Exception {
+  constructor(message, ...data) {
+    this.message = message;
+    this.data = data;
+  }
+  get translatedMessage() {
+    return translate(this.message, ...this.data);
+  }
 }
 
 config.get().then(cfg => setLocale(cfg.locale));

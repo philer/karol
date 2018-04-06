@@ -1,6 +1,7 @@
 import {World} from "./world.js";
 import {Interpreter} from "./interpreter.js";
 import * as graphics from "./graphics.js";
+import {Exception} from "./localization.js";
 
 import {noop} from "./util.js";
 
@@ -115,12 +116,12 @@ export async function step() {
  *
  * @param  {string}  identifier  name of the builtin
  * @param  {Boolean} ignoreDelay finish immediately
- * @param  {int}     lineno      number of code line
+ * @param  {int}     line        number of code line
  * @return {Promise}
  */
-async function execute(identifier, lineno=null) {
-  execCallback(identifier, lineno);
-  evaluate(identifier);
+async function execute(identifier, line=null) {
+  execCallback(identifier, line);
+  evaluate(identifier, line);
   redraw();
   if (useDelay) {
     await sleep(delay);
@@ -146,10 +147,10 @@ export function runCommand(indentifier) {
  * @param  {string} identifier name of the builtin
  * @return {mixed}             return value of the builtin
  */
-export function evaluate(identifier) {
+export function evaluate(identifier, line=null) {
   const methodName = nativeSymbols[identifier.toLowerCase()];
   if (!methodName) {
-    throw new Error(`RunTime Error: ${identifier} is not defined.`);
+    throw new Exception("error.runtime.undefined", {identifier, line});
   }
   return world[methodName]();
 }

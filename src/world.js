@@ -1,4 +1,5 @@
 import {rand} from "./util.js";
+import {Exception} from "./localization.js";
 
 export class World {
 
@@ -46,14 +47,14 @@ export class World {
     const z = this.tiles[this.player.x * this.length + this.player.y].blocks;
     const [x, y] = World.move(this.player, forward, left);
     if (!this.contains(x, y)) {
-      throw new Error("invalid move: out of world");
+      throw new Exception("error.world.move_out_of_world");
     }
     const targetTile = this.tiles[x * this.length + y];
     if (1 < Math.abs(z - targetTile.blocks)) {
-      throw new Error("invalid move: jump too high");
+      throw new Exception("error.world.jump_too_high");
     }
     if (targetTile.cuboid) {
-      throw new Error("invalid move: cuboid");
+      throw new Exception("error.world.move_cuboid");
     }
     [this.player.x, this.player.y] = [x, y];
   }
@@ -75,14 +76,14 @@ export class World {
   placeBlock() {
     const [x, y] = World.move(this.player);
     if (!this.contains(x, y)) {
-      throw new Error("invalid action: out of world");
+      throw new Exception("error.world.action_out_of_world");
     }
     const targetTile = this.tiles[x * this.length + y];
     if (targetTile.cuboid) {
-      throw new Error("invalid action: block on cuboid");
+      throw new Exception("error.world.action_cuboid");
     }
     if (targetTile.blocks >= this.height) {
-      throw new Error("invalid action: building too high");
+      throw new Exception("error.world.action_too_high");
     }
     targetTile.blocks++;
   }
@@ -90,11 +91,11 @@ export class World {
   takeBlock() {
     const [x, y] = World.move(this.player);
     if (!this.contains(x, y)) {
-      throw new Error("invalid action: out of world");
+      throw new Exception("error.world.action_out_of_world");
     }
     const targetTile = this.tiles[x * this.length + y];
     if (targetTile.blocks <= 0) {
-      throw new Error("invalid action: no blocks");
+      throw new Exception("error.world.action_no_blocks");
     }
     targetTile.blocks--;
   }
@@ -104,7 +105,7 @@ export class World {
     const targetTile = this.tiles[this.player.x * this.length + this.player.y];
     // can't stand on cuboid -> no need to check
     if (targetTile.mark) {
-      throw new Error("invalid action: already has a mark");
+      throw new Exception("error.world.action_already_marked");
     }
     targetTile.mark = true;
   }
@@ -112,7 +113,7 @@ export class World {
   takeMark() {
     const targetTile = this.tiles[this.player.x * this.length + this.player.y];
     if (!targetTile.mark) {
-      throw new Error("invalid action: no mark");
+      throw new Exception("error.world.action_no_mark");
     }
     targetTile.mark = false;
   }
