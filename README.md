@@ -54,3 +54,5 @@ Current targets are up-to-date Firefox and Chrome as well as Internet Explore 11
 Required APIs:
 
 * canvas: IE9+
+
+* dataset: IE11+

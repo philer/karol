@@ -6,6 +6,7 @@ import {Editor} from "./editor.js";
 import {domReady, byId} from "./util.js";
 import {readKdwFile} from "./files.js";
 
+import "./localization.js";
 import "./icons.js";
 
 const keyMap = {

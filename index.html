@@ -23,12 +23,12 @@
 
     <section class="panel editor-panel">
       <header>
-        <h2>Code</h2>
+        <h2 data-i18t="program.code">Code</h2>
       </header>
       <form class="editor-wrapper">
         <div class="editor-buttons">
-          <button class="button" id="program-load-button" disabled="disabled">Save</button>
-          <button class="button" id="program-save-button" disabled="disabled">Load</button>
+          <button class="button" id="program-load-button" disabled="disabled" data-i18t="program.save">Save</button>
+          <button class="button" id="program-save-button" disabled="disabled" data-i18t="program.load">Load</button>
         </div>
         <div id="editor" class="editor">
           <div class="editor-scrollbox">
@@ -38,7 +38,7 @@
           </div>
         </div>
         <div class="editor-buttons">
-          <button class="button" id="run-button">Run</button>
+          <button class="button" id="run-button" data-i18t="program.run">Run</button>
           <button class="button icon-button" id="unpause-button" disabled="disabled">
             <i class="fa fa-play"></i>
           </button>
@@ -57,7 +57,7 @@
 
     <section class="panel world-panel">
       <header>
-        <h2>World</h2>
+        <h2 data-i18t="world.world">World</h2>
       </header>
 
       <div class="world-wrapper">
@@ -67,14 +67,14 @@
             <i class="fa fa-cog"></i>
           </label>
           <i class="separator"></i>
-          <button class="button" id="world-new-button">New</button>
+          <button class="button" id="world-new-button" data-i18t="world.new">New</button>
           <i class="separator"></i>
-          <label class="button" for="world-file-input">Load</label>
+          <label class="button" for="world-file-input" data-i18t="world.load">Load</label>
           <input type="file" class="hidden" id="world-file-input">
-          <button class="button" id="world-save-button">Save</button>
+          <button class="button" id="world-save-button" data-i18t="world.save">Save</button>
           <i class="separator"></i>
           <label class="button nohover">
-            Speed:
+            <span data-i18t="world.speed">Speed</span>:
             <input type="range" min="1" max="2.5" step="any" id="world-simulation-speed">
           </label>
         </nav>
@@ -83,26 +83,26 @@
           <input type="checkbox" class="hidden" id="world-settings-toggle">
           <form class="world-settings">
             <label>
-              <span>Width:</span>
+              <span data-i18t="world.width">Width</span>:
               <input id="width-input" type="number" value="18">
             </label>
             <label>
-              <span>Length:</span>
+              <span data-i18t="world.length">Length</span>:
               <input id="length-input" type="number" value="7">
             </label>
             <label>
-              <span>Height:</span>
+              <span data-i18t="world.height">Height</span>:
               <input id="height-input" type="number" value="5">
             </label>
             <i class="separator"></i>
             <label>
               <input type="checkbox" id="world-show-flat">
-              Flat World
+              <span data-i18t="world.flat">Flat World</span>
             </label>
             <i class="separator"></i>
             <label>
               <input type="checkbox" id="world-show-player" checked="checked">
-              Show Robot
+              <span data-i18t="world.show_player">Show Robot</span>
             </label>
             <i class="expander"></i>
             <label class="world-settings-close" for="world-settings-toggle">

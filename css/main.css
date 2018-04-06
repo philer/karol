@@ -278,12 +278,10 @@ canvas#world-canvas {
   margin: 0 .25em;
   cursor: pointer;
 }
-.world-settings label > span {
-  flex: 1 0 auto;
-  margin-right: .25em;
-}
+
 .world-settings input[type="number"] {
   width: 3em;
+  margin: 0 .25em;
   text-align: center;
 }
 #world-load-form input {
