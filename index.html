@@ -39,11 +39,10 @@
         </div>
         <div class="editor-buttons">
           <button id="run-button">Run</button>
-          <button id="unpause-button" disabled="disabled">▶</button>
-          <button id="pause-button" disabled="disabled">⏸</button>
-          <button id="step-button" disabled="disabled">Step</button>
-          <button id="stop-button" disabled="disabled">⏹</button>
-          <!-- ⏯ -->
+          <button id="unpause-button" disabled="disabled"><i class="fa fa-play"></i></button>
+          <button id="pause-button" disabled="disabled"><i class="fa fa-pause"></i></button>
+          <button id="step-button" disabled="disabled"><i class="fa fa-step-forward"></i></button>
+          <button id="stop-button" disabled="disabled"><i class="fa fa-stop"></i></button>
         </div>
       </form>
     </section>
@@ -54,10 +53,10 @@
       </header>
 
       <div class="world-canvas-container-outer">
-        <label class="world-tools-toggle-icon" for="world-tools-toggle">&#9881;</label>
+        <label class="world-tools-toggle-icon" for="world-tools-toggle"><i class="fa fa-cog"></i></label>
         <input type="checkbox" class="offscreen" id="world-tools-toggle">
         <nav class="world-tools">
-          <label class="world-tools-toggle-icon" for="world-tools-toggle">✕</label>
+          <label class="world-tools-toggle-icon" for="world-tools-toggle"><i class="fa fa-times"></i></label>
           <form id="world-create-form">
             <label>
               <span>Width:</span>

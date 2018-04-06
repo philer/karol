@@ -13,6 +13,8 @@
     "pre-commit": "npm-run-all --parallel lint dist"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome": "^1.1.5",
+    "@fortawesome/fontawesome-free-solid": "^5.0.9",
     "babel-core": "^6.26.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -21,6 +23,7 @@
     "eslint-friendly-formatter": "^3.0.0",
     "npm-run-all": "^4.1.2",
     "rollup": "^0.57.1",
+    "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-node-resolve": "^3.3.0",
