@@ -432,6 +432,10 @@ export class Interpreter {
     this.routines = Object.create(null);
   }
 
+  get interrupted() {
+    return this._interrupted;
+  }
+
   interrupt() {
     this._interrupted = true;
   }
@@ -454,6 +458,7 @@ export class Interpreter {
     switch (statement.type) {
       case IDENTIFIER:
         if (this._interrupted) {
+          // throw new Error("INTERRUPTED");
           return;
         }
         if (statement.identifier in this.routines) {

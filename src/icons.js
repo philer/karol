@@ -5,19 +5,24 @@ import fontawesome from '@fortawesome/fontawesome';
 // Only use single statement import when tree-shaking is available,
 // see https://fontawesome.com/how-to-use/use-with-node-js#tree-shaking
 import {
-  faPlay,
-  faPause,
-  faStop,
-  faStepForward,
-  faCog,
-  faTimes,
+
+  // runtime controlls
+  faPlay, faPause, faStop, faStepForward,
+
+  // settings toggles
+  faCog, faTimes,
+
 } from '@fortawesome/fontawesome-free-solid';
 
+
+// Copy-paste all icons imported above into here.
+// Yeah, I know...
 fontawesome.library.add(
-  faPlay,
-  faPause,
-  faStop,
-  faStepForward,
-  faCog,
-  faTimes,
+
+  // runtime controlls
+  faPlay, faPause, faStop, faStepForward,
+
+  // settings toggles
+  faCog, faTimes,
+
 );

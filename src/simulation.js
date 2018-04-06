@@ -94,9 +94,6 @@ export function togglePause() {
  * Perform a single step in the currently running code.
  */
 export async function step() {
-  if (!running) {
-    return;
-  }
   if (paused) {
     const _useDelay = useDelay;
     useDelay = false;
@@ -122,15 +119,12 @@ export async function step() {
  * @return {Promise}
  */
 async function execute(identifier, lineno=null) {
-  await unpausePromise;
-  if (!running) {
-    return;
-  }
   execCallback(identifier, lineno);
   evaluate(identifier);
   redraw();
   if (useDelay) {
     await sleep(delay);
+    await unpausePromise;
   }
 }
 
@@ -168,13 +162,14 @@ export function evaluate(identifier) {
 export async function run(code) {
   useDelay = true;
   running = true;
-  unpause();
   await interpreter.run(code);
+  running = false;
+  return interpreter.interrupted;
 }
 
 export function stop() {
   interpreter.interrupt();
-  running = false;
   useDelay = false;
+  interruptSleep();
   unpause();
 }

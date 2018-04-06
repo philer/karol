@@ -29,9 +29,9 @@ let widthInput;
 let lengthInput;
 let heightInput;
 
-let fileInput;
+let worldFileInput;
 
-let statusOutput;
+let outputElem;
 
 function resetSimulation() {
   simulation.setWorldDimensions(+widthInput.value,
@@ -40,7 +40,7 @@ function resetSimulation() {
 }
 
 function loadWorld() {
-  readKdwFile(fileInput.files[0]).then(simulation.setWorld);
+  readKdwFile(worldFileInput.files[0]).then(simulation.setWorld);
 }
 
 function on(eventName, target, fn) {
@@ -58,24 +58,34 @@ function disable(...btns) {
   btns.map(btn => btn.setAttribute("disabled", "disabled"));
 }
 
+function info(message) {
+  outputElem.innerHTML += `<p class="info-message">${message}</p>`;
+  outputElem.scrollTop = outputElem.scrollHeight;
+}
+
+function error(message) {
+  outputElem.innerHTML += `<p class="error-message">${message}</p>`;
+  outputElem.scrollTop = outputElem.scrollHeight;
+}
 
 function initWorldControls() {
 
   widthInput = byId("width-input");
   lengthInput = byId("length-input");
   heightInput = byId("height-input");
-  fileInput = byId("file-input");
-  statusOutput = byId("status-text");
+  worldFileInput = byId("world-file-input");
+  outputElem = byId("world-output");
 
   const simSpeedInput = byId("world-simulation-speed");
   const showPlayerCheckbox = byId("world-show-player");
   const showFlatWorldCheckbox = byId("world-show-flat");
 
   // world creation/loading
-  on("submit", byId("world-create-form"), resetSimulation);
+  on("click", byId("world-new-button"), resetSimulation);
 
-  on("submit", byId("world-load-form"), loadWorld);
-  on("change", fileInput, loadWorld);
+  // on("click", byId("world-load-button"), loadWorld);
+  // on("click", byId("world-save-button"), saveWorld);
+  on("change", worldFileInput, loadWorld);
 
   // world view settings
   on("change", showPlayerCheckbox, function() {
@@ -111,11 +121,8 @@ function initWorldControls() {
       }
       try {
         await simulation.runCommand(action);
-        statusOutput.innerHTML = "";
-        statusOutput.classList.remove("status-error");
       } catch (err) {
-        statusOutput.innerHTML = err.message;
-        statusOutput.classList.add("status-error");
+        error(err.message);
       }
     }
   });
@@ -134,26 +141,16 @@ function initEditorButtons() {
   on("click", runButton, async function() {
     disable(runButton);
     enable(stopButton, stepButton, pauseButton);
-
-    statusOutput.innerHTML = "";
-    statusOutput.classList.remove("status-error");
-    statusOutput.innerHTML = "RUNNING.";
-
-    try {
-      await simulation.run(editor.value);
-    } catch (err) {
-      statusOutput.innerHTML = err.message;
-      statusOutput.classList.add("status-error");
-    } finally {
-      enable(runButton);
-      disable(stopButton, stepButton, pauseButton, unpauseButton);
-      editor.markLine();
-    }
+    info("RUNNING...");
+    const interrupted = await simulation.run(editor.value);
+    info(interrupted ? "STOPPED" : "DONE");
+    enable(runButton);
+    disable(stopButton, stepButton, pauseButton, unpauseButton);
+    editor.markLine();
   });
 
   on("click", stopButton, function() {
     simulation.stop();
-    statusOutput.innerHTML = "STOPPED.";
   });
 
   on("click", stepButton, function() {
@@ -162,14 +159,14 @@ function initEditorButtons() {
 
   on("click", pauseButton, function() {
     simulation.pause();
-    statusOutput.innerHTML = "PAUSED.";
+    info("PAUSED");
     disable(pauseButton);
     enable(unpauseButton);
   });
 
   on("click", unpauseButton, function() {
     simulation.unpause();
-    statusOutput.innerHTML = "RUNNING.";
+    info("RUNNING...");
     disable(unpauseButton);
     enable(pauseButton);
   });
