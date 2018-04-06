@@ -1,20 +1,36 @@
 import * as config from "./config.js";
-import {domReady} from "./util.js";
+import {domReady, mergeDeep} from "./util.js";
 
 const DATA_ATTRIBUTE_SUFFIX = "i18t";
 
 const INTERPOLATION_REGEX = /\{([^}]*?)\}/g;
 
-let locale;
+let locales;
 let translations;
 
+/**
+ * Get the first configured locale. Use getAllLocales for the full list of
+ * fallback options.
+ * @return {string} usually a two character string, like "en".
+ */
 export function getLocale() {
-  return locale;
+  return locales[0];
 }
 
-async function setLocale(_locale) {
-  locale = _locale;
-  translations = await config.get(`localization/${locale}.js`);
+/**
+ * Get all configured locales. The forward ones overrule the later ones,
+ * which consequently serve as fallback options.
+ * @return {[string]} usually an array of two character strings like "en".
+ */
+export function getAllLocales() {
+  return locales;
+}
+
+async function setLocales(_locales) {
+  locales = Array.isArray(_locales) ? _locales : [_locales];
+  translations = mergeDeep({}, ...await Promise.all(
+    locales.slice().reverse().map(l => config.get(`localization/${l}.js`))
+  ));
   await translateDOM();
 }
 
@@ -25,7 +41,7 @@ async function setLocale(_locale) {
  */
 async function translateDOM() {
   await domReady;
-  document.body.setAttribute("lang", locale);
+  document.body.setAttribute("lang", locales[0]);
   const elements = document.querySelectorAll(`[data-${DATA_ATTRIBUTE_SUFFIX}]`);
   for (const elem of elements) {
     const result = translate(elem.dataset[DATA_ATTRIBUTE_SUFFIX]);
@@ -90,4 +106,4 @@ export class Exception {
   }
 }
 
-config.get().then(cfg => setLocale(cfg.locale));
+config.get().then(cfg => setLocales(cfg.locale));

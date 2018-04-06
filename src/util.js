@@ -82,6 +82,36 @@ export function countOccurences(char, str) {
   return count;
 }
 
+
+/**
+ * Check if given argument is an Object (also not an Array).
+ */
+export function isObject(item) {
+  return item && typeof item === 'object' && !Array.isArray(item);
+}
+
+/**
+ * Recursively merge objects into a target. Only merges objects,
+ * everything else gets overwritten by later objects in the argument
+ * list.
+ * @param  {Object}    target
+ * @param  {...[Object]} objects
+ * @return {Object}
+ */
+export function mergeDeep(target, ...objects) {
+  return objects.reduce((prev, obj) => {
+    for (const key of Object.keys(obj)) {
+      if (isObject(prev[key]) && isObject(obj[key])) {
+        prev[key] = mergeDeep({}, prev[key], obj[key]);
+      } else {
+        prev[key] = obj[key];
+      }
+    }
+    return prev;
+  },
+  target);
+}
+
 /**
  * Wrapper for Math.random to get ints
  * @param  {int} min
