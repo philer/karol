@@ -56,7 +56,7 @@ export function showHeightNoise(show=true) {
  * @return {Promise}
  */
 export async function init() {
-  await Promise.all([
+  return Promise.all([
     initSprites(await config.get()),
     initCanvas(),
   ]);

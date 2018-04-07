@@ -113,7 +113,7 @@ const symbols = new Set(Object.keys(symbolTokenTypes));
 
 const reSpace = /\s/;
 const reDigit = /[0-9]/;
-const reLetter = /[A-Za-z0-9_]/i;
+const reLetter = /[a-z0-9_]/i;
 
 /**
  * Iterable lexer
@@ -143,10 +143,7 @@ export class TokenIterator {
    */
   next() {
     const token = this.nextToken();
-    if (token.type === EOF) {
-      return {done: true};
-    }
-    return {value: token, done: false};
+    return {value: token, done: token.type === EOF};
   }
 
   /**
@@ -262,7 +259,7 @@ export class Parser {
   }
 
   forward() {
-    this.currentToken = this.tokens.nextToken();
+    this.currentToken = this.tokens.next().value;
   }
 
   eat(type) {

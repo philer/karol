@@ -163,9 +163,12 @@ export function evaluate(identifier, line=null) {
 export async function run(code) {
   useDelay = true;
   running = true;
-  await interpreter.run(code);
-  running = false;
-  return interpreter.interrupted;
+  try {
+    await interpreter.run(code);
+    return interpreter.interrupted;
+  } finally {
+    running = false;
+  }
 }
 
 export function stop() {
