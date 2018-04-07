@@ -5,48 +5,53 @@
  ***********************************/
 
 .editor {
-    background: #272822;
-    color: #575852; /* whitespace color */
-    /*text-shadow: 0 1px rgba(0, 0, 0, 0.3);*/
+  background: #272822;
+  color: #f8f8f2;
+  /*text-shadow: 0 1px rgba(0, 0, 0, 0.3);*/
 }
 .editor-caret {
-    border-color: #f8f8f2;
+  border-color: #f8f8f2;
 }
 .editor-selection {
-    background-color: #49483e;
+  background-color: #49483e;
 }
 .editor-textarea:not(:focus) ~ .editor-caret-layer .editor-selection {
-    background-color: #39382e;
+  background-color: #39382e;
 }
 .editor-highlight .line.current {
   background-color: rgba(255, 255, 255, .1);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .2);
 }
 .editor-highlight .line.current::before {
-    color: #f8f8f2; /* arrow */
+  color: #f8f8f2; /* arrow */
 }
 
 .editor .lineno {
-    border-color: #444;
+  border-color: #444;
 }
-
+.whitespace {
+  color: #575852;
+}
 .token.keyword {
-    color: #f92672; /* red-ish */
-    font-weight: normal;
+  color: #f92672; /* red-ish */
+  font-weight: normal;
 }
 .token.identifier {
-    color: #a6e22e; /* green */
+  color: #a6e22e; /* green */
 }
 .token.identifier.builtin {
-    color: #66d9ef;
+  color: #66d9ef;
 }
 .token.comment {
-    color: #75715e;
+  color: #75715e;
+}
+.token.comment .whitespace {
+  color: #474842;
 }
 .token.punctuation {
-    color: #f8f8f2; /* white */
+  color: #f8f8f2; /* white */
 }
 .token.boolean,
 .token.number {
-    color: #ae81ff; /* purple */
+  color: #ae81ff; /* purple */
 }

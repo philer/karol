@@ -207,5 +207,5 @@ function initEditorButtons() {
   initEditorButtons();
 
   // demo
-  editor.value = await fetch("BOT.kdp").then(response => response.text());
+  editor.value = await fetch("examples/BOT.kdp").then(response => response.text());
 })();

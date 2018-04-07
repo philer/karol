@@ -119,9 +119,9 @@ export async function step() {
  * @param  {int}     line        number of code line
  * @return {Promise}
  */
-async function execute(identifier, line=null) {
+async function execute(identifier, args=[], line=null) {
   execCallback(identifier, line);
-  evaluate(identifier, line);
+  evaluate(identifier, args, line);
   redraw();
   if (useDelay) {
     await sleep(delay);
@@ -147,12 +147,12 @@ export function runCommand(indentifier) {
  * @param  {string} identifier name of the builtin
  * @return {mixed}             return value of the builtin
  */
-export function evaluate(identifier, line=null) {
+export function evaluate(identifier, args=[], line=null) {
   const methodName = nativeSymbols[identifier.toLowerCase()];
   if (!methodName) {
     throw new Exception("error.runtime.undefined", {identifier, line});
   }
-  return world[methodName]();
+  return world[methodName](...args);
 }
 
 /**

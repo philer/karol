@@ -1,5 +1,7 @@
 import {TokenIterator, TokenTypes as TT} from "./interpreter.js";
 
+const VISUAL_SPACE = "·";
+
 /**
  * Map TokenTypes to css class names
  */
@@ -8,6 +10,7 @@ const ttClasses = Object.create(null);
 ttClasses[TT.IDENTIFIER] = "identifier";
 ttClasses[TT.INTEGER] =  "number";
 ttClasses[TT.COMMENT] = "comment";
+ttClasses[TT.WHITESPACE] = "whitespace";
 [
   TT.NOT,
   TT.IF, TT.THEN, TT.ELSE,
@@ -23,28 +26,56 @@ ttClasses[TT.COMMENT] = "comment";
 ].forEach(tt => ttClasses[tt] = "punctuation");
 
 
+const reSpaces = / +/g;
+
+const transformWhitespace = text => text.replace(reSpaces, spaces =>
+    `<span class="whitespace">${VISUAL_SPACE.repeat(spaces.length)}</span>`
+  );
+
+function wrapToken(text, type) {
+  if (type === TT.WHITESPACE) {
+    return text;  // already wrapped
+  }
+  return `<span class="token ${ttClasses[type]}">${text}</span>`;
+}
+
+let lineno;
+
+const wrapLine = text => '<span class="line">'
+                       +   '<span class="lineno">'
+                       +     lineno++
+                       +   '</span>'
+                       +   '<span>'
+                       +     text
+                       +   '</span>'
+                       + '</span>';
+
 /**
  * Add syntax highlighting HTML tags to given code snippet.
  * @param  {String} text code
  * @return {String}      code with tokens wrapped in HTML tags
  */
 export default function highlight(text) {
-  let html = "";
-  let lineno = 1;
-  const lineSep = () => `</span></span><span class="line"><span class="lineno">${++lineno}</span><span>`;
   const tokens = new TokenIterator(text, true, true);
+  let html = "";
+  let currentLine = "";
+  lineno = 1;
   try {
     for (const token of tokens) {
-      if (token.type in ttClasses) {
-        html += `<span class="token ${ttClasses[token.type]}">${token.value}</span>`;
+      if (token.type === TT.COMMENT || token.type === TT.WHITESPACE) {
+        const [first, ...lines] = transformWhitespace(token.value).split("\n");
+        currentLine += wrapToken(first, token.type);
+        for (const line of lines) {
+          html += wrapLine(currentLine);
+          currentLine = wrapToken(line, token.type);
+        }
       } else {
-        html += token.value.replace(/ /g, "·")
-                           // .replace(/\t/g, "––––")
-                           .replace(/\n/g, lineSep);
+        currentLine += wrapToken(token.value, token.type);
       }
     }
   } catch (err) {
-    html += tokens.remainingText.replace(/\n/g, lineSep);
+    html += (currentLine + transformWhitespace(tokens.remainingText))
+            .split("\n").map(wrapLine).join("");
   }
-  return `<span class="line"><span class="lineno">1</span><span>${html}</span></span>`;
+  return html;
 }

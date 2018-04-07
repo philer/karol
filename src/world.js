@@ -59,8 +59,8 @@ export class World {
     [this.player.x, this.player.y] = [x, y];
   }
 
-  stepBackwards() {
-    this.step(-1);
+  stepBackwards(count=1) {
+    this.step(-count);
   }
 
 
@@ -73,7 +73,7 @@ export class World {
   }
 
 
-  placeBlock() {
+  placeBlock(count=1) {
     const [x, y] = World.move(this.player);
     if (!this.contains(x, y)) {
       throw new Exception("error.world.action_out_of_world");
@@ -82,22 +82,22 @@ export class World {
     if (targetTile.cuboid) {
       throw new Exception("error.world.action_cuboid");
     }
-    if (targetTile.blocks >= this.height) {
+    if (targetTile.blocks + count > this.height) {
       throw new Exception("error.world.action_too_high");
     }
-    targetTile.blocks++;
+    targetTile.blocks += count;
   }
 
-  takeBlock() {
+  takeBlock(count=1) {
     const [x, y] = World.move(this.player);
     if (!this.contains(x, y)) {
       throw new Exception("error.world.action_out_of_world");
     }
     const targetTile = this.tiles[x * this.length + y];
-    if (targetTile.blocks <= 0) {
+    if (targetTile.blocks - count < 0) {
       throw new Exception("error.world.action_no_blocks");
     }
-    targetTile.blocks--;
+    targetTile.blocks -= count;
   }
 
 

@@ -262,20 +262,32 @@ export class Parser {
     this.currentToken = this.tokens.next().value;
   }
 
-  eat(type) {
-    if (this.currentToken.type !== type) {
+  eat(...types) {
+    if (types.includes(this.currentToken.type)) {
+      const type = this.currentToken.type;
+      this.forward();
+      return type;
+    } else {
       throw new Exception("error.parser.unexpected_token_instead", {
         token: this.currentToken,
         line: this.currentToken.line,
         column: this.currentToken.column,
-        expected: type,
+        expected: types,
       });
     }
-    this.forward();
   }
 
-  readToken(...validTypes) {
-    if (validTypes.includes(this.currentToken.type)) {
+  maybeEat(...types) {
+    if (types.includes(this.currentToken.type)) {
+      const type = this.currentToken.type;
+      this.forward();
+      return type;
+    }
+    return false;
+  }
+
+  readToken(...types) {
+    if (types.includes(this.currentToken.type)) {
       const value = this.currentToken.value;
       this.forward();
       return value;
@@ -284,7 +296,7 @@ export class Parser {
         token: this.currentToken,
         line: this.currentToken.line,
         column: this.currentToken.column,
-        expected: validTypes,
+        expected: types,
       });
   }
 
@@ -315,16 +327,16 @@ export class Parser {
     const call = {
       type: IDENTIFIER,
       identifier: this.currentToken.value,
+      arguments: [],
       line: this.currentToken.line,
     };
     this.forward();
-    if (this.currentToken.type === LPAREN) {
-      this.forward();
-      if (this.currentToken.type === RPAREN) {
-        this.forward();
-      } else {
-        call.argument = this.readExpression();
-        this.eat(RPAREN);
+    if (this.maybeEat(LPAREN)) {
+      if (!this.maybeEat(RPAREN)) {
+        call.arguments.push(this.readExpression());
+        while (this.eat(RPAREN, COMMA) === COMMA) {
+          call.arguments.push(this.readExpression());
+        }
       }
     }
     return call;
@@ -402,6 +414,10 @@ export class Parser {
         }
         this.forward();
         statement.identifier = this.readToken(IDENTIFIER);
+        if (this.maybeEat(LPAREN)) {
+          // TODO implement routine arguments
+          this.eat(RPAREN);
+        }
         statement.sequence = this.readSequence();
         this.eat(ASTERISC);
         this.eat(ROUTINE);
@@ -471,7 +487,9 @@ export class Interpreter {
           await this.visitSequence(
                         this.routines[statement.identifier]);
         } else {
-          await this.runtime.execute(statement.identifier, statement.line);
+          const args = await Promise.all(statement.arguments.map(arg =>
+                          this.visitExpression(arg)));
+          await this.runtime.execute(statement.identifier, args, statement.line);
         }
         break;
 
@@ -517,7 +535,8 @@ export class Interpreter {
         return +expression.value;
 
       case IDENTIFIER:
-        return this.runtime.evaluate(expression.identifier);
+        return this.runtime.evaluate(expression.identifier,
+                                     expression.arguments);
 
       case NOT:
         return ! await this.visitExpression(expression.expression);

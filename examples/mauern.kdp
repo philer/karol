@@ -1,0 +1,26 @@
+{ Legt eine Mauer rund um die Welt }
+
+anweisung mauer()
+    solange nicht IstWand() tue
+        hinlegen(2)
+        schritt()
+    *solange
+*anweisung
+
+// Treppe
+hinlegen()
+schritt()
+hinlegen(2)
+schritt()
+rechtsDrehen() rechtsDrehen()
+hinlegen()
+linksDrehen() linksDrehen()
+
+mauer()
+linksDrehen()
+mauer()
+linksDrehen()
+mauer()
+linksDrehen()
+mauer()
+linksDrehen()
