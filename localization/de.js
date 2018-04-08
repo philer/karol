@@ -14,6 +14,7 @@ config({
       canceled: "ABGEBROCHEN",
       finished: "FERTIG",
     },
+    default_filename: "program.kdp",
   },
   world: {
     world: "Welt",
@@ -26,8 +27,11 @@ config({
     height: "Höhe",
     flat: "Flache Welt",
     show_player: "Figur anzeigen",
+    default_filename: "welt.kdw",
   },
   error: {
+    browser_feature_not_available: "Der Browser ist veraltet und unterstützt diese Funktionalität nicht.",
+    invalid_world_file: "Das ist keine valide *.kdw Datei.",
     parser: {
       token_read:
         "Syntax-Fehler in Zeile {line}, Spalte {column}: Nächstes Wort nicht lesbar.",

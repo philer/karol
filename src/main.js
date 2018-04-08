@@ -5,7 +5,8 @@ import * as simulation from "./simulation.js";
 import {Editor} from "./editor.js";
 
 import {domReady, byId} from "./util.js";
-import {readKdwFile} from "./files.js";
+import {readFile, saveTextAs} from "./files.js";
+import {checkKdwFormat, parseKdw, worldToKdwString} from "./world.js";
 
 import "./icons.js";
 
@@ -30,18 +31,12 @@ let widthInput;
 let lengthInput;
 let heightInput;
 
-let worldFileInput;
-
 let outputElem;
 
 function resetSimulation() {
   simulation.setWorldDimensions(+widthInput.value,
                                 +lengthInput.value,
                                 +heightInput.value);
-}
-
-function loadWorld() {
-  readKdwFile(worldFileInput.files[0]).then(simulation.setWorld);
 }
 
 function on(eventName, target, fn) {
@@ -74,9 +69,9 @@ function initWorldControls() {
   widthInput = byId("width-input");
   lengthInput = byId("length-input");
   heightInput = byId("height-input");
-  worldFileInput = byId("world-file-input");
   outputElem = byId("world-output");
 
+  const worldFileInput = byId("world-file-input");
   const simSpeedInput = byId("world-simulation-speed");
   const showPlayerCheckbox = byId("world-show-player");
   const showFlatWorldCheckbox = byId("world-show-flat");
@@ -84,9 +79,21 @@ function initWorldControls() {
   // world creation/loading
   on("click", byId("world-new-button"), resetSimulation);
 
-  // on("click", byId("world-load-button"), loadWorld);
-  // on("click", byId("world-save-button"), saveWorld);
-  on("change", worldFileInput, loadWorld);
+  on("click", byId("world-save-button"), function() {
+    saveTextAs(worldToKdwString(simulation.getWorld()),
+               t("world.default_filename"));
+  });
+
+  on("change", worldFileInput, async function() {
+    const file = worldFileInput.files[0];
+    // info(t("world.loading_from_file", file.name));
+    const text = await readFile(file);
+    if (checkKdwFormat(text)) {
+      simulation.setWorld(parseKdw(text));
+    } else {
+      error(t("error.invalid_world_file"));
+    }
+  });
 
   // world view settings
   on("change", showPlayerCheckbox, function() {
@@ -135,6 +142,8 @@ function initWorldControls() {
 }
 
 function initEditorButtons() {
+  const saveButton = byId("program-save-button");
+  const programFileInput = byId("program-file-input");
 
   const runButton = byId("run-button");
   const stopButton = byId("stop-button");
@@ -185,6 +194,16 @@ function initEditorButtons() {
     info(t("program.message.running"));
     disable(unpauseButton);
     enable(pauseButton);
+  });
+
+  on("click", saveButton, function() {
+    saveTextAs(editor.value, t("program.default_filename"));
+  });
+
+  on("change", programFileInput, async function() {
+    const file = programFileInput.files[0];
+    // info(t("program.loading_from_file", file.name));
+    editor.value = await readFile(file);
   });
 }
 

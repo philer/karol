@@ -173,7 +173,7 @@ i.fa { /* prevent page load flicker */
   display: flex;
   padding-right: .5em;
 }
-.editor-buttons button {
+.editor-buttons .button {
   margin: .5em 0 .5em .5em;
   flex:  1 1 auto;
 }

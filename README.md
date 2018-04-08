@@ -25,25 +25,15 @@ Check `package.json` where these commands are defined, in case this gets outdate
 
 ## TODO
 
-* jump to current line
 * fast/slow/instant
 * routine arguments
 * nested routines (scopes)
-
-* save & load (program & world)
-
-* localization
-
 * extended tiles
-
-* resizable layout
-
 * recording
-
 * fullscreen, screenshot
-
-+ help
-+ better steve
+* resizable layout
+* help
+* more/better sprites
 
 
 ## Compatibility
@@ -54,5 +44,5 @@ Current targets are up-to-date Firefox and Chrome as well as Internet Explore 11
 Required APIs:
 
 * canvas: IE9+
-
+* FileReader, Blob: IE10+
 * dataset: IE11+

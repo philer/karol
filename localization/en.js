@@ -17,6 +17,7 @@ config({
       canceled: "CANCELED",
       finished: "DONE",
     },
+    default_filename: "program.kdp",
   },
   world: {
     world: "World",
@@ -29,8 +30,11 @@ config({
     height: "Height",
     flat: "Flat World",
     show_player: "Show Player",
+    default_filename: "world.kdw",
   },
   error: {
+    browser_feature_not_available: "Your browser does not support his feature. Consider switch to an up-to-date browser.",
+    invalid_world_file: "This does not appear to be a valid *.kdw file.",
     parser: {
       token_read:
         "Syntax Error on line {line}, column {column}: Could not read next token.",

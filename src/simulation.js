@@ -18,6 +18,9 @@ const nativeSymbols = {
   "istwand":       "isLookingAtEdge",
 };
 
+
+// TODO turn most of this into a singleton class for more convenient get/set
+
 const interpreter = new Interpreter({execute, evaluate});
 
 let world;
@@ -35,6 +38,9 @@ const sleep = ms => new Promise(function(resolve) {
   setTimeout(resolve, ms);
 });
 
+export function getWorld() {
+  return world;
+}
 
 export function setWorld(newWorld) {
   world = newWorld;

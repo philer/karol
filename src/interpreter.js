@@ -112,8 +112,8 @@ const symbols = new Set(Object.keys(symbolTokenTypes));
 
 
 const reSpace = /\s/;
-const reDigit = /[0-9]/;
-const reLetter = /[a-z0-9_]/i;
+const reDigit = /\d/;
+const reLetter = /\w/;
 
 /**
  * Iterable lexer

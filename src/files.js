@@ -1,56 +1,52 @@
-import {World} from "./world.js";
-
-/**
- * Read a .kdw file
- * @param  {File} file DOM file (from input[type="filel"])
- * @return {Promise} resolves with text content
- */
-export function readKdwFile(file) {
-  return readFile(file).then(parseKdw);
-}
+import {translate as t} from "./localization.js";
 
 /**
  * Read a text file (e.g. .kdw file)
  * @param  {File} file DOM file (from input[type="filel"])
  * @return {Promise} resolves with text content
  */
-function readFile(file) {
-  return new Promise(function(resolve) {
-    const reader = new FileReader();
-    reader.onload = function() {
-      resolve(reader.result);
-    };
-    reader.readAsText(file);
-  });
-}
-
+export const readFile = file => new Promise(function(resolve) {
+  const reader = new FileReader();
+  reader.onload = function() {
+    resolve(reader.result);
+  };
+  reader.readAsText(file);
+});
 
 /**
- * Parse text from a *.kdw file and return a valid game state object
- * @param  {String} kdw contents of a .kdw file
- * @return {Object} game state
+ * Take text and a filename and (hopefully) offer it as a download
+ * to the user.
+ * @param  {string} text  string to be downloaded as text file
+ * @param  {string} filename
  */
-export function parseKdw(kdw) {
-  const parts = kdw.split(/\s+/);
-  const [width, length, height,
-         playerX, playerY, orientation] = parts.slice(1, 7).map(x => +x);
-  const tiles = [];
-  for (let xy = 0 ; xy < width * length ; xy++) {
-    const offset = 7 + (height + 1) * xy;
-    const colData = parts.slice(offset, offset + height + 1);
-    const tile = {
-      blocks: colData.filter(s => s === "z").length,
-      mark: colData[colData.length - 1] === "m",
+export const saveTextAs = (function() {
+  const downloadLink = document.createElement('a');
+
+  // feature detection
+  if ("download" in downloadLink) {
+    downloadLink.style.display = "none";
+    return function download(text, filename) {
+      const blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+
+      downloadLink.setAttribute("href", url);
+      downloadLink.setAttribute("download", filename);
+
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+
+      setTimeout(() => URL.revokeObjectURL(url), 60 * 1000);
     };
-    if (colData.includes("q")) {
-      tile.cuboid = true;
-    }
-    /*else if (playerX * length + playerY === xy) {
-      tile.player = true;
-    }*/
-    tiles.push(tile);
+
+  // maybe old IE?
+  } else if (typeof navigator !== "undefined" && navigator.msSaveOrOpenBlob) {
+    return function oldIEDownload(text, filename) {
+      const blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+      navigator.msSaveOrOpenBlob(blob, filename);
+    };
+
+  } else {
+    alert(t("error.browser_feature_not_available"));
   }
-  return new World(width, length, height, 0,
-                   {x: playerX, y: playerY, orientation},  // player
-                   tiles);
-}
+})();
