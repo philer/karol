@@ -113,6 +113,15 @@ export function mergeDeep(target, ...objects) {
 }
 
 /**
+ * Combination of Math.min and Math.max -> restrict val in between min and max.
+ * @param  {mixed} min
+ * @param  {mixed} max
+ * @param  {mixed} val
+ * @return {mixed}
+ */
+export const clamp = (min, max, val) => val < min ? min : val > max ? max : val;
+
+/**
  * Wrapper for Math.random to get ints
  * @param  {int} min
  * @param  {int} max

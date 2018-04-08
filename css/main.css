@@ -280,7 +280,7 @@ canvas#world-canvas {
 }
 
 .world-settings input[type="number"] {
-  width: 3em;
+  width: 4em;
   margin: 0 .25em;
   text-align: center;
 }

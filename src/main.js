@@ -4,7 +4,7 @@ import * as graphics from "./graphics.js";
 import * as simulation from "./simulation.js";
 import {Editor} from "./editor.js";
 
-import {domReady, byId} from "./util.js";
+import {domReady, byId, byClass, clamp} from "./util.js";
 import {readFile, saveTextAs} from "./files.js";
 import {checkKdwFormat, parseKdw, worldToKdwString} from "./world.js";
 
@@ -34,9 +34,8 @@ let heightInput;
 let outputElem;
 
 function resetSimulation() {
-  simulation.setWorldDimensions(+widthInput.value,
-                                +lengthInput.value,
-                                +heightInput.value);
+  simulation.setWorldDimensions(...[widthInput, lengthInput, heightInput].map(
+                                inp => clamp(+inp.min, +inp.max, +inp.value)));
 }
 
 function on(eventName, target, fn) {
@@ -44,6 +43,13 @@ function on(eventName, target, fn) {
     evt.preventDefault();
     fn.apply(this, arguments);
   });
+}
+
+function validateNumberInput() {
+  const value = clamp(+this.min, +this.max, +this.value);
+  if (+this.value !== value) {
+    this.value = value;
+  }
 }
 
 function enable(...btns) {
@@ -76,8 +82,12 @@ function initWorldControls() {
   const showPlayerCheckbox = byId("world-show-player");
   const showFlatWorldCheckbox = byId("world-show-flat");
 
-  // world creation/loading
+  on("input", widthInput, validateNumberInput);
+  on("input", lengthInput, validateNumberInput);
+  on("input", heightInput, validateNumberInput);
+
   on("click", byId("world-new-button"), resetSimulation);
+  on("submit", byClass("world-settings")[0], resetSimulation);
 
   on("click", byId("world-save-button"), function() {
     saveTextAs(worldToKdwString(simulation.getWorld()),
@@ -118,7 +128,10 @@ function initWorldControls() {
 
   // key controls
   addEventListener("keydown", async function(evt) {
-    if (evt.defaultPrevented || evt.target instanceof HTMLTextAreaElement) {
+    if (evt.defaultPrevented
+        || evt.target instanceof HTMLTextAreaElement
+        || evt.target instanceof HTMLInputElement)
+    {
       return;
     }
     const action = keyMap[evt.key];

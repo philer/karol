@@ -86,16 +86,17 @@
           <form class="world-settings">
             <label>
               <span data-i18t="world.width">Width</span>:
-              <input id="width-input" type="number" value="18">
+              <input id="width-input" type="number" min="1" max="100" value="18">
             </label>
             <label>
               <span data-i18t="world.length">Length</span>:
-              <input id="length-input" type="number" value="7">
+              <input id="length-input" type="number" min="1" max="100" value="7">
             </label>
             <label>
               <span data-i18t="world.height">Height</span>:
-              <input id="height-input" type="number" value="5">
+              <input id="height-input" type="number" min="1" max="25" value="5">
             </label>
+            <input type="submit" class="hidden">
             <i class="separator"></i>
             <label>
               <input type="checkbox" id="world-show-flat">
