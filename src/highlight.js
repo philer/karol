@@ -74,8 +74,8 @@ export default function highlight(text) {
       }
     }
   } catch (err) {
-    html += (currentLine + transformWhitespace(tokens.remainingText))
-            .split("\n").map(wrapLine).join("");
+    return html + (currentLine + transformWhitespace(tokens.remainingText))
+                  .split("\n").map(wrapLine).join("");
   }
-  return html;
+  return html + wrapLine(currentLine);
 }
