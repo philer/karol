@@ -120,7 +120,7 @@ export class World {
 }
 
 // Currently not checking for the typical "KarolVersion2Deutsch" prefix.
-const reKdwFile = /^\w+(?:\s+\d+){6}(?:\s+[a-z])*$/;
+const reKdwFile = /^\w+(?:\s+\d+){6}(?:\s+\w)*\s*$/;
 
 /**
  * Check if a given string represents a valid, known *.kdw file's content.
