@@ -1,10 +1,9 @@
 import {Interpreter} from "./interpreter.js";
 import {render} from "./graphics.js";
-import {Exception} from "./localization.js";
 
 import {noop} from "./util.js";
 
-const nativeSymbols = {
+const commandNames = {
   "linksdrehen":   "turnLeft",
   "rechtsdrehen":  "turnRight",
   "schritt":       "step",
@@ -23,7 +22,7 @@ export class Simulation {
     this.world = world;
     this.delay = delay;
 
-    this._interpreter = new Interpreter(this);
+    this._interpreter = new Interpreter(this, commandNames);
 
     this._useDelay = true;
     this._running = false;
@@ -47,6 +46,7 @@ export class Simulation {
   }
 
   set world(world) {
+    this.stop();
     this._world = world;
     this.redraw();
   }
@@ -101,7 +101,7 @@ export class Simulation {
       this.pause();
       this._useDelay = useDelay;
     } else {
-      this.interruptSleep();
+      this._interruptSleep();
     }
   }
 
@@ -112,45 +112,44 @@ export class Simulation {
    * and after the execution waits for a specified delay
    * (unless suppressed).
    *
-   * @param  {string}  identifier  name of the builtin
+   * @param  {string}  command  name of the builtin
    * @param  {Boolean} ignoreDelay finish immediately
    * @param  {int}     line        number of code line
    * @return {Promise}
    */
-  async execute(identifier, args=[], line=null) {
-    this._execCallback(identifier, line);
-    this.evaluate(identifier, args, line);
-    this.redraw();
+  async execute(command, args=[], line=null) {
+    this._execCallback(command, line);
+    const result = this.evaluate(command, args, line);
+    if (result === undefined) {
+      this.redraw();
+    }
     if (this._useDelay) {
       await this.sleep(this.delay);
       await this._unpausePromise;
     }
+    return result;
   }
 
   /**
    * Execute a single native command (aka. method) and
    * redraw. Use this for commands that have a visual effect
    * on the world view.
-   * @param  {String} indentifier
+   * @param  {String} command
    * @return {undefined}
    */
-  runCommand(indentifier) {
-    this.evaluate(indentifier);
+  runCommand(command) {
+    this.evaluate(command);
     this.redraw();
   }
 
   /**
    * Execute a single native command (aka. method) and return
    * the result.
-   * @param  {string} identifier name of the builtin
+   * @param  {string} command name of the builtin
    * @return {mixed}             return value of the builtin
    */
-  evaluate(identifier, args=[], line=null) {
-    const methodName = nativeSymbols[identifier.toLowerCase()];
-    if (!methodName) {
-      throw new Exception("error.runtime.undefined", {identifier, line});
-    }
-    return this.world[methodName](...args);
+  evaluate(command, args=[]) {
+    return this.world[command](...args);
   }
 
   /**
@@ -159,6 +158,7 @@ export class Simulation {
    * @return {Promise}
    */
   async run(code) {
+    this.stop();
     this._useDelay = true;
     this._running = true;
     try {
@@ -170,10 +170,12 @@ export class Simulation {
   }
 
   stop() {
-    this._interpreter.interrupt();
-    this._useDelay = false;
-    this._interruptSleep();
-    this.unpause();
+    if (this._running) {
+      this._interpreter.interrupt();
+      this._useDelay = false;
+      this._interruptSleep();
+      this.unpause();
+    }
   }
 
 }

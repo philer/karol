@@ -17,9 +17,14 @@ export class Interpreter {
    * Create a new program iteration
    * @param  {RunTime} runtime  simulated machine/world
    */
-  constructor(runtime) {
+  constructor(runtime, builtinNames) {
     this.runtime = runtime;
-    this.routines = Object.create(null);
+    this.builtins = Object.create(null);
+    for (const [identifier, name] of Object.entries(builtinNames)) {
+      this.builtins[identifier.toLowerCase()] = {name, isBuiltin: true};
+    }
+    this._interrupted = false;
+    this._depth = 0;
   }
 
   get interrupted() {
@@ -30,66 +35,54 @@ export class Interpreter {
     this._interrupted = true;
   }
 
-  async run(text) {
+  run(text) {
     const ast = textToAst(text);
+    const symbolTable = Object.create(this.builtins);
     this._interrupted = false;
-    await this.visitSequence(ast);
+    return this.visitSequence(ast, symbolTable);
   }
 
-  async visitSequence(sequence) {
+  async visitSequence(sequence, symbols) {
     for (const statement of sequence) {
-      await this.visitStatement(statement);
+      await this.visitStatement(statement, symbols);
     }
   }
 
-  async visitStatement(statement) {
+  async visitStatement(statement, symbols) {
     switch (statement.type) {
       case TT.IDENTIFIER:
         if (this._interrupted) {
           return;
         }
-        if (statement.identifier in this.routines) {
-          if (this.depth > MAX_RECURSION_DEPTH) {
-            throw new Exception("error.runtime.max_recursion_depth_exceeded",
-                                MAX_RECURSION_DEPTH);
-          }
-          await this.visitSequence(
-                        this.routines[statement.identifier]);
-        } else {
-          const args = await Promise.all(statement.arguments.map(arg =>
-                          this.visitExpression(arg)));
-          await this.runtime.execute(statement.identifier, args, statement.line);
-        }
-        break;
+        return this.call(statement, symbols);
 
       case TT.IF:
-        if (await this.visitExpression(statement.condition)) {
-          await this.visitSequence(statement.sequence);
+        if (await this.visitExpression(statement.condition, symbols)) {
+          return this.visitSequence(statement.sequence, symbols);
         } else if (statement.alternative) {
-          await this.visitSequence(statement.alternative);
+          return this.visitSequence(statement.alternative, symbols);
         }
         break;
 
       case TT.WHILE:
-        while (await this.visitExpression(statement.condition)) {
-          await this.visitSequence(statement.sequence);
+        while (await this.visitExpression(statement.condition, symbols)) {
+          await this.visitSequence(statement.sequence, symbols);
         }
         break;
 
       case TT.REPEAT: {
-        const count = await this.visitExpression(statement.count);
+        const count = await this.visitExpression(statement.count, symbols);
         for (let i = 0 ; i < count ; i++) {
-          await this.visitSequence(statement.sequence);
+          await this.visitSequence(statement.sequence, symbols);
         }
         break;
       }
 
       case TT.PROGRAM:
-        await this.visitSequence(statement.sequence);
-        break;
+        return this.visitSequence(statement.sequence, symbols);
 
       case TT.ROUTINE:
-        this.routines[statement.identifier] = statement.sequence;
+        symbols[statement.identifier.toLowerCase()] = statement.sequence;
         break;
 
       default:
@@ -98,21 +91,44 @@ export class Interpreter {
     }
   }
 
-  async visitExpression(expression) {
+  async visitExpression(expression, symbols) {
     switch (expression.type) {
       case TT.INTEGER:
         return +expression.value;
 
       case TT.IDENTIFIER:
-        return this.runtime.evaluate(expression.identifier,
-                                     expression.arguments);
+        return this.call(expression, symbols);
 
       case TT.NOT:
-        return ! await this.visitExpression(expression.expression);
+        return ! await this.visitExpression(expression.expression, symbols);
 
       default:
         throw new Exception("error.runtime.unimplemented_expression_type",
                             expression.type);
     }
+  }
+
+  async call(routine, symbols) {
+    const identifier = routine.identifier.toLowerCase();
+    if (!(identifier in symbols)) {
+      throw new Exception("error.runtime.undefined",
+                          {identifier, line: routine.line});
+    }
+    this._depth++;
+    if (this._depth > MAX_RECURSION_DEPTH) {
+      throw new Exception("error.runtime.max_recursion_depth_exceeded",
+                          MAX_RECURSION_DEPTH);
+    }
+    let result;
+    if (symbols[identifier].isBuiltin) {
+      const args = await Promise.all(routine.arguments.map(arg =>
+                                this.visitExpression(arg, symbols)));
+      result = await this.runtime.execute(symbols[identifier].name,
+                                          args, routine.line);
+    } else {
+      result = await this.visitSequence(symbols[identifier], symbols);
+    }
+    this._depth--;
+    return result;
   }
 }

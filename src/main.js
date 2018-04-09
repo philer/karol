@@ -12,18 +12,18 @@ import {checkKdwFormat, parseKdw, worldToKdwString} from "./world.js";
 import "./icons.js";
 
 const keyMap = {
-  "ArrowLeft":  "LinksDrehen",
-  "a":          "LinksDrehen",
-  "ArrowRight": "RechtsDrehen",
-  "d":          "RechtsDrehen",
-  "ArrowUp":    "Schritt",
-  "w":          "Schritt",
-  "ArrowDown":  "SchrittZurück",
-  "s":          "SchrittZurück",
-  "h":          "Hinlegen",
-  "H":          "Aufheben",
-  "m":          "MarkeSetzen",
-  "M":          "MarkeLöschen",
+  "ArrowLeft":  "turnLeft",
+  "a":          "turnLeft",
+  "ArrowRight": "turnRight",
+  "d":          "turnRight",
+  "ArrowUp":    "step",
+  "w":          "step",
+  "ArrowDown":  "stepBackwards",
+  "s":          "stepBackwards",
+  "h":          "placeBlock",
+  "H":          "takeBlock",
+  "m":          "placeMark",
+  "M":          "takeMark",
 };
 
 let editor;
@@ -106,6 +106,7 @@ function initWorldControls() {
   });
 
   on("change", worldFileInput, async function() {
+    simulation.stop();
     const file = worldFileInput.files[0];
     // info(t("world.loading_from_file", file.name));
     const text = await readFile(file);
@@ -221,6 +222,7 @@ function initEditorButtons() {
   });
 
   on("change", programFileInput, async function() {
+    simulation.stop();
     const file = programFileInput.files[0];
     // info(t("program.loading_from_file", file.name));
     editor.value = await readFile(file);
