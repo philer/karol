@@ -1,8 +1,8 @@
 old
 data
 doc
-build/*
-!build/*.min.js
+build
+releases
 
 .*
 !.gitignore

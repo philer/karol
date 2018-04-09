@@ -10,7 +10,7 @@
     "watch": "rollup -c --watch",
     "dist": "NODE_ENV=production rollup -c",
     "lint": "eslint src/* --cache --format node_modules/eslint-friendly-formatter",
-    "pre-commit": "npm-run-all --parallel lint dist"
+    "pre-commit": "npm-run-all lint"
   },
   "devDependencies": {
     "@fortawesome/fontawesome": "^1.1.5",
