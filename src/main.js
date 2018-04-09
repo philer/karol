@@ -1,7 +1,8 @@
 import * as config from "./config.js";
 import {translate as t, Exception} from "./localization.js";
 import * as graphics from "./graphics.js";
-import * as simulation from "./simulation.js";
+import {World} from "./world.js";
+import {Simulation} from "./simulation.js";
 import {Editor} from "./editor.js";
 
 import {domReady, byId, byClass, clamp} from "./util.js";
@@ -26,23 +27,28 @@ const keyMap = {
 };
 
 let editor;
+let simulation;
 
 let widthInput;
 let lengthInput;
 let heightInput;
+let simSpeedInput;
 
 let outputElem;
-
-function resetSimulation() {
-  simulation.setWorldDimensions(...[widthInput, lengthInput, heightInput].map(
-                                inp => clamp(+inp.min, +inp.max, +inp.value)));
-}
 
 function on(eventName, target, fn) {
   target.addEventListener(eventName, function(evt) {
     evt.preventDefault();
     fn.apply(this, arguments);
   });
+}
+
+function enable(...btns) {
+  btns.map(btn => btn.removeAttribute("disabled"));
+}
+
+function disable(...btns) {
+  btns.map(btn => btn.setAttribute("disabled", "disabled"));
 }
 
 function validateNumberInput() {
@@ -52,12 +58,13 @@ function validateNumberInput() {
   }
 }
 
-function enable(...btns) {
-  btns.map(btn => btn.removeAttribute("disabled"));
+function makeWorld() {
+  return new World(...[widthInput, lengthInput, heightInput]
+                      .map(inp => clamp(+inp.min, +inp.max, +inp.value)));
 }
 
-function disable(...btns) {
-  btns.map(btn => btn.setAttribute("disabled", "disabled"));
+function calculateDelay() {
+  return Math.pow(10, 4 - simSpeedInput.value);
 }
 
 function info(message) {
@@ -70,15 +77,18 @@ function error(message) {
   outputElem.scrollTop = outputElem.scrollHeight;
 }
 
+
 function initWorldControls() {
 
   widthInput = byId("width-input");
   lengthInput = byId("length-input");
   heightInput = byId("height-input");
+  simSpeedInput = byId("world-simulation-speed");
+
   outputElem = byId("world-output");
 
   const worldFileInput = byId("world-file-input");
-  const simSpeedInput = byId("world-simulation-speed");
+
   const showPlayerCheckbox = byId("world-show-player");
   const showFlatWorldCheckbox = byId("world-show-flat");
 
@@ -86,11 +96,12 @@ function initWorldControls() {
   on("input", lengthInput, validateNumberInput);
   on("input", heightInput, validateNumberInput);
 
+  const resetSimulation = () => simulation.world = makeWorld();
   on("click", byId("world-new-button"), resetSimulation);
   on("submit", byClass("world-settings")[0], resetSimulation);
 
   on("click", byId("world-save-button"), function() {
-    saveTextAs(worldToKdwString(simulation.getWorld()),
+    saveTextAs(worldToKdwString(simulation.world),
                t("world.default_filename"));
   });
 
@@ -99,7 +110,7 @@ function initWorldControls() {
     // info(t("world.loading_from_file", file.name));
     const text = await readFile(file);
     if (checkKdwFormat(text)) {
-      simulation.setWorld(parseKdw(text));
+      simulation.world = parseKdw(text);
     } else {
       error(t("error.invalid_world_file"));
     }
@@ -119,12 +130,8 @@ function initWorldControls() {
   graphics.showHeightNoise(!showFlatWorldCheckbox.checked);
 
   on("change", simSpeedInput, function() {
-    simulation.setDelay(Math.pow(10, 4 - simSpeedInput.value));
+    simulation.delay = calculateDelay();
   });
-  simulation.setDelay(Math.pow(10, 4 - simSpeedInput.value));
-
-  resetSimulation();
-
 
   // key controls
   addEventListener("keydown", async function(evt) {
@@ -137,7 +144,7 @@ function initWorldControls() {
     const action = keyMap[evt.key];
     if (action) {
       evt.preventDefault();
-      if (simulation.isRunning()) {
+      if (simulation.isRunning) {
         return;
       }
       try {
@@ -232,11 +239,13 @@ function initEditorButtons() {
     domReady,
   ]);
 
-  editor = new Editor(byId("editor"));
-  simulation.onExecute((_, lineno) => editor.markLine(lineno));
-
   initWorldControls();
   initEditorButtons();
+
+  simulation = new Simulation(makeWorld(), calculateDelay());
+
+  editor = new Editor(byId("editor"));
+  simulation.onExecute((_, lineno) => editor.markLine(lineno));
 
   // demo
   editor.value = await fetch("examples/BOT.kdp").then(response => response.text());
