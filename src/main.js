@@ -111,7 +111,11 @@ function initWorldControls() {
     // info(t("world.loading_from_file", file.name));
     const text = await readFile(file);
     if (checkKdwFormat(text)) {
-      simulation.world = parseKdw(text);
+      const world = parseKdw(text);
+      simulation.world = world;
+      widthInput.value = world.width;
+      lengthInput.value = world.length;
+      heightInput.value = world.height;
     } else {
       error(t("error.invalid_world_file"));
     }
