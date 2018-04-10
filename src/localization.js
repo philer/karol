@@ -44,8 +44,10 @@ async function translateDOM() {
   document.body.setAttribute("lang", locales[0]);
   const elements = document.querySelectorAll(`[data-${DATA_ATTRIBUTE_SUFFIX}]`);
   for (const elem of elements) {
-    const result = translate(elem.dataset[DATA_ATTRIBUTE_SUFFIX]);
-    if (typeof result === "string") {
+    const variable = elem.dataset[DATA_ATTRIBUTE_SUFFIX];
+    const result = translate(variable);
+    if (typeof result === "string" && !(result === variable && elem.innerHTML))
+    {
       elem.innerHTML = result;
     }
   }
