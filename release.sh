@@ -48,7 +48,6 @@ elif ! git diff --quiet HEAD -- package.json; then
     echo "You have uncommitted changes in package.json."
     return 1
 elif [ -d "$TARGET_DIR" ]; then
-    return 1
     echo "Target directory exists: $TARGET_DIR"
     return 1
 elif ! yarn lint; then
