@@ -2,7 +2,7 @@
 
 ## Usage
 
-Copy the project and open `index.html` in a browser. It should just work.
+Download the latest [release](https://github.com/philer/karol/releases) and unpack it. Open the included `index.html` in a browser. It should just work.
 If it doesn't, try a different browser.
 
 ### Configuration
