@@ -253,6 +253,4 @@ function initEditorButtons() {
   editor = new Editor(byId("editor"));
   simulation.onExecute((_, lineno) => editor.markLine(lineno));
 
-  // demo
-  editor.value = await fetch("examples/BOT.kdp").then(response => response.text());
 })();
