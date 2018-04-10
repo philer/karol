@@ -30,8 +30,8 @@ export function get(url="config.js") {
   if (url in promises) {
     return promises[url];
   }
-  return new Promise(function(resolve, reject) {
-    resolvers[url] = function(data) {
+  return promises[url] = new Promise(function(resolve, reject) {
+    resolvers[url] = function resolveAndRemove(data) {
       delete resolvers[url];
       resolve(data);
     };
@@ -59,13 +59,13 @@ const getCurrentScriptSrc = (function() {
     return function() { return document.currentScript.src; };
   }
   // IE bandaid. Did I mention IE is a horrible "browser"?
-  const urlRegex = /\/\/.+?\/.+?.js/g;  // may include file:// urls
+  const urlRegex = /(?:file|https?):\/\/.+?\/.+?\.js(?=\W)/g;
   return function() {
     try {
       throw new Error();
     } catch (error) {
       const urls = error.stack.match(urlRegex);
-      return resolveUrl(urls[urls.length - 1]);
+      return urls[urls.length - 1];
     }
   };
 })();
