@@ -1,4 +1,11 @@
 /**
+ * Are we caught up in Microsoft's horrible creation?
+ * @type {Boolean}
+ */
+export const isIE = window.navigator.userAgent.indexOf('Trident/') >= 0;
+
+
+/**
  * "No Operation" empty function - does nothing.
  * @return {undefined}
  */
@@ -33,17 +40,6 @@ export const getJSON = url => new Promise(function(resolve, reject) {
   xhr.send();
 });
 
-
-export const resolveUrl = (function() {
-  if (URL) {
-    return url => (new URL(url, document.location)).href;
-  }
-  return function compatibleUrlResolver(url) {
-    const a = document.createElement("a");
-    a.href = url;
-    return a.href;
-  };
-})();
 
 /**
  * sleep function for use with await

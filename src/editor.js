@@ -1,3 +1,4 @@
+import {isIE} from "./util.js";
 import highlight from "./highlight.js";
 
 export class Editor {
@@ -16,7 +17,9 @@ export class Editor {
 
     this.beforeCaret = caretLayer.appendChild(document.createElement("span"));
     this.caret = caretLayer.appendChild(document.createElement("span"));
-    this.caret.classList.add("editor-caret");
+    if (!isIE) {
+      this.caret.classList.add("editor-caret");
+    }
     this.selection = caretLayer.appendChild(document.createElement("span"));
     this.selection.classList.add("editor-selection");
 

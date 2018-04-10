@@ -1,6 +1,14 @@
-import {resolveUrl} from "./util.js";
+/**
+ * Mapping of URLs to Promises, which will be resolved with data.
+ * @type {Object}
+ */
+const promises = Object.create(null);
 
-const cache = Object.create(null);
+/**
+ * Mapping of URLs to the resolve function of each Promise.
+ * @type {Object}
+ */
+const resolvers = Object.create(null);
 
 /**
  * Global function will be called by JSONP style config files.
@@ -8,7 +16,7 @@ const cache = Object.create(null);
  * @param  {mixed} data whatever the config file defines
  */
 window.config = function setConfigData(data) {
-  cache[document.currentScript.src] = Object.freeze(data);
+  resolvers[getCurrentScriptSrc()](Object.freeze(data));
 };
 
 /**
@@ -19,20 +27,61 @@ window.config = function setConfigData(data) {
  */
 export function get(url="config.js") {
   url = resolveUrl(url);
-  if (url in cache) {
-    return Promise.resolve(cache[url]);
+  if (url in promises) {
+    return promises[url];
   }
   return new Promise(function(resolve, reject) {
+    resolvers[url] = function(data) {
+      delete resolvers[url];
+      resolve(data);
+    };
     const script = document.createElement("script");
     script.onload = function() {
-      resolve(cache[script.src]);
-      script.remove();
+      document.head.removeChild(script); // script.remove(); // IE sucks
     };
     script.onerror = function() {
       reject();
-      script.remove();
+      document.head.removeChild(script); // script.remove(); // IE sucks
     };
     document.head.appendChild(script);
     script.src = url;
   });
 }
+
+/**
+ * Browser compatible function for detecting the URL of the currently
+ * executing script.
+ * @return {string}
+ */
+const getCurrentScriptSrc = (function() {
+  if (document.currentScript !== undefined) {
+    // non-horrible browsers
+    return function() { return document.currentScript.src; };
+  }
+  // IE bandaid. Did I mention IE is a horrible "browser"?
+  const urlRegex = /\/\/.+?\/.+?.js/g;  // may include file:// urls
+  return function() {
+    try {
+      throw new Error();
+    } catch (error) {
+      const urls = error.stack.match(urlRegex);
+      return resolveUrl(urls[urls.length - 1]);
+    }
+  };
+})();
+
+/**
+ * Browser compatible function for converting partial/relative URLs to full.
+ * @param {string} url
+ * @return {string}
+ */
+const resolveUrl = (function() {
+  if (URL && URL.call) {
+    return url => (new URL(url, document.location)).href;
+  }
+  const a = document.createElement("a");
+  return function compatibleUrlResolver(url) {
+    a.href = url;
+    return a.href;
+  };
+})();

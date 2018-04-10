@@ -69,6 +69,7 @@ yarn dist
 echo "Copying assets..."
 mkdir -pv "$TARGET_DIR/scripts"
 cp -rv build/*.min.js "$TARGET_DIR/scripts"
+cp -v "node_modules/babel-polyfill/dist/polyfill.min.js" "$TARGET_DIR/scripts"
 cp -rv config.js css img localization examples package.json README.md "$TARGET_DIR"
 
 echo "Converting index.html..."
