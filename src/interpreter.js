@@ -57,7 +57,7 @@ export class Interpreter {
         return this.call(statement, symbols);
 
       case TT.IF:
-        if (await this.visitExpression(statement.condition, symbols)) {
+        if (this.visitExpression(statement.condition, symbols)) {
           return this.visitSequence(statement.sequence, symbols);
         } else if (statement.alternative) {
           return this.visitSequence(statement.alternative, symbols);
@@ -65,13 +65,13 @@ export class Interpreter {
         break;
 
       case TT.WHILE:
-        while (await this.visitExpression(statement.condition, symbols)) {
+        while (this.visitExpression(statement.condition, symbols)) {
           await this.visitSequence(statement.sequence, symbols);
         }
         break;
 
       case TT.REPEAT: {
-        const count = await this.visitExpression(statement.count, symbols);
+        const count = this.visitExpression(statement.count, symbols);
         for (let i = 0 ; i < count ; i++) {
           await this.visitSequence(statement.sequence, symbols);
         }
@@ -91,7 +91,7 @@ export class Interpreter {
     }
   }
 
-  async visitExpression(expression, symbols) {
+  visitExpression(expression, symbols) {
     switch (expression.type) {
       case TT.INTEGER:
         return +expression.value;
@@ -100,7 +100,7 @@ export class Interpreter {
         return this.call(expression, symbols);
 
       case TT.NOT:
-        return ! await this.visitExpression(expression.expression, symbols);
+        return !this.visitExpression(expression.expression, symbols);
 
       default:
         throw new Exception("error.runtime.unimplemented_expression_type",
