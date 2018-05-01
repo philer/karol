@@ -1,5 +1,6 @@
 import {Exception} from "./localization.js";
 import {TokenTypes as TT, textToAst} from "./parser.js";
+import {assignEntries, zip} from "./util.js";
 
 const MAX_RECURSION_DEPTH = 10;
 
@@ -71,6 +72,8 @@ export class Interpreter {
         break;
 
       case TT.REPEAT: {
+        // There is currently nothing in the language that could change the
+        // result of the limit expression while the loop is running.
         const count = this.visitExpression(statement.count, symbols);
         for (let i = 0 ; i < count ; i++) {
           await this.visitSequence(statement.sequence, symbols);
@@ -82,7 +85,7 @@ export class Interpreter {
         return this.visitSequence(statement.sequence, symbols);
 
       case TT.ROUTINE:
-        symbols[statement.identifier.toLowerCase()] = statement.sequence;
+        symbols[statement.identifier.toLowerCase()] = statement;
         break;
 
       default:
@@ -96,8 +99,18 @@ export class Interpreter {
       case TT.INTEGER:
         return +expression.value;
 
-      case TT.IDENTIFIER:
-        return this.call(expression, symbols);
+      case TT.IDENTIFIER: {
+        const identifier = expression.identifier.toLowerCase();
+        if (!(identifier in symbols)) {
+          throw new Exception("error.runtime.undefined",
+                              {identifier, line: expression.line});
+        }
+        const symbol = symbols[expression.identifier];
+        if (symbol.isBuiltin || symbol.type === TT.IDENTIFIER) {
+          return this.call(expression, symbols);
+        }
+        return symbol;
+      }
 
       case TT.NOT:
         return !this.visitExpression(expression.expression, symbols);
@@ -108,25 +121,33 @@ export class Interpreter {
     }
   }
 
-  async call(routine, symbols) {
-    const identifier = routine.identifier.toLowerCase();
+  /**
+   * Call a builtin or user defined routine.
+   * @param  {Object} call
+   * @param  {Object} symbols lookup table
+   * @return {mixed}  return value of the call
+   */
+  call(call, symbols) {
+    const identifier = call.identifier.toLowerCase();
     if (!(identifier in symbols)) {
       throw new Exception("error.runtime.undefined",
-                          {identifier, line: routine.line});
+                          {identifier, line: call.line});
     }
     this._depth++;
     if (this._depth > MAX_RECURSION_DEPTH) {
       throw new Exception("error.runtime.max_recursion_depth_exceeded",
                           MAX_RECURSION_DEPTH);
     }
+    const routine = symbols[identifier];
+    const args = call.arguments.map(arg => this.visitExpression(arg, symbols));
     let result;
-    if (symbols[identifier].isBuiltin) {
-      const args = await Promise.all(routine.arguments.map(arg =>
-                                this.visitExpression(arg, symbols)));
-      result = await this.runtime.execute(symbols[identifier].name,
-                                          args, routine.line);
+    if (routine.isBuiltin) {
+      result = this.runtime.execute(symbols[identifier].name,
+                                          args, call.line);
     } else {
-      result = await this.visitSequence(symbols[identifier], symbols);
+      const localSymbols = assignEntries(Object.create(symbols),
+                                         zip(routine.argNames, args));
+      result = this.visitSequence(routine.sequence, localSymbols);
     }
     this._depth--;
     return result;

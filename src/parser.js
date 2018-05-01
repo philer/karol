@@ -413,9 +413,14 @@ export class Parser {
         }
         this.forward();
         statement.identifier = this.readToken(IDENTIFIER);
+        statement.argNames = [];
         if (this.maybeEat(LPAREN)) {
-          // TODO implement routine arguments
-          this.eat(RPAREN);
+          if (!this.maybeEat(RPAREN)) {
+            statement.argNames.push(this.readToken(IDENTIFIER));
+            while (this.eat(RPAREN, COMMA) === COMMA) {
+              statement.argNames.push(this.readToken(IDENTIFIER));
+            }
+          }
         }
         statement.sequence = this.readSequence();
         this.eat(ASTERISC);

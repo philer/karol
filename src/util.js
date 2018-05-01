@@ -86,6 +86,40 @@ export function isObject(item) {
   return item && typeof item === 'object' && !Array.isArray(item);
 }
 
+export function* zip(...iterables) {
+  const iterators = iterables.map(it => it[Symbol.iterator]());
+  let current = iterators.map(it => it.next());
+  while (!current.some(item => item.done)) {
+    yield current.map(item => item.value);
+    current = iterators.map(it => it.next());
+  }
+}
+
+export function unzip(tuples) {
+  const trails = tuples[0].map(() => []);
+  for (const tuple of tuples) {
+    trails.forEach((trail, index) => {
+      trail.push(tuple[index]);
+    });
+  }
+  return trails;
+}
+
+export function objectFrom(entries) {
+  const obj = {};
+  for (const [name, value] of entries) {
+    obj[name] = value;
+  }
+  return obj;
+}
+
+export function assignEntries(obj, entries) {
+  for (const [name, value] of entries) {
+    obj[name] = value;
+  }
+  return obj;
+}
+
 /**
  * Recursively merge objects into a target. Only merges objects,
  * everything else gets overwritten by later objects in the argument
