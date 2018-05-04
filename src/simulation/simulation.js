@@ -1,7 +1,7 @@
-import {Interpreter} from "./interpreter.js";
-import {render} from "./graphics.js";
+import {Interpreter} from "../language/interpreter";
+import {render} from "../graphics";
 
-import {noop} from "./util.js";
+import {noop} from "../util";
 
 const commandNames = {
   "linksdrehen":   "turnLeft",

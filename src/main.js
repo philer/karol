@@ -1,15 +1,17 @@
-import * as config from "./config.js";
-import {translate as t, Exception} from "./localization.js";
-import * as graphics from "./graphics.js";
-import {World} from "./world.js";
-import {Simulation} from "./simulation.js";
-import {Editor} from "./editor.js";
+import * as config from "./config";
+import {translate as t, Exception} from "./localization";
 
-import {domReady, byId, byClass, clamp} from "./util.js";
-import {readFile, saveTextAs} from "./files.js";
-import {checkKdwFormat, parseKdw, worldToKdwString} from "./world.js";
+import * as graphics from "./graphics";
 
-import "./icons.js";
+import {Simulation} from "./simulation/simulation";
+import {World, checkKdwFormat, parseKdw, worldToKdwString} from "./simulation/world";
+
+import {Editor} from "./ui/editor";
+import "./ui/icons";
+
+import {domReady, byId, byClass, clamp} from "./util";
+import {readFile, saveTextAs} from "./util/files";
+
 
 const keyMap = {
   "ArrowLeft":  "turnLeft",

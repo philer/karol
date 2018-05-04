@@ -1,4 +1,4 @@
-import {translate as t} from "./localization.js";
+import {translate as t} from "../localization";
 
 /**
  * Read a text file (e.g. .kdw file)

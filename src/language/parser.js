@@ -1,4 +1,4 @@
-import {Exception} from "./localization.js";
+import {Exception} from "../localization";
 
 // Token types
 // TODO Might use Symbol here, gotta check performance.

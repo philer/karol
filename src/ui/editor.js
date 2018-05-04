@@ -1,5 +1,5 @@
-import {isIE} from "./util.js";
-import highlight from "./highlight.js";
+import {isIE} from "../util";
+import highlight from "../language/highlight";
 
 export class Editor {
 

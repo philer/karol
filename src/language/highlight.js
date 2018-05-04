@@ -1,4 +1,4 @@
-import {TokenIterator, TokenTypes as TT} from "./parser.js";
+import {TokenIterator, TokenTypes as TT} from "./parser";
 
 const VISUAL_SPACE = "·";
 

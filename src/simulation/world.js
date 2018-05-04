@@ -1,5 +1,5 @@
-import {rand} from "./util.js";
-import {Exception} from "./localization.js";
+import {rand} from "../util";
+import {Exception} from "../localization";
 
 export class World {
 

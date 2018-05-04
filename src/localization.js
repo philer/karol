@@ -1,5 +1,5 @@
-import * as config from "./config.js";
-import {domReady, mergeDeep} from "./util.js";
+import * as config from "./config";
+import {domReady, mergeDeep} from "./util";
 
 const DATA_ATTRIBUTE_SUFFIX = "i18t";
 

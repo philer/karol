@@ -1,6 +1,6 @@
-import {Exception} from "./localization.js";
-import {TokenTypes as TT, textToAst} from "./parser.js";
-import {assignEntries, zip} from "./util.js";
+import {Exception} from "../localization";
+import {TokenTypes as TT, textToAst} from "./parser";
+import {assignEntries, zip} from "../util";
 
 const MAX_RECURSION_DEPTH = 10;
 

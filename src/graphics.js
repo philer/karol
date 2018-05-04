@@ -7,9 +7,9 @@
  * - multiple canvas layers
  */
 
-import * as config from "./config.js";
-import {domReady} from "./util.js";
-import * as noise from "./perlin.js";
+import * as config from "./config";
+import {domReady} from "./util";
+import * as noise from "./util/perlin";
 
 const DEFAULT_THEME_DIR = "img/simple/";
 
