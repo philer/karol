@@ -166,6 +166,7 @@ export class Simulation {
       return this._interpreter.interrupted;
     } finally {
       this._running = false;
+      this.redraw();
     }
   }
 

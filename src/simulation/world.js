@@ -43,9 +43,17 @@ export class World {
   }
 
 
-  step(forward=1, left=0) {
+  step(count=1) {
+    if (Math.abs(count) != 1) {
+      let direction = count >= 0 ? 1 : -1;
+      count = Math.abs(count);
+      for (let i = 0 ; i < count ; ++i) {
+        this.step(direction);
+      }
+      return;
+    }
     const z = this.tiles[this.player.x * this.length + this.player.y].blocks;
-    const [x, y] = World.move(this.player, forward, left);
+    const [x, y] = World.move(this.player, count);
     if (!this.contains(x, y)) {
       throw new Exception("error.world.move_out_of_world");
     }
