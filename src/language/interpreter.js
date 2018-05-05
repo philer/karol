@@ -2,7 +2,7 @@ import {Exception} from "../localization";
 import {TokenTypes as TT, textToAst} from "./parser";
 import {assignEntries, zip} from "../util";
 
-const MAX_RECURSION_DEPTH = 10;
+const MAX_RECURSION_DEPTH = 100;
 
 /**
  * Run a program upon the world simulation.
@@ -94,7 +94,7 @@ export class Interpreter {
     }
   }
 
-  visitExpression(expression, symbols) {
+  async visitExpression(expression, symbols) {
     switch (expression.type) {
       case TT.INTEGER:
         return +expression.value;
@@ -113,7 +113,7 @@ export class Interpreter {
       }
 
       case TT.NOT:
-        return !this.visitExpression(expression.expression, symbols);
+        return ! await this.visitExpression(expression.expression, symbols);
 
       default:
         throw new Exception("error.runtime.unimplemented_expression_type",
@@ -127,28 +127,29 @@ export class Interpreter {
    * @param  {Object} symbols lookup table
    * @return {mixed}  return value of the call
    */
-  call(call, symbols) {
+  async call(call, symbols) {
     const identifier = call.identifier.toLowerCase();
     if (!(identifier in symbols)) {
       throw new Exception("error.runtime.undefined",
                           {identifier, line: call.line});
     }
+    const routine = symbols[identifier];
+    const args = call.arguments.map(arg => this.visitExpression(arg, symbols));
+
+    if (routine.isBuiltin) {
+      return this.runtime.execute(symbols[identifier].name,
+                                          args, call.line);
+    }
+
+    // execute user defined routine
+    const localSymbols = assignEntries(Object.create(symbols),
+                                       zip(routine.argNames, args));
     this._depth++;
     if (this._depth > MAX_RECURSION_DEPTH) {
       throw new Exception("error.runtime.max_recursion_depth_exceeded",
                           MAX_RECURSION_DEPTH);
     }
-    const routine = symbols[identifier];
-    const args = call.arguments.map(arg => this.visitExpression(arg, symbols));
-    let result;
-    if (routine.isBuiltin) {
-      result = this.runtime.execute(symbols[identifier].name,
-                                          args, call.line);
-    } else {
-      const localSymbols = assignEntries(Object.create(symbols),
-                                         zip(routine.argNames, args));
-      result = this.visitSequence(routine.sequence, localSymbols);
-    }
+    const result = await this.visitSequence(routine.sequence, localSymbols);
     this._depth--;
     return result;
   }
