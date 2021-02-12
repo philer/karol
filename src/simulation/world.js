@@ -13,6 +13,14 @@ export class World {
                                      () => ({blocks: 0, mark: false}));
   }
 
+  get currentTile() {
+    return this.tiles[this.player.x * this.length + this.player.y];
+  }
+
+  get forwardTile() {
+    const [x, y] = World.move(this.player);
+    return this.tiles[x * this.length + y];
+  }
 
   /**
    * Get coordinates of tile by offset from player position.
@@ -40,6 +48,10 @@ export class World {
 
   isLookingAtEdge() {
     return !this.contains(...World.move(this.player));
+  }
+
+  isNotLookingAtEdge() {
+    return this.contains(...World.move(this.player));
   }
 
 
@@ -81,12 +93,19 @@ export class World {
   }
 
 
+  isLookingAtBlock() {
+    return this.targetTile && this.targetTile.blocks > 0;
+  }
+
+  isNotLookingAtBlock() {
+    return !this.isLookingAtBlock();
+  }
+
   placeBlock(count=1) {
-    const [x, y] = World.move(this.player);
-    if (!this.contains(x, y)) {
+    const targetTile = this.forwardTile;
+    if (!targetTile) {
       throw new Exception("error.world.action_out_of_world");
     }
-    const targetTile = this.tiles[x * this.length + y];
     if (targetTile.cuboid) {
       throw new Exception("error.world.action_cuboid");
     }
@@ -97,11 +116,10 @@ export class World {
   }
 
   takeBlock(count=1) {
-    const [x, y] = World.move(this.player);
-    if (!this.contains(x, y)) {
+    const targetTile = this.forwardTile;
+    if (!targetTile) {
       throw new Exception("error.world.action_out_of_world");
     }
-    const targetTile = this.tiles[x * this.length + y];
     if (targetTile.blocks - count < 0) {
       throw new Exception("error.world.action_no_blocks");
     }
@@ -109,8 +127,16 @@ export class World {
   }
 
 
+  isOnMark() {
+    return this.currentTile.mark;
+  }
+
+  isNotOnMark() {
+    return !this.currentTile.mark;
+  }
+
   placeMark() {
-    const targetTile = this.tiles[this.player.x * this.length + this.player.y];
+    const targetTile = this.currentTile;
     // can't stand on cuboid -> no need to check
     if (targetTile.mark) {
       throw new Exception("error.world.action_already_marked");
@@ -119,7 +145,7 @@ export class World {
   }
 
   takeMark() {
-    const targetTile = this.tiles[this.player.x * this.length + this.player.y];
+    const targetTile = this.currentTile;
     if (!targetTile.mark) {
       throw new Exception("error.world.action_no_mark");
     }
