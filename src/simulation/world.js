@@ -94,7 +94,7 @@ export class World {
 
 
   isLookingAtBlock() {
-    return this.targetTile && this.targetTile.blocks > 0
+    return this.forwardTile && this.forwardTile.blocks > 0
   }
 
   isNotLookingAtBlock() {

@@ -4,25 +4,25 @@ import {render} from "../graphics"
 import {noop} from "../util"
 
 const commandNames = {
-  "linksDrehen": "turnLeft",
-  "rechtsDrehen": "turnRight",
+  "linksdrehen": "turnLeft",
+  "rechtsdrehen": "turnRight",
 
-  "istWand": "isLookingAtEdge",
-  "nichtIstwand": "isNotLookingAtEdge",
+  "istwand": "isLookingAtEdge",
+  "nichtistwand": "isNotLookingAtEdge",
   "schritt": "step",
-  "schrittZurück": "stepBackwards",
-  "schrittZurueck": "stepBackwards",
+  "schrittzurück": "stepBackwards",
+  "schrittzurueck": "stepBackwards",
 
-  "istZiegel": "isLookingAtBrick",
-  "nichtIstZiegel": "isNotLookingAtBrick",
+  "istziegel": "isLookingAtBlock",
+  "nichtistziegel": "isNotLookingAtBlock",
   "hinlegen": "placeBlock",
   "aufheben": "takeBlock",
 
-  "istMarke": "isOnMark",
-  "nichtIstMarke": "isNotOnMark",
-  "markeSetzen": "placeMark",
-  "markeLöschen": "takeMark",
-  "markeLoeschen": "takeMark",
+  "istmarke": "isOnMark",
+  "nichtistmarke": "isNotOnMark",
+  "markesetzen": "placeMark",
+  "markelöschen": "takeMark",
+  "markeloeschen": "takeMark",
 }
 
 

@@ -58,7 +58,7 @@ export class Interpreter {
         return this.call(statement, symbols)
 
       case TT.IF:
-        if (this.visitExpression(statement.condition, symbols)) {
+        if (await this.visitExpression(statement.condition, symbols)) {
           return this.visitSequence(statement.sequence, symbols)
         } else if (statement.alternative) {
           return this.visitSequence(statement.alternative, symbols)
@@ -66,7 +66,7 @@ export class Interpreter {
         break
 
       case TT.WHILE:
-        while (this.visitExpression(statement.condition, symbols)) {
+        while (await this.visitExpression(statement.condition, symbols)) {
           await this.visitSequence(statement.sequence, symbols)
         }
         break
@@ -74,7 +74,7 @@ export class Interpreter {
       case TT.REPEAT: {
         // There is currently nothing in the language that could change the
         // result of the limit expression while the loop is running.
-        const count = this.visitExpression(statement.count, symbols)
+        const count = await this.visitExpression(statement.count, symbols)
         for (let i = 0 ; i < count ; i++) {
           await this.visitSequence(statement.sequence, symbols)
         }
@@ -102,10 +102,9 @@ export class Interpreter {
       case TT.IDENTIFIER: {
         const identifier = expression.identifier.toLowerCase()
         if (!(identifier in symbols)) {
-          throw new Exception("error.runtime.undefined",
-                              {identifier, line: expression.line})
+          throw new Exception("error.runtime.undefined", expression)
         }
-        const symbol = symbols[expression.identifier]
+        const symbol = symbols[identifier]
         if (symbol.isBuiltin || symbol.type === TT.IDENTIFIER) {
           return this.call(expression, symbols)
         }
@@ -134,11 +133,12 @@ export class Interpreter {
                           {identifier, line: call.line})
     }
     const routine = symbols[identifier]
-    const args = call.arguments.map(arg => this.visitExpression(arg, symbols))
+    const args = await Promise.all(
+      call.arguments.map(arg => this.visitExpression(arg, symbols))
+    )
 
     if (routine.isBuiltin) {
-      return this.runtime.execute(symbols[identifier].name,
-                                          args, call.line)
+      return this.runtime.execute(symbols[identifier].name, args, call.line)
     }
 
     // execute user defined routine
