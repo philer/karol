@@ -1,5 +1,5 @@
 
-import fontawesome from '@fortawesome/fontawesome';
+import fontawesome from '@fortawesome/fontawesome'
 
 // All icons used on the page need to be listed here.
 // Only use single statement import when tree-shaking is available,
@@ -12,7 +12,7 @@ import {
   // settings toggles
   faCog, faTimes,
 
-} from '@fortawesome/fontawesome-free-solid';
+} from '@fortawesome/fontawesome-free-solid'
 
 
 // Copy-paste all icons imported above into here.
@@ -25,4 +25,4 @@ fontawesome.library.add(
   // settings toggles
   faCog, faTimes,
 
-);
+)

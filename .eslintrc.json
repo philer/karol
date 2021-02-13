@@ -16,7 +16,7 @@
     "no-var": "warn",
     "semi": [
       "error",
-      "always"
+      "never"
     ],
     "strict": "error",
     "no-cond-assign": "off"

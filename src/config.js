@@ -2,13 +2,13 @@
  * Mapping of URLs to Promises, which will be resolved with data.
  * @type {Object}
  */
-const promises = Object.create(null);
+const promises = Object.create(null)
 
 /**
  * Mapping of URLs to the resolve function of each Promise.
  * @type {Object}
  */
-const resolvers = Object.create(null);
+const resolvers = Object.create(null)
 
 /**
  * Global function will be called by JSONP style config files.
@@ -16,8 +16,8 @@ const resolvers = Object.create(null);
  * @param  {mixed} data whatever the config file defines
  */
 window.config = function setConfigData(data) {
-  resolvers[getCurrentScriptSrc()](Object.freeze(data));
-};
+  resolvers[getCurrentScriptSrc()](Object.freeze(data))
+}
 
 /**
  * Load JSONP style configuration from .js files. This is necessary
@@ -26,26 +26,26 @@ window.config = function setConfigData(data) {
  * @return {Promise}
  */
 export function get(url="config.js") {
-  url = resolveUrl(url);
+  url = resolveUrl(url)
   if (url in promises) {
-    return promises[url];
+    return promises[url]
   }
   return promises[url] = new Promise(function(resolve, reject) {
     resolvers[url] = function resolveAndRemove(data) {
-      delete resolvers[url];
-      resolve(data);
-    };
-    const script = document.createElement("script");
+      delete resolvers[url]
+      resolve(data)
+    }
+    const script = document.createElement("script")
     script.onload = function() {
-      document.head.removeChild(script); // script.remove(); // IE sucks
-    };
+      document.head.removeChild(script) // script.remove(); // IE sucks
+    }
     script.onerror = function() {
-      reject();
-      document.head.removeChild(script); // script.remove(); // IE sucks
-    };
-    document.head.appendChild(script);
-    script.src = url;
-  });
+      reject()
+      document.head.removeChild(script) // script.remove(); // IE sucks
+    }
+    document.head.appendChild(script)
+    script.src = url
+  })
 }
 
 /**
@@ -56,19 +56,19 @@ export function get(url="config.js") {
 const getCurrentScriptSrc = (function() {
   if (document.currentScript !== undefined) {
     // non-horrible browsers
-    return function() { return document.currentScript.src; };
+    return function() { return document.currentScript.src }
   }
   // IE bandaid. Did I mention IE is a horrible "browser"?
-  const urlRegex = /(?:file|https?):\/\/.+?\/.+?\.js(?=\W)/g;
+  const urlRegex = /(?:file|https?):\/\/.+?\/.+?\.js(?=\W)/g
   return function() {
     try {
-      throw new Error();
+      throw new Error()
     } catch (error) {
-      const urls = error.stack.match(urlRegex);
-      return urls[urls.length - 1];
+      const urls = error.stack.match(urlRegex)
+      return urls[urls.length - 1]
     }
-  };
-})();
+  }
+})()
 
 /**
  * Browser compatible function for converting partial/relative URLs to full.
@@ -77,11 +77,11 @@ const getCurrentScriptSrc = (function() {
  */
 const resolveUrl = (function() {
   if (URL && URL.call) {
-    return url => (new URL(url, document.location)).href;
+    return url => (new URL(url, document.location)).href
   }
-  const a = document.createElement("a");
+  const a = document.createElement("a")
   return function compatibleUrlResolver(url) {
-    a.href = url;
-    return a.href;
-  };
-})();
+    a.href = url
+    return a.href
+  }
+})()

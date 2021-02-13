@@ -2,7 +2,7 @@
  * Are we caught up in Microsoft's horrible creation?
  * @type {Boolean}
  */
-export const isIE = window.navigator.userAgent.indexOf('Trident/') >= 0;
+export const isIE = window.navigator.userAgent.indexOf('Trident/') >= 0
 
 
 /**
@@ -14,9 +14,9 @@ export function noop() {}
 /**
  * Convenience abbreviations for document element getters
  */
-export const byId = document.getElementById.bind(document);
-export const byClass = document.getElementsByClassName.bind(document);
-export const byTag = document.getElementsByTagName.bind(document);
+export const byId = document.getElementById.bind(document)
+export const byClass = document.getElementsByClassName.bind(document)
+export const byTag = document.getElementsByTagName.bind(document)
 
 /**
  * Load JSON. Fails for local installations.
@@ -27,18 +27,18 @@ export const byTag = document.getElementsByTagName.bind(document);
  * @return {Promise}
  */
 export const getJSON = url => new Promise(function(resolve, reject) {
-  const xhr = new XMLHttpRequest();
-  xhr.open('get', url, true);
-  xhr.responseType = 'json';
+  const xhr = new XMLHttpRequest()
+  xhr.open('get', url, true)
+  xhr.responseType = 'json'
   xhr.onload = function() {
     if (xhr.status == 200) {
-      resolve(xhr.response);
+      resolve(xhr.response)
     } else {
-      reject(xhr.status);
+      reject(xhr.status)
     }
-  };
-  xhr.send();
-});
+  }
+  xhr.send()
+})
 
 
 /**
@@ -46,14 +46,14 @@ export const getJSON = url => new Promise(function(resolve, reject) {
  * @param  {int} ms
  * @return {Promise}
  */
-export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
  * Await a global event
  * @param  {String} evt event name
  * @return {Promise}
  */
-export const event = evt => new Promise(resolve => addEventListener(evt, resolve));
+export const event = evt => new Promise(resolve => addEventListener(evt, resolve))
 
 /**
  * Promise fulfilled on DOMContentLoaded
@@ -61,7 +61,7 @@ export const event = evt => new Promise(resolve => addEventListener(evt, resolve
  */
 export const domReady = document.readyState === "loading"
                           ? event("DOMContentLoaded")
-                          : Promise.resolve();
+                          : Promise.resolve()
 
 /**
  * Count how many times a character appears in a string.
@@ -70,12 +70,12 @@ export const domReady = document.readyState === "loading"
  * @return {int}
  */
 export function countOccurences(char, str) {
-  let count = 0;
+  let count = 0
   str.replace(char, function() {
-    count++;
-    return char;
-  });
-  return count;
+    count++
+    return char
+  })
+  return count
 }
 
 
@@ -83,41 +83,41 @@ export function countOccurences(char, str) {
  * Check if given argument is an Object (also not an Array).
  */
 export function isObject(item) {
-  return item && typeof item === 'object' && !Array.isArray(item);
+  return item && typeof item === 'object' && !Array.isArray(item)
 }
 
 export function* zip(...iterables) {
-  const iterators = iterables.map(it => it[Symbol.iterator]());
-  let current = iterators.map(it => it.next());
+  const iterators = iterables.map(it => it[Symbol.iterator]())
+  let current = iterators.map(it => it.next())
   while (!current.some(item => item.done)) {
-    yield current.map(item => item.value);
-    current = iterators.map(it => it.next());
+    yield current.map(item => item.value)
+    current = iterators.map(it => it.next())
   }
 }
 
 export function unzip(tuples) {
-  const trails = tuples[0].map(() => []);
+  const trails = tuples[0].map(() => [])
   for (const tuple of tuples) {
     trails.forEach((trail, index) => {
-      trail.push(tuple[index]);
-    });
+      trail.push(tuple[index])
+    })
   }
-  return trails;
+  return trails
 }
 
 export function objectFrom(entries) {
-  const obj = {};
+  const obj = {}
   for (const [name, value] of entries) {
-    obj[name] = value;
+    obj[name] = value
   }
-  return obj;
+  return obj
 }
 
 export function assignEntries(obj, entries) {
   for (const [name, value] of entries) {
-    obj[name] = value;
+    obj[name] = value
   }
-  return obj;
+  return obj
 }
 
 /**
@@ -132,14 +132,14 @@ export function mergeDeep(target, ...objects) {
   return objects.reduce((prev, obj) => {
     for (const key of Object.keys(obj)) {
       if (isObject(prev[key]) && isObject(obj[key])) {
-        prev[key] = mergeDeep({}, prev[key], obj[key]);
+        prev[key] = mergeDeep({}, prev[key], obj[key])
       } else {
-        prev[key] = obj[key];
+        prev[key] = obj[key]
       }
     }
-    return prev;
+    return prev
   },
-  target);
+  target)
 }
 
 /**
@@ -149,7 +149,7 @@ export function mergeDeep(target, ...objects) {
  * @param  {mixed} val
  * @return {mixed}
  */
-export const clamp = (min, max, val) => val < min ? min : val > max ? max : val;
+export const clamp = (min, max, val) => val < min ? min : val > max ? max : val
 
 /**
  * Wrapper for Math.random to get ints
@@ -157,7 +157,7 @@ export const clamp = (min, max, val) => val < min ? min : val > max ? max : val;
  * @param  {int} max
  * @return {int}
  */
-export const rand = (min, max) => Math.floor(Math.random() * Math.floor(max)) + min;
+export const rand = (min, max) => Math.floor(Math.random() * Math.floor(max)) + min
 
 /**
  * Turn a string into a hash (integer)
@@ -166,11 +166,11 @@ export const rand = (min, max) => Math.floor(Math.random() * Math.floor(max)) + 
  */
 export function hash(str) {
   // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
-  let hash = 0, i = 0, len = str.length;
+  let hash = 0, i = 0, len = str.length
   while (i < len) {
-    hash  = ((hash << 5) - hash + str.charCodeAt(i++)) << 0;
+    hash  = ((hash << 5) - hash + str.charCodeAt(i++)) << 0
   }
-  return hash;
+  return hash
 }
 
 /**
@@ -183,9 +183,9 @@ export function hash(str) {
  */
 export class Random {
   constructor(seed) {
-    this._seed = seed % 2147483647;
+    this._seed = seed % 2147483647
     if (this._seed <= 0) {
-      this._seed += 2147483646;
+      this._seed += 2147483646
     }
   }
 
@@ -193,13 +193,13 @@ export class Random {
    * Returns a pseudo-random value between 1 and 2^32 - 2.
    */
   next() {
-    return this._seed = this._seed * 16807 % 2147483647;
+    return this._seed = this._seed * 16807 % 2147483647
   }
 
   /**
    * Returns a pseudo-random floating point number in range [0, 1).
    */
   nextFloat() {
-    return (this.next() - 1) / 2147483646;
+    return (this.next() - 1) / 2147483646
   }
 }

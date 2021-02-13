@@ -1,12 +1,12 @@
-import * as config from "./config";
-import {domReady, mergeDeep} from "./util";
+import * as config from "./config"
+import {domReady, mergeDeep} from "./util"
 
-const DATA_ATTRIBUTE_SUFFIX = "i18t";
+const DATA_ATTRIBUTE_SUFFIX = "i18t"
 
-const INTERPOLATION_REGEX = /\{([^}]*?)\}/g;
+const INTERPOLATION_REGEX = /\{([^}]*?)\}/g
 
-let locales;
-let translations;
+let locales
+let translations
 
 /**
  * Get the first configured locale. Use getAllLocales for the full list of
@@ -14,7 +14,7 @@ let translations;
  * @return {string} usually a two character string, like "en".
  */
 export function getLocale() {
-  return locales[0];
+  return locales[0]
 }
 
 /**
@@ -23,15 +23,15 @@ export function getLocale() {
  * @return {[string]} usually an array of two character strings like "en".
  */
 export function getAllLocales() {
-  return locales;
+  return locales
 }
 
 async function setLocales(_locales) {
-  locales = Array.isArray(_locales) ? _locales : [_locales];
+  locales = Array.isArray(_locales) ? _locales : [_locales]
   translations = mergeDeep({}, ...await Promise.all(
-    locales.slice().reverse().map(l => config.get(`localization/${l}.js`))
-  ));
-  await translateDOM();
+    locales.slice().reverse().map(l => config.get(`localization/${l}.js`)),
+  ))
+  await translateDOM()
 }
 
 /**
@@ -40,15 +40,15 @@ async function setLocales(_locales) {
  * Also set the lang attribute of the body.
  */
 async function translateDOM() {
-  await domReady;
-  document.body.setAttribute("lang", locales[0]);
-  const elements = document.querySelectorAll(`[data-${DATA_ATTRIBUTE_SUFFIX}]`);
+  await domReady
+  document.body.setAttribute("lang", locales[0])
+  const elements = document.querySelectorAll(`[data-${DATA_ATTRIBUTE_SUFFIX}]`)
   for (const elem of elements) {
-    const variable = elem.dataset[DATA_ATTRIBUTE_SUFFIX];
-    const result = translate(variable);
+    const variable = elem.dataset[DATA_ATTRIBUTE_SUFFIX]
+    const result = translate(variable)
     if (typeof result === "string" && !(result === variable && elem.innerHTML))
     {
-      elem.innerHTML = result;
+      elem.innerHTML = result
     }
   }
 }
@@ -59,18 +59,18 @@ async function translateDOM() {
  * @return {mixed}
  */
 export function translate(variable, ...values) {
-  let result = translations;
+  let result = translations
   for (const key of variable.split(".")) {
-    result = result[key];
+    result = result[key]
     if (result === undefined) {
-      console.warn(`Could not resolve localization variable ${variable}`);
-      return variable;
+      console.warn(`Could not resolve localization variable ${variable}`)
+      return variable
     }
   }
   if (typeof result === "string") {
-    return values.length ? interpolate(result, ...values) : result;
+    return values.length ? interpolate(result, ...values) : result
   } else {
-    return JSON.stringify(result);
+    return JSON.stringify(result)
   }
 }
 
@@ -82,13 +82,13 @@ export function translate(variable, ...values) {
  */
 function interpolate(string, ...values) {
   if (values.length === 1 && typeof values[0] === "object") {
-    values = values[0];
+    values = values[0]
   }
   let iter = (typeof values[Symbol.iterator] === "function"
-              ? values : [])[Symbol.iterator]();
+              ? values : [])[Symbol.iterator]()
   return string.replace(INTERPOLATION_REGEX,
                         (_, key) => key ? values[key]
-                                        : iter.next().value);
+                                        : iter.next().value)
 }
 
 /**
@@ -100,12 +100,12 @@ function interpolate(string, ...values) {
  */
 export class Exception {
   constructor(message, ...data) {
-    this.message = message;
-    this.data = data;
+    this.message = message
+    this.data = data
   }
   get translatedMessage() {
-    return translate(this.message, ...this.data);
+    return translate(this.message, ...this.data)
   }
 }
 
-config.get().then(cfg => setLocales(cfg.locale));
+config.get().then(cfg => setLocales(cfg.locale))

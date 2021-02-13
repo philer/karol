@@ -1,7 +1,7 @@
-import {Interpreter} from "../language/interpreter";
-import {render} from "../graphics";
+import {Interpreter} from "../language/interpreter"
+import {render} from "../graphics"
 
-import {noop} from "../util";
+import {noop} from "../util"
 
 const commandNames = {
   "linksDrehen": "turnLeft",
@@ -23,79 +23,79 @@ const commandNames = {
   "markeSetzen": "placeMark",
   "markeLöschen": "takeMark",
   "markeLoeschen": "takeMark",
-};
+}
 
 
 export class Simulation {
   constructor(world, delay=100) {
-    this.world = world;
-    this.delay = delay;
+    this.world = world
+    this.delay = delay
 
-    this._interpreter = new Interpreter(this, commandNames);
+    this._interpreter = new Interpreter(this, commandNames)
 
-    this._useDelay = true;
-    this._running = false;
-    this._paused = false;
-    this._unpausePromise = Promise.resolve();
-    this._unpauseResolve = noop;
-    this._interruptSleep = noop;
-    this._execCallback = noop;
+    this._useDelay = true
+    this._running = false
+    this._paused = false
+    this._unpausePromise = Promise.resolve()
+    this._unpauseResolve = noop
+    this._interruptSleep = noop
+    this._execCallback = noop
   }
 
   get isRunning() {
-    return this._running;
+    return this._running
   }
 
   get isPaused() {
-    return this._paused;
+    return this._paused
   }
 
   get world() {
-    return this._world;
+    return this._world
   }
 
   set world(world) {
-    this.stop();
-    this._world = world;
-    this.redraw();
+    this.stop()
+    this._world = world
+    this.redraw()
   }
 
   onExecute(fn) {
-    this._execCallback = fn;
+    this._execCallback = fn
   }
 
   pause() {
     if (!this._paused) {
-      this._paused = true;
+      this._paused = true
       this._unpausePromise = new Promise(resolve =>
-                                         this._unpauseResolve = resolve);
+                                         this._unpauseResolve = resolve)
     }
   }
 
   unpause() {
     if (this._paused) {
-      this._paused = false;
-      this._interruptSleep();
-      this._unpauseResolve();
+      this._paused = false
+      this._interruptSleep()
+      this._unpauseResolve()
     }
   }
 
   togglePause() {
-    this._paused ? this.pause() : this.unpause();
+    this._paused ? this.pause() : this.unpause()
   }
 
   /**
    * Trigger graphics update
    */
   redraw() {
-    render(this._world);
+    render(this._world)
   }
 
   sleep(ms) {
     return new Promise(resolve => {
-      this._interruptSleep = resolve;
-      setTimeout(resolve, ms);
-    });
+      this._interruptSleep = resolve
+      setTimeout(resolve, ms)
+    })
   }
 
   /**
@@ -103,14 +103,14 @@ export class Simulation {
    */
   async step() {
     if (this._paused) {
-      const useDelay = this._useDelay;
-      this._useDelay = false;
-      this.unpause();
-      await this._unpausePromise;
-      this.pause();
-      this._useDelay = useDelay;
+      const useDelay = this._useDelay
+      this._useDelay = false
+      this.unpause()
+      await this._unpausePromise
+      this.pause()
+      this._useDelay = useDelay
     } else {
-      this._interruptSleep();
+      this._interruptSleep()
     }
   }
 
@@ -127,16 +127,16 @@ export class Simulation {
    * @return {Promise}
    */
   async execute(command, args=[], line=null) {
-    this._execCallback(command, line);
-    const result = this.evaluate(command, args, line);
+    this._execCallback(command, line)
+    const result = this.evaluate(command, args, line)
     if (result === undefined) {
-      this.redraw();
+      this.redraw()
     }
     if (this._useDelay) {
-      await this.sleep(this.delay);
-      await this._unpausePromise;
+      await this.sleep(this.delay)
+      await this._unpausePromise
     }
-    return result;
+    return result
   }
 
   /**
@@ -147,8 +147,8 @@ export class Simulation {
    * @return {undefined}
    */
   runCommand(command) {
-    this.evaluate(command);
-    this.redraw();
+    this.evaluate(command)
+    this.redraw()
   }
 
   /**
@@ -158,7 +158,7 @@ export class Simulation {
    * @return {mixed}             return value of the builtin
    */
   evaluate(command, args=[]) {
-    return this.world[command](...args);
+    return this.world[command](...args)
   }
 
   /**
@@ -167,24 +167,24 @@ export class Simulation {
    * @return {Promise}
    */
   async run(code) {
-    this.stop();
-    this._useDelay = true;
-    this._running = true;
+    this.stop()
+    this._useDelay = true
+    this._running = true
     try {
-      await this._interpreter.run(code);
-      return this._interpreter.interrupted;
+      await this._interpreter.run(code)
+      return this._interpreter.interrupted
     } finally {
-      this._running = false;
-      this.redraw();
+      this._running = false
+      this.redraw()
     }
   }
 
   stop() {
     if (this._running) {
-      this._interpreter.interrupt();
-      this._useDelay = false;
-      this._interruptSleep();
-      this.unpause();
+      this._interpreter.interrupt()
+      this._useDelay = false
+      this._interruptSleep()
+      this.unpause()
     }
   }
 
