@@ -28,27 +28,20 @@ ttClasses[TT.WHITESPACE] = "whitespace";
 
 const reSpaces = / +/g
 
-const transformWhitespace = text => text.replace(reSpaces, spaces =>
+const wrapSpaces = text => text.replace(reSpaces, spaces =>
     `<span class="whitespace">${VISUAL_SPACE.repeat(spaces.length)}</span>`,
   )
 
-function wrapToken(text, type) {
-  if (type === TT.WHITESPACE) {
-    return text  // already wrapped
-  }
-  return `<span class="token ${ttClasses[type]}">${text}</span>`
-}
+ const wrapToken = (text, type) =>
+  type === TT.WHITESPACE
+    ? text  // already wrapped
+    : `<span class="token ${ttClasses[type]}">${text}</span>`
 
-let lineno
-
-const wrapLine = text => '<span class="line">'
-                       +   '<span class="lineno">'
-                       +     lineno++
-                       +   '</span>'
-                       +   '<span>'
-                       +     text
-                       +   '</span>'
-                       + '</span>'
+const wrapLine = (line, idx) =>
+    '<div class="line">'
+  +   `<span class="lineno">${idx + 1}</span>`
+  +   `<span>${line}</span>`
+  + '</div>'
 
 /**
  * Add syntax highlighting HTML tags to given code snippet.
@@ -57,25 +50,29 @@ const wrapLine = text => '<span class="line">'
  */
 export default function highlight(text) {
   const tokens = new TokenIterator(text, true, true)
-  let html = ""
+  const htmlLines = []
   let currentLine = ""
-  lineno = 1
+  let value, type
   try {
-    for (const token of tokens) {
-      if (token.type === TT.COMMENT || token.type === TT.WHITESPACE) {
-        const [first, ...lines] = transformWhitespace(token.value).split("\n")
-        currentLine += wrapToken(first, token.type)
+    for ({value, type} of tokens) {
+      if (type === TT.COMMENT || type === TT.WHITESPACE) {
+        const [first, ...lines] = wrapSpaces(value).split("\n")
+        currentLine += wrapToken(first, type)
         for (const line of lines) {
-          html += wrapLine(currentLine)
-          currentLine = wrapToken(line, token.type)
+          htmlLines.push(currentLine)
+          currentLine = wrapToken(line, type)
         }
       } else {
-        currentLine += wrapToken(token.value, token.type)
+        currentLine += wrapToken(value, type)
       }
     }
   } catch (err) {
-    return html + (currentLine + transformWhitespace(tokens.remainingText))
-                  .split("\n").map(wrapLine).join("")
+    console.error(err)
+    htmlLines.push(currentLine)
+    return htmlLines.map(wrapLine).join("")
+      + wrapSpaces(tokens.remainingText)
+          .split("\n").map(wrapLine).join("")
   }
-  return html + wrapLine(currentLine)
+  htmlLines.push(currentLine)
+  return htmlLines.map(wrapLine).join("")
 }
