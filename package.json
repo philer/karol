@@ -1,6 +1,6 @@
 {
   "name": "karol",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Web based version of Karol, a kids friendly tool for learning algorithms",
   "main": "index.js",
   "author": "Philipp Miller",
