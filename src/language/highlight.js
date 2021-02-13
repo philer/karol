@@ -1,6 +1,6 @@
 import {TokenIterator, TokenTypes as TT} from "./parser"
 
-const VISUAL_SPACE = "·"
+const VISUAL_SPACE = "·<wbr>"
 
 /**
  * Map TokenTypes to css class names

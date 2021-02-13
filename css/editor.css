@@ -26,24 +26,28 @@
   width: 100%;
   min-height: 100%;
   display: block;
-  padding: .5em 1em .5em 3em;
+  padding: .5em 1em .5em 4.5ch;
   margin: 0;
-  border-width: 0;
-  outline-width: 0;
+  overflow: hidden; /* inconsistent scroll bars mess up the width */
+
+  border: none;
+  outline: none;
   font-size: inherit;
   font-family: inherit;
   line-height: inherit;
   color: inherit;
-  overflow: hidden; /* inconsistent scroll bars mess up the width */
-  white-space: pre-wrap;
-  word-wrap: break-word; /* word-wrap  = overflow-wrap */
-  tab-size: 4;
   background: transparent;
+
+  white-space: pre-wrap;
+  word-wrap: normal; /* word-wrap = overflow-wrap */
+  overflow-wrap: normal;
+  word-break: normal;
+  tab-size: 4;
 }
 .editor-highlight {
   z-index: 2;
   pointer-events: none;
-  padding-left: .5em; /* line numbers */
+  padding-left: .5ch; /* line numbers */
 }
 .editor-textarea {
   z-index: 0;
@@ -59,7 +63,6 @@
   position: static;
   pointer-events: none;
   color: transparent;
-  background: inherit; /* editor background */
 }
 @keyframes caretBlink {
   0% { opacity: 1; }
@@ -68,22 +71,17 @@
   100% { opacity: 0; }
 }
 .editor-caret {
-  position: relative;
-  z-index: 100;
-  display: inline;
   border: 1px solid black; /* caret color */
-  border-width: 3px 1px;
-  margin: -3px -1px;
+  margin: 0 -1px;
 }
 .editor-caret.blink {
-  animation: caretBlink 1s linear infinite alternate;
+  animation: caretBlink .6s linear infinite alternate;
   animation-delay: .5s;
 }
 .editor-textarea:not(:focus) ~ .editor-caret-layer .editor-caret {
   display: none;
 }
 .editor-selection {
-  padding: 2px;
   border-radius: 2px;
 }
 .editor-selection:empty {
@@ -107,15 +105,10 @@
   width: 0;
 }
 .editor-highlight .lineno {
-  flex: 0 0 auto;
-  width: 2em;
-  padding-right: .5em;
-  margin-right: .5em;
+  flex: 0 0 3.5ch;
+  padding-right: .5ch;
+  margin-right: .5ch;
   border-right: 1px solid #ddd;
   text-align: right;
-  word-wrap: normal; /* word-wrap  = overflow-wrap */
   color: grey;
-}
-.editor-highlight .lineno + span {
-  max-width: calc(100% - 2.5em);
 }

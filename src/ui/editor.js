@@ -22,6 +22,7 @@ export class Editor {
     }
     this.selection = caretLayer.appendChild(document.createElement("span"))
     this.selection.classList.add("editor-selection")
+    this.afterSelection = caretLayer.appendChild(document.createElement("span"))
 
     // chrome ignores keypress
     textarea.addEventListener("keydown", evt => {
@@ -39,7 +40,7 @@ export class Editor {
     //  more events: paste propertychange
 
     const updateCaret = this.updateCaret.bind(this)
-    const deferredCaretUpdate = () => setTimeout(updateCaret, 0)
+    const deferredCaretUpdate = () => setTimeout(updateCaret, 10)
     // Listening to both because chrome doesn't trigger keydown on arrow keys
     // while firefox misplaces the cursor with keypress.
     textarea.addEventListener("keypress", deferredCaretUpdate)
@@ -75,16 +76,20 @@ export class Editor {
   }
 
   updateCaret() {
-    const {value, selectionDirection, selectionEnd, selectionStart} = this.textarea
-    // const offset = selectionDirection === "forward" ? selectionEnd : selectionStart;
-    // this.beforeCaret.innerHTML = this.textarea.value.slice(0, offset);
-    this.beforeCaret.innerHTML = value.slice(0, selectionStart)
+    const {
+      value,
+      selectionDirection,
+      selectionEnd,
+      selectionStart,
+    } = this.textarea
 
-    // selection may be empty
+    this.beforeCaret.innerHTML = value.slice(0, selectionStart)
     this.selection.innerHTML = value.slice(selectionStart, selectionEnd)
-    this.caret.insertAdjacentElement(selectionDirection === "forward"
-                                        ? "beforebegin" : "afterend",
-                                     this.selection)
+    this.afterSelection.innerHTML = value.slice(selectionEnd)
+    this.caret.insertAdjacentElement(
+      selectionDirection === "forward" ? "beforebegin" : "afterend",
+      this.selection,
+    )
 
     // restart animation
     this.caret.classList.remove("blink")
