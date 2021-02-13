@@ -46,7 +46,6 @@ const babelPlugin = babel({
 
 export default DEBUG ? [
   makeConfig("core", []),
-  makeConfig("core-old-browsers", [babelPlugin]),
 ] : [
   makeConfig("core.min", [uglify()]),
   makeConfig("core-old-browsers.min", [babelPlugin, uglify()]),
