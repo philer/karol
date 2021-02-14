@@ -1,5 +1,5 @@
 
-import fontawesome from '@fortawesome/fontawesome'
+import {dom, library} from "@fortawesome/fontawesome-svg-core"
 
 // All icons used on the page need to be listed here.
 // Only use single statement import when tree-shaking is available,
@@ -16,12 +16,12 @@ import {
   faArrowUp, faArrowDown, faReply,
   faPlusCircle, faMinusCircle,
 
-} from '@fortawesome/fontawesome-free-solid'
+} from "@fortawesome/free-solid-svg-icons"
 
 
 // Copy-paste all icons imported above into here.
 // Yeah, I know...
-fontawesome.library.add(
+library.add(
 
   // runtime controlls
   faPlay, faPause, faStop, faStepForward,
@@ -34,3 +34,6 @@ fontawesome.library.add(
   faPlusCircle, faMinusCircle,
 
 )
+
+// TODO remove after switching to Preact
+dom.i2svg()
