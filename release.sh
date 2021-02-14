@@ -68,11 +68,10 @@ yarn dist
 echo "Copying assets..."
 mkdir -pv "$TARGET_DIR/scripts"
 cp -rv build/*.min.js "$TARGET_DIR/scripts"
-cp -v "node_modules/babel-polyfill/dist/polyfill.min.js" "$TARGET_DIR/scripts"
 cp -rv config.js css img localization examples package.json README.md "$TARGET_DIR"
 
 echo "Converting index.html..."
-sed -E 's#build/(.*)\.(js|css)#build/\1.min.\2#g' "index.html" \
+sed -E 's#build/(.*)\.(js|css)#scripts/\1.min.\2#g' "index.html" \
     > "$TARGET_DIR/index.html"
 
 echo "Creating archives..."
