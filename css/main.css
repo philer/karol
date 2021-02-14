@@ -14,13 +14,15 @@ html {
 body {
   font-family: verdana, arial, helvetica, sans-serif;
   font-size: 14px;
-  padding: 0;
-  margin: 0;
   position: absolute;
   top: .25em;
   left: .5em;
   right: .5em;
   bottom: .5em;
+  display: flex;
+  justify-content: stretch;
+  padding: 0;
+  margin: 0;
   background-color: #f7f7f7;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -48,12 +50,15 @@ i.fa { /* prevent page load flicker */
 }
 .button {
   position: relative;
+
   margin: .5em .25em;
   padding: 0 1em;
-  line-height: 2em;
+  line-height: 3em;
+  height: 3em;
 
   font-family: inherit;
-  font-size: inherit;
+  /*font-size: inherit;*/
+  font-size: 1.2em;
   cursor: pointer;
   outline: none;
 
@@ -74,7 +79,7 @@ i.fa { /* prevent page load flicker */
   filter: drop-shadow(1px 1px 0px white);
 }
 .icon-button {
-  padding: 0 .75em;
+  width: 3em;
 }
 .button.nohover{
   cursor: default;
@@ -98,25 +103,18 @@ i.fa { /* prevent page load flicker */
 /*** layout ***/
 
 .panel {
-  position: absolute;
   padding: .5em;
   overflow: auto;
-
   display: flex;
   flex-direction: column;
   justify-content: stretch;
 }
 .editor-panel {
-  width: 20em;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  flex: auto 1 1;
+  min-width: 30em;
 }
 .world-panel {
-  left: 20em;
-  right: 0;
-  top: 0;
-  bottom: 0;
+  flex: 100% 1 1;
 }
 .panel > header {
   display: flex;
@@ -173,24 +171,24 @@ i.fa { /* prevent page load flicker */
 }
 .editor-buttons {
   display: flex;
-  padding-right: .5em;
 }
 .editor-buttons .button {
+  flex: 1 1 auto;
   margin: .5em 0 .5em .5em;
-  flex:  1 1 auto;
+}
+.editor-buttons .button:last-child {
+  margin-right: .5em;
+}
+.editor-buttons .icon-button {
+  flex: 0 0 0;
+}
+.editor-buttons .icon-button + .icon-button {
+  margin-left: 0;
 }
 #run-button {
   font-weight: bold;
-  margin-right: .5em;
 }
-#unpause-button,
-#pause-button,
-#step-button,
-#stop-button
-{
-  flex: 0 0 0;
-  margin: .5em 0;
-}
+
 
 /** world **/
 
@@ -342,8 +340,7 @@ canvas#world-canvas {
   background-color: #eee;
   border-radius: 3px;
 }
-.world-settings .separator
-{
+.world-settings .separator {
   margin: 0 .25em;
   border: 1px solid transparent;
   border-right-color: rgba(255, 255, 255, .66);

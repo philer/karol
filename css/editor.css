@@ -99,7 +99,7 @@
 .editor-highlight .line.current::before {
   content: "➡";
   position: relative;
-  left: -.5em;
+  left: -.33em;
   font-weight: bold;
   font-size: 2em;
   width: 0;
