@@ -27,7 +27,13 @@ export function getAllLocales() {
 }
 
 async function setLocales(_locales) {
-  locales = Array.isArray(_locales) ? _locales : [_locales]
+  _locales = Array.isArray(_locales) ? _locales : [_locales]
+  if (_locales.includes("auto")) {
+    const browserLocale = navigator.language.split(/[_-]/)[0]
+    _locales = _locales.map(locale => locale === "auto" ? browserLocale : locale)
+  }
+
+  locales = Array.from(new Set(_locales))
   translations = mergeDeep({}, ...await Promise.all(
     locales.slice().reverse().map(l => config.get(`localization/${l}.js`)),
   ))
