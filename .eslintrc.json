@@ -2,24 +2,19 @@
   "root": true,
   "extends": "eslint:recommended",
   "parserOptions": {
+    "ecmaFeatures": {"impliedStrict": true},
     "ecmaVersion": 2017,
-    "sourceType": "module",
-    "ecmaFeatures": {"impliedStrict": true}
+    "sourceType": "module"
   },
   "rules": {
     "block-scoped-var": "warn",
-    "comma-dangle": [
-      "warn",
-      "always-multiline"
-    ],
+    "comma-dangle": ["warn", "always-multiline"],
+    "no-cond-assign": "off",
     "no-console": ["warn", {"allow": ["warn", "error"]}],
+    "no-prototype-builtins": "off",
     "no-var": "warn",
-    "semi": [
-      "error",
-      "never"
-    ],
-    "strict": "error",
-    "no-cond-assign": "off"
+    "semi": ["error", "never"],
+    "strict": "error"
   },
   "env": {
     "browser": true,

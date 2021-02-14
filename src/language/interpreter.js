@@ -134,7 +134,7 @@ export class Interpreter {
     }
     const routine = symbols[identifier]
     const args = await Promise.all(
-      call.arguments.map(arg => this.visitExpression(arg, symbols))
+      call.arguments.map(arg => this.visitExpression(arg, symbols)),
     )
 
     if (routine.isBuiltin) {
