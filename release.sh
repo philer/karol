@@ -72,15 +72,8 @@ cp -v "node_modules/babel-polyfill/dist/polyfill.min.js" "$TARGET_DIR/scripts"
 cp -rv config.js css img localization examples package.json README.md "$TARGET_DIR"
 
 echo "Converting index.html..."
-cat "index.html" | while read line; do
-    if [ "$line" = '<script async src="build/core.js"></script>' ]; then
-        echo "<script>"
-        cat "src/_asset_loader.js"
-        echo "</script>"
-    else
-        echo "$line"
-    fi
-done > "$TARGET_DIR/index.html"
+sed -E 's#build/(.*)\.(js|css)#build/\1.min.\2#g' "index.html" \
+    > "$TARGET_DIR/index.html"
 
 echo "Creating archives..."
 cd "$RELEASES_DIR"

@@ -15,14 +15,7 @@ Additionally, sprite themes are located in `img/`. Each theme has a `theme.js` w
 
 ### Compatibility
 
-I'm not quite sure which browsers are currently supported.
-Current targets are up-to-date Firefox and Chrome as well as Internet Explore 11.
-
-Required APIs:
-
-* canvas: IE9+
-* FileReader, Blob: IE10+
-* dataset: IE11+
+Current targets are up-to-date Firefox and Chrome. It probably works in latest Edge, too.
 
 ## Development
 

@@ -1,11 +1,4 @@
 /**
- * Are we caught up in Microsoft's horrible creation?
- * @type {Boolean}
- */
-export const isIE = window.navigator.userAgent.indexOf('Trident/') >= 0
-
-
-/**
  * "No Operation" empty function - does nothing.
  * @return {undefined}
  */

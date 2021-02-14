@@ -1,5 +1,3 @@
-import {translate as t} from "../localization"
-
 /**
  * Read a text file (e.g. .kdw file)
  * @param  {File} file DOM file (from input[type="filel"])
@@ -19,34 +17,18 @@ export const readFile = file => new Promise(function(resolve) {
  * @param  {string} text  string to be downloaded as text file
  * @param  {string} filename
  */
-export const saveTextAs = (function() {
+export function saveTextAs(text, filename) {
+  const blob = new Blob([text], {type: "text/plain;charset=utf-8"})
+  const url = URL.createObjectURL(blob)
+
   const downloadLink = document.createElement('a')
+  downloadLink.style.display = "none"
+  downloadLink.setAttribute("href", url)
+  downloadLink.setAttribute("download", filename)
 
-  // feature detection
-  if ("download" in downloadLink) {
-    downloadLink.style.display = "none"
-    return function download(text, filename) {
-      const blob = new Blob([text], {type: "text/plain;charset=utf-8"})
-      const url = URL.createObjectURL(blob)
+  document.body.appendChild(downloadLink)
+  downloadLink.click()
+  document.body.removeChild(downloadLink)
 
-      downloadLink.setAttribute("href", url)
-      downloadLink.setAttribute("download", filename)
-
-      document.body.appendChild(downloadLink)
-      downloadLink.click()
-      document.body.removeChild(downloadLink)
-
-      setTimeout(() => URL.revokeObjectURL(url), 60 * 1000)
-    }
-
-  // maybe old IE?
-  } else if (typeof navigator !== "undefined" && navigator.msSaveOrOpenBlob) {
-    return function oldIEDownload(text, filename) {
-      const blob = new Blob([text], {type: "text/plain;charset=utf-8"})
-      navigator.msSaveOrOpenBlob(blob, filename)
-    }
-
-  } else {
-    alert(t("error.browser_feature_not_available"))
-  }
-})()
+  setTimeout(() => URL.revokeObjectURL(url), 60 * 1000)
+}
