@@ -7,12 +7,15 @@
     "sourceType": "module"
   },
   "rules": {
+    "arrow-body-style": ["error", "as-needed"],
+    "arrow-parens": ["warn", "as-needed"],
     "block-scoped-var": "warn",
     "comma-dangle": ["warn", "always-multiline"],
     "no-cond-assign": "off",
     "no-console": ["warn", {"allow": ["warn", "error"]}],
     "no-prototype-builtins": "off",
     "no-var": "warn",
+    "prefer-arrow-callback": "warn",
     "semi": ["error", "never"],
     "strict": "error"
   },

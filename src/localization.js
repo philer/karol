@@ -92,9 +92,10 @@ function interpolate(string, ...values) {
   }
   let iter = (typeof values[Symbol.iterator] === "function"
               ? values : [])[Symbol.iterator]()
-  return string.replace(INTERPOLATION_REGEX,
-                        (_, key) => key ? values[key]
-                                        : iter.next().value)
+  return string.replace(
+    INTERPOLATION_REGEX,
+    (_, key) => key ? values[key] : iter.next().value,
+  )
 }
 
 /**

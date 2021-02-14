@@ -201,7 +201,7 @@ function loadImage(path) {
   if (path in imageCache) {
     return imageCache[path]
   }
-  return imageCache[path] = new Promise(function(resolve) {
+  return imageCache[path] = new Promise(resolve => {
     const image = new Image()
     image.onload = function() {
       resolve(image)

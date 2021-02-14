@@ -23,7 +23,7 @@ export const css = mapping =>
  * @param  {string} url
  * @return {Promise}
  */
-export const getJSON = url => new Promise(function(resolve, reject) {
+export const getJSON = url => new Promise((resolve, reject) => {
   const xhr = new XMLHttpRequest()
   xhr.open('get', url, true)
   xhr.responseType = 'json'
@@ -68,7 +68,7 @@ export const domReady = document.readyState === "loading"
  */
 export function countOccurences(char, str) {
   let count = 0
-  str.replace(char, function() {
+  str.replace(char, () => {
     count++
     return char
   })

@@ -162,12 +162,11 @@ export class Editor {
 
     let firstLineUnindent = null // need this to find out how much was removed
     const lines = value.slice(firstLineStart, lastLineEnd)
-                      .replace(this.unindenRegex, function(match) {
-                        if (firstLineUnindent === null) {
-                          firstLineUnindent = match.length
-                        }
-                        return ''
-                      })
+                       .replace(this.unindenRegex, match =>
+                         firstLineUnindent === null
+                           ? firstLineUnindent = match.length
+                           : '',
+                       )
 
     this.textarea.value = value.slice(0, firstLineStart)
                         + lines

@@ -3,11 +3,10 @@
  * @param  {File} file DOM file (from input[type="filel"])
  * @return {Promise} resolves with text content
  */
-export const readFile = file => new Promise(function(resolve) {
+export const readFile = file => new Promise((resolve, reject) => {
   const reader = new FileReader()
-  reader.onload = function() {
-    resolve(reader.result)
-  }
+  reader.onload = () => resolve(reader.result)
+  reader.onerror = () => reject(reader.error)
   reader.readAsText(file)
 })
 

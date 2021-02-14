@@ -102,12 +102,11 @@ function initWorldControls() {
   on("click", byId("world-new-button"), resetSimulation)
   on("submit", byClass("world-settings")[0], resetSimulation)
 
-  on("click", byId("world-save-button"), function() {
-    saveTextAs(worldToKdwString(simulation.world),
-               t("world.default_filename"))
-  })
+  on("click", byId("world-save-button"), () =>
+    saveTextAs(worldToKdwString(simulation.world), t("world.default_filename")),
+  )
 
-  on("change", worldFileInput, async function() {
+  on("change", worldFileInput, async () => {
     simulation.stop()
     const file = worldFileInput.files[0]
     // info(t("world.loading_from_file", file.name));
@@ -124,19 +123,19 @@ function initWorldControls() {
   })
 
   // world view settings
-  on("change", showPlayerCheckbox, function() {
+  on("change", showPlayerCheckbox, () => {
     graphics.showPlayer(showPlayerCheckbox.checked)
     simulation.redraw()
   })
   graphics.showPlayer(showPlayerCheckbox.checked)
 
-  on("change", showFlatWorldCheckbox, function() {
+  on("change", showFlatWorldCheckbox, () => {
     graphics.showHeightNoise(!showFlatWorldCheckbox.checked)
     simulation.redraw()
   })
   graphics.showHeightNoise(!showFlatWorldCheckbox.checked)
 
-  on("change", simSpeedInput, function() {
+  on("change", simSpeedInput, () => {
     simulation.delay = calculateDelay()
   })
 
@@ -203,7 +202,7 @@ function initEditorButtons() {
 
   disable(stopButton, stepButton, pauseButton, unpauseButton)
 
-  on("click", runButton, async function() {
+  on("click", runButton, async () => {
     disable(runButton)
     enable(stopButton, stepButton, pauseButton)
     info(t("program.message.running"))
@@ -224,37 +223,26 @@ function initEditorButtons() {
     editor.markLine()
   })
 
-  on("click", stopButton, function() {
-    simulation.stop()
-  })
-
-  on("click", stepButton, function() {
-    simulation.step()
-  })
-
-  on("click", pauseButton, function() {
+  on("click", stopButton, () => simulation.stop())
+  on("click", stepButton, () => simulation.step())
+  on("click", pauseButton, () => {
     simulation.pause()
     info(t("program.message.paused"))
     disable(pauseButton)
     enable(unpauseButton)
   })
-
-  on("click", unpauseButton, function() {
+  on("click", unpauseButton, () => {
     simulation.unpause()
     info(t("program.message.running"))
     disable(unpauseButton)
     enable(pauseButton)
   })
-
-  on("click", saveButton, function() {
+  on("click", saveButton, () => {
     saveTextAs(editor.value, t("program.default_filename"))
   })
-
-  on("change", programFileInput, async function() {
+  on("change", programFileInput, async () => {
     simulation.stop()
-    const file = programFileInput.files[0]
-    // info(t("program.loading_from_file", file.name));
-    editor.value = await readFile(file)
+    editor.value = await readFile(programFileInput.files[0])
   })
 }
 
@@ -265,10 +253,7 @@ function initEditorButtons() {
   const editorTheme = (await config.get()).editor_theme || "bright"
   byId("editor-theme-stylesheet").href = `css/editor-theme-${editorTheme}.css`
 
-  await Promise.all([
-    graphics.init(),
-    domReady,
-  ])
+  await Promise.all([graphics.init(), domReady])
 
   initWorldControls()
   initEditorButtons()
@@ -277,5 +262,4 @@ function initEditorButtons() {
 
   editor = new Editor(byId("editor"))
   simulation.onExecute((_, lineno) => editor.markLine(lineno))
-
 })()
