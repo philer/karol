@@ -4,6 +4,9 @@ import {assignEntries, zip} from "../util"
 
 const MAX_RECURSION_DEPTH = 100
 
+/** Will be thrown like an exception to stop execution. */
+const INTERRUPT = Symbol('INTERRUPT')
+
 /**
  * Run a program upon the world simulation.
  * More specifically, interpret a given AST and
@@ -36,11 +39,18 @@ export class Interpreter {
     this._interrupted = true
   }
 
-  run(text) {
+  async run(text) {
     const ast = textToAst(text)
     const symbolTable = Object.create(this.builtins)
     this._interrupted = false
-    return this.visitSequence(ast, symbolTable)
+    this._depth = 0
+    try {
+      await this.visitSequence(ast, symbolTable)
+    } catch (err) {
+      if (err !== INTERRUPT) {
+        throw err
+      }
+    }
   }
 
   async visitSequence(sequence, symbols) {
@@ -52,9 +62,6 @@ export class Interpreter {
   async visitStatement(statement, symbols) {
     switch (statement.type) {
       case TT.IDENTIFIER:
-        if (this._interrupted) {
-          return
-        }
         return this.call(statement, symbols)
 
       case TT.IF:
@@ -127,15 +134,19 @@ export class Interpreter {
    * @return {mixed}  return value of the call
    */
   async call(call, symbols) {
+    if (this._interrupted) {
+      throw INTERRUPT
+    }
     const identifier = call.identifier.toLowerCase()
     if (!(identifier in symbols)) {
       throw new Exception("error.runtime.undefined",
                           {identifier, line: call.line})
     }
     const routine = symbols[identifier]
-    const args = await Promise.all(
-      call.arguments.map(arg => this.visitExpression(arg, symbols)),
-    )
+    const args = []
+    for (const arg of call.arguments) {
+      args.push(await this.visitExpression(arg, symbols))
+    }
 
     if (routine.isBuiltin) {
       return this.runtime.execute(symbols[identifier].name, args, call.line)
