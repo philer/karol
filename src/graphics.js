@@ -8,7 +8,7 @@
  */
 
 import * as config from "./config"
-import {domReady} from "./util"
+import {css, domReady} from "./util"
 import * as noise from "./util/perlin"
 
 const DEFAULT_THEME_DIR = "img/simple/"
@@ -29,7 +29,7 @@ const PLAYER_SPRITE_NAMES = ORIENTATIONS.map(str => "player_" + str)
 const TILE_SPRITE_NAMES = ["floor", "block", "mark", "cuboid"]
 
 // drawable objects
-const sprites  = {}
+export const sprites  = {}
 
 const imageCache = Object.create(null)
 
@@ -116,6 +116,7 @@ async function initSprites(cfg) {
       sprites[key] = createSprite(key, defaultTheme, DEFAULT_THEME_DIR)
     }
   }
+  Object.freeze(sprites)
   return Promise.all(Object.values(sprites).map(sprite => sprite.load()))
 }
 
@@ -154,6 +155,9 @@ class Sprite {
                   x, y - this.height,
                   this._scaledWidth, this._scaledHeight)
   }
+  img(alt = "") {
+    return `<img src="${this.imagePath}" alt="${alt}">`
+  }
 }
 
 /**
@@ -180,6 +184,16 @@ class AtlasSprite {
                   this._crop.width, this._crop.height,
                   x + this.xOffset, y - this.height - this.yOffset,
                   this._scaledWidth, this._scaledHeight)
+  }
+  img(alt = "") {
+    const {x, y, width, height} = this._crop
+    const style = css({
+      "object-fit": "none",
+      "object-position": `-${x}px -${y}px`,
+      "width": width + "px",
+      "height": height + "px",
+    })
+    return `<img src="${this.imagePath}" alt="${alt}" style="${style}">`
   }
 }
 

@@ -140,8 +140,27 @@ function initWorldControls() {
     simulation.delay = calculateDelay()
   })
 
+  // world controls
+  on("click", byId("world-step"), () => simulateAction("step"))
+  on("click", byId("world-step-backwards"), () => simulateAction("stepBackwards"))
+  on("click", byId("world-turn-left"), () => simulateAction("turnLeft"))
+  on("click", byId("world-turn-right"), () => simulateAction("turnRight"))
+
+  const placeBlockButton = byId("world-place-block")
+  on("click", placeBlockButton, () => simulateAction("placeBlock"))
+  placeBlockButton.insertAdjacentHTML("afterbegin", graphics.sprites.block.img())
+  const takeBlockButton = byId("world-take-block")
+  on("click", takeBlockButton, () => simulateAction("takeBlock"))
+  takeBlockButton.insertAdjacentHTML("afterbegin", graphics.sprites.block.img())
+  const placeMarkButton = byId("world-place-mark")
+  on("click", placeMarkButton, () => simulateAction("placeMark"))
+  placeMarkButton.insertAdjacentHTML("afterbegin", graphics.sprites.mark.img())
+  const takeMarkButton = byId("world-take-mark")
+  on("click", takeMarkButton, () => simulateAction("takeMark"))
+  takeMarkButton.insertAdjacentHTML("afterbegin", graphics.sprites.mark.img())
+
   // key controls
-  addEventListener("keydown", async function(evt) {
+  addEventListener("keydown", evt => {
     if (evt.defaultPrevented
         || evt.target instanceof HTMLTextAreaElement
         || evt.target instanceof HTMLInputElement)
@@ -151,21 +170,25 @@ function initWorldControls() {
     const action = keyMap[evt.key]
     if (action) {
       evt.preventDefault()
-      if (simulation.isRunning) {
-        return
-      }
-      try {
-        await simulation.runCommand(action)
-      } catch (err) {
-        if (err instanceof Exception) {
-          error(err.translatedMessage)
-        } else {
-          error(err.message)
-          console.error(err)
-        }
-      }
+      simulateAction(action)
     }
   })
+}
+
+async function simulateAction(action) {
+  if (simulation.isRunning) {
+    return
+  }
+  try {
+    await simulation.runCommand(action)
+  } catch (err) {
+    if (err instanceof Exception) {
+      error(err.translatedMessage)
+    } else {
+      error(err.message)
+      console.error(err)
+    }
+  }
 }
 
 function initEditorButtons() {

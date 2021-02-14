@@ -12,6 +12,10 @@ import {
   // settings toggles
   faCog, faTimes,
 
+  // touch controls
+  faArrowUp, faArrowDown, faReply,
+  faPlusCircle, faMinusCircle,
+
 } from '@fortawesome/fontawesome-free-solid'
 
 
@@ -24,5 +28,9 @@ fontawesome.library.add(
 
   // settings toggles
   faCog, faTimes,
+
+  // touch controls
+  faArrowUp, faArrowDown, faReply,
+  faPlusCircle, faMinusCircle,
 
 )

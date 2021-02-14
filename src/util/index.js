@@ -18,6 +18,10 @@ export const byId = document.getElementById.bind(document)
 export const byClass = document.getElementsByClassName.bind(document)
 export const byTag = document.getElementsByTagName.bind(document)
 
+/** Turn an object into a valid CSS property list */
+export const css = mapping =>
+  Object.entries(mapping).map(entry => entry.join(":")).join(";")
+
 /**
  * Load JSON. Fails for local installations.
  *
