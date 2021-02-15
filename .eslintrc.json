@@ -11,13 +11,21 @@
     "arrow-parens": ["warn", "as-needed"],
     "block-scoped-var": "warn",
     "comma-dangle": ["warn", "always-multiline"],
+    "indent": ["error", 2, {"SwitchCase": 1}],
     "no-cond-assign": "off",
     "no-console": ["warn", {"allow": ["warn", "error"]}],
+    "no-else-return": "off",
+    "no-lonely-if": "off",
     "no-prototype-builtins": "off",
+    "no-useless-concat": "warn",
     "no-var": "warn",
     "prefer-arrow-callback": "warn",
+    "prefer-template": "off",
+    "quote-props": ["warn", "consistent"],
+    "quotes": ["warn", "double", {"avoidEscape": true, "allowTemplateLiterals": true}],
     "semi": ["error", "never"],
-    "strict": "error"
+    "strict": "error",
+    "template-curly-spacing": ["warn", "never"]
   },
   "env": {
     "browser": true,

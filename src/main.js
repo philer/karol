@@ -14,18 +14,18 @@ import {readFile, saveTextAs} from "./util/files"
 
 
 const keyMap = {
-  "ArrowLeft":  "turnLeft",
-  "a":          "turnLeft",
-  "ArrowRight": "turnRight",
-  "d":          "turnRight",
-  "ArrowUp":    "step",
-  "w":          "step",
-  "ArrowDown":  "stepBackwards",
-  "s":          "stepBackwards",
-  "h":          "placeBlock",
-  "H":          "takeBlock",
-  "m":          "placeMark",
-  "M":          "takeMark",
+  ArrowLeft: "turnLeft",
+  a: "turnLeft",
+  ArrowRight: "turnRight",
+  d: "turnRight",
+  ArrowUp: "step",
+  w: "step",
+  ArrowDown: "stepBackwards",
+  s: "stepBackwards",
+  h: "placeBlock",
+  H: "takeBlock",
+  m: "placeMark",
+  M: "takeMark",
 }
 
 let editor

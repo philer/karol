@@ -29,19 +29,19 @@ ttClasses[TT.WHITESPACE] = "whitespace";
 const reSpaces = / +/g
 
 const wrapSpaces = text => text.replace(reSpaces, spaces =>
-    `<span class="whitespace">${VISUAL_SPACE.repeat(spaces.length)}</span>`,
-  )
+  `<span class="whitespace">${VISUAL_SPACE.repeat(spaces.length)}</span>`,
+)
 
- const wrapToken = (text, type) =>
+const wrapToken = (text, type) =>
   type === TT.WHITESPACE
     ? text  // already wrapped
     : `<span class="token ${ttClasses[type]}">${text}</span>`
 
 const wrapLine = (line, idx) =>
-    '<div class="line">'
+  '<div class="line">'
   +   `<span class="lineno">${idx + 1}</span>`
   +   `<span>${line}</span>`
-  + '</div>'
+  + "</div>"
 
 /**
  * Add syntax highlighting HTML tags to given code snippet.

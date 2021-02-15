@@ -16,29 +16,6 @@ export const css = mapping =>
   Object.entries(mapping).map(entry => entry.join(":")).join(";")
 
 /**
- * Load JSON. Fails for local installations.
- *
- * https://mathiasbynens.be/notes/xhr-responsetype-json
- *
- * @param  {string} url
- * @return {Promise}
- */
-export const getJSON = url => new Promise((resolve, reject) => {
-  const xhr = new XMLHttpRequest()
-  xhr.open('get', url, true)
-  xhr.responseType = 'json'
-  xhr.onload = function() {
-    if (xhr.status == 200) {
-      resolve(xhr.response)
-    } else {
-      reject(xhr.status)
-    }
-  }
-  xhr.send()
-})
-
-
-/**
  * sleep function for use with await
  * @param  {int} ms
  * @return {Promise}
@@ -57,8 +34,8 @@ export const event = evt => new Promise(resolve => addEventListener(evt, resolve
  * @type {Promise}
  */
 export const domReady = document.readyState === "loading"
-                          ? event("DOMContentLoaded")
-                          : Promise.resolve()
+  ? event("DOMContentLoaded")
+  : Promise.resolve()
 
 /**
  * Count how many times a character appears in a string.
@@ -80,7 +57,7 @@ export function countOccurences(char, str) {
  * Check if given argument is an Object (also not an Array).
  */
 export function isObject(item) {
-  return item && typeof item === 'object' && !Array.isArray(item)
+  return item && typeof item === "object" && !Array.isArray(item)
 }
 
 export function* zip(...iterables) {

@@ -54,13 +54,10 @@ export const TokenTypes = Object.freeze({
 
 class Token {
   constructor(type, value, line, column) {
-    this.type = type
-    this.value = value
-    this.line = line
-    this.column = column
+    Object.assign(this, {type, value, line, column})
   }
   toString() {
-    return this.type + "(" + this.value + ")"
+    return `${this.type}(${this.value})`
   }
 }
 
@@ -269,14 +266,13 @@ export class Parser {
       const type = this.currentToken.type
       this.forward()
       return type
-    } else {
-      throw new Exception("error.parser.unexpected_token_instead", {
-        token: this.currentToken,
-        line: this.currentToken.line,
-        column: this.currentToken.column,
-        expected: types,
-      })
     }
+    throw new Exception("error.parser.unexpected_token_instead", {
+      token: this.currentToken,
+      line: this.currentToken.line,
+      column: this.currentToken.column,
+      expected: types,
+    })
   }
 
   maybeEat(...types) {

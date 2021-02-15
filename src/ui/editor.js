@@ -165,7 +165,7 @@ export class Editor {
                        .replace(this.unindenRegex, match =>
                          firstLineUnindent === null
                            ? firstLineUnindent = match.length
-                           : '',
+                           : "",
                        )
 
     this.textarea.value = value.slice(0, firstLineStart)

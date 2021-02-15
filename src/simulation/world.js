@@ -201,16 +201,14 @@ export function parseKdw(kdw) {
 export function worldToKdwString(world) {
   const {width, length, height} = world
   const {x, y, orientation} = world.player
-  let str = "KarolVersion2Deutsch"
-          + " " + width + " " + length + " " + height
-          + " " + x     + " " + y      + " " + orientation
+  let str = `KarolVersion2Deutsch ${width} ${length} ${height} ${x} ${y} ${orientation}`
   for (const tile of world.tiles) {
     if (tile.cuboid) {
-      str += " q" + " n".repeat(height - 1)
+      str += ` q${" n".repeat(height - 1)}`
     } else {
       str += " z".repeat(tile.blocks) + " n".repeat(height - tile.blocks)
     }
-    str += " " + (tile.mark ? "m" : "o")
+    str += ` ${tile.mark ? "m" : "o"}`
   }
   return str
 }

@@ -11,7 +11,7 @@ import * as config from "./config"
 import {css, domReady} from "./util"
 import * as noise from "./util/perlin"
 
-const DEFAULT_THEME_DIR = "img/simple/"
+const DEFAULT_THEME_DIR = "img/simple"
 
 // themes should provide their own settings
 const DEFAULT_SETTINGS = {
@@ -81,24 +81,24 @@ async function initCanvas() {
  * @param  {Object} cfg
  * @return {Promise}
  */
-async function initSprites(cfg) {
-  const tileThemeDir = cfg.tile_theme + "/"
-  const playerThemeDir = (cfg.player_theme || cfg.tile_theme) + "/"
+async function initSprites({tile_theme, player_theme}) {
+  const tileThemeDir = tile_theme
+  const playerThemeDir = player_theme || tile_theme
 
   const [tileTheme, playerTheme, defaultTheme] = await Promise.all([
-      tileThemeDir + "theme.js",
-      playerThemeDir + "theme.js",
-      DEFAULT_THEME_DIR + "theme.js",
+      tileThemeDir + "/theme.js",
+      playerThemeDir + "/theme.js",
+      DEFAULT_THEME_DIR + "/theme.js",
     ].map(config.get))
 
   const sizes = Object.assign({}, DEFAULT_SETTINGS, tileTheme)
-  tileWidth      = sizes.tile_width
-  tileDepth      = sizes.tile_depth
-  blockHeight    = sizes.block_height
-  tileGap        = sizes.tile_gap
-  tileGapZ       = sizes.tile_gap_z
+  tileWidth = sizes.tile_width
+  tileDepth = sizes.tile_depth
+  blockHeight = sizes.block_height
+  tileGap = sizes.tile_gap
+  tileGapZ = sizes.tile_gap_z
   noiseAmplifier = sizes.noise_amplifier
-  playerHeight   = playerTheme.player_height || sizes.player_height
+  playerHeight = playerTheme.player_height || sizes.player_height
 
   for (const key of PLAYER_SPRITE_NAMES) {
     if (playerTheme.sprites.hasOwnProperty(key)) {
