@@ -218,7 +218,7 @@ export class TokenIterator {
     // integer
     token = this.readWhile(reDigit)
     if (token.length) {
-      return new Token(INTEGER, +token, line, column)
+      return new Token(INTEGER, token, line, column)
     }
 
     // word (identifier / keyword)
