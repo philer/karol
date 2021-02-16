@@ -67,11 +67,11 @@ export default function highlight(text) {
       }
     }
   } catch (err) {
-    console.error(err)
-    htmlLines.push(currentLine)
-    return htmlLines.map(wrapLine).join("")
-      + wrapSpaces(tokens.remainingText)
-          .split("\n").map(wrapLine).join("")
+    return htmlLines
+      .concat(
+        (currentLine + wrapSpaces(tokens.remainingText))
+          .split("\n"))
+      .map(wrapLine).join("")
   }
   htmlLines.push(currentLine)
   return htmlLines.map(wrapLine).join("")
