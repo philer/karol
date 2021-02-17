@@ -1,4 +1,4 @@
-import {Interpreter} from "../language/interpreter"
+import {run} from "../language/interpreter"
 import {render} from "../graphics"
 
 import {noop} from "../util"
@@ -25,13 +25,13 @@ const commandNames = {
   "markeloeschen": "takeMark",
 }
 
+/** Will be thrown like an exception to stop execution. */
+const INTERRUPT = Symbol("INTERRUPT")
 
 export class Simulation {
   constructor(world, delay=100) {
     this.world = world
     this.delay = delay
-
-    this._interpreter = new Interpreter(this, commandNames)
 
     this._useDelay = true
     this._running = false
@@ -68,7 +68,7 @@ export class Simulation {
     if (!this._paused) {
       this._paused = true
       this._unpausePromise = new Promise(resolve =>
-                                         this._unpauseResolve = resolve)
+        this._unpauseResolve = resolve)
     }
   }
 
@@ -170,9 +170,23 @@ export class Simulation {
     this.stop()
     this._useDelay = true
     this._running = true
+    this._interrupted = false
     try {
-      await this._interpreter.run(code)
-      return this._interpreter.interrupted
+      const gen = run(code, Object.keys(commandNames))
+      let step = gen.next()
+      while (!step.done) {
+        if (this._interrupted) {
+          throw INTERRUPT
+        }
+        const {identifier, args, line} = step.value
+        step = gen.next(await this.execute(commandNames[identifier], args, line))
+      }
+      return false
+    } catch (err) {
+      if (err === INTERRUPT) {
+        return true
+      }
+      throw err
     } finally {
       this._running = false
       this.redraw()
@@ -181,7 +195,7 @@ export class Simulation {
 
   stop() {
     if (this._running) {
-      this._interpreter.interrupt()
+      this._interrupted = true
       this._useDelay = false
       this._interruptSleep()
       this.unpause()
