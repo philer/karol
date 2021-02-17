@@ -3,7 +3,7 @@ import {translate as t, Exception} from "./localization"
 
 import * as graphics from "./graphics"
 
-import {Simulation} from "./simulation/simulation"
+import {run} from "./simulation/simulation"
 import {World, checkKdwFormat, parseKdw, worldToKdwString} from "./simulation/world"
 
 import {Editor} from "./ui/editor"
@@ -30,10 +30,17 @@ const keyMap = {
 
 let editor
 let simulation
+let world
 
 let widthInput
 let lengthInput
 let heightInput
+
+let runButton
+let stopButton
+let stepButton
+let unpauseButton
+let pauseButton
 let simSpeedInput
 
 let outputElem
@@ -60,13 +67,46 @@ function validateNumberInput() {
   }
 }
 
-function makeWorld() {
-  return new World(...[widthInput, lengthInput, heightInput]
-                      .map(inp => clamp(+inp.min, +inp.max, +inp.value)))
+function resetSimulation() {
+  if (!simulation) {
+    return
+  }
+  simulation.pause()
+  simulation = null
+  enable(runButton)
+  disable(stopButton, stepButton, pauseButton, unpauseButton)
+  editor.markLine()
+}
+
+function resetWorld() {
+  resetSimulation()
+  world = new World(...[widthInput, lengthInput, heightInput]
+      .map(inp => clamp(+inp.min, +inp.max, +inp.value)))
+}
+
+async function callWorldMethod(action) {
+  if (simulation) {
+    return  // maybe allow it via config?
+  }
+  try {
+    world[action]()
+    graphics.render(world)
+  } catch (err) {
+    if (err instanceof Exception) {
+      error(err.translatedMessage)
+    } else {
+      error(err.message)
+      console.error(err)
+    }
+  }
 }
 
 function calculateDelay() {
   return Math.pow(10, 4 - simSpeedInput.value)
+}
+
+function initOutput() {
+  outputElem = byId("world-output")
 }
 
 function info(message) {
@@ -80,40 +120,30 @@ function error(message) {
 }
 
 
-function initWorldControls() {
-
+function initWorldSettings() {
   widthInput = byId("width-input")
   lengthInput = byId("length-input")
   heightInput = byId("height-input")
-  simSpeedInput = byId("world-simulation-speed")
-
-  outputElem = byId("world-output")
 
   const worldFileInput = byId("world-file-input")
-
-  const showPlayerCheckbox = byId("world-show-player")
-  const showFlatWorldCheckbox = byId("world-show-flat")
 
   on("input", widthInput, validateNumberInput)
   on("input", lengthInput, validateNumberInput)
   on("input", heightInput, validateNumberInput)
 
-  const resetSimulation = () => simulation.world = makeWorld()
-  on("click", byId("world-new-button"), resetSimulation)
-  on("submit", byClass("world-settings")[0], resetSimulation)
+  on("click", byId("world-new-button"), resetWorld)
+  on("submit", byClass("world-settings")[0], resetWorld)
 
   on("click", byId("world-save-button"), () =>
-    saveTextAs(worldToKdwString(simulation.world), t("world.default_filename")),
+    saveTextAs(worldToKdwString(world), t("world.default_filename")),
   )
 
   on("change", worldFileInput, async () => {
-    simulation.stop()
     const file = worldFileInput.files[0]
-    // info(t("world.loading_from_file", file.name));
     const text = await readFile(file)
     if (checkKdwFormat(text)) {
-      const world = parseKdw(text)
-      simulation.world = world
+      resetSimulation()
+      world = parseKdw(text)
       widthInput.value = world.width
       lengthInput.value = world.length
       heightInput.value = world.height
@@ -121,41 +151,44 @@ function initWorldControls() {
       error(t("error.invalid_world_file"))
     }
   })
+}
 
-  // world view settings
+
+function initGraphicsSettings() {
+  const showPlayerCheckbox = byId("world-show-player")
+  const showFlatWorldCheckbox = byId("world-show-flat")
+
   on("change", showPlayerCheckbox, () => {
     graphics.showPlayer(showPlayerCheckbox.checked)
-    simulation.redraw()
+    graphics.render(world)
   })
   graphics.showPlayer(showPlayerCheckbox.checked)
 
   on("change", showFlatWorldCheckbox, () => {
     graphics.showHeightNoise(!showFlatWorldCheckbox.checked)
-    simulation.redraw()
+    graphics.render(world)
   })
   graphics.showHeightNoise(!showFlatWorldCheckbox.checked)
+}
 
-  on("change", simSpeedInput, () => {
-    simulation.delay = calculateDelay()
-  })
 
-  // world controls
-  on("click", byId("world-step"), () => simulateAction("step"))
-  on("click", byId("world-step-backwards"), () => simulateAction("stepBackwards"))
-  on("click", byId("world-turn-left"), () => simulateAction("turnLeft"))
-  on("click", byId("world-turn-right"), () => simulateAction("turnRight"))
+function initWorldControls() {
+  on("click", byId("world-step"), () => callWorldMethod("step"))
+  on("click", byId("world-step-backwards"), () => callWorldMethod("stepBackwards"))
+  on("click", byId("world-turn-left"), () => callWorldMethod("turnLeft"))
+  on("click", byId("world-turn-right"), () => callWorldMethod("turnRight"))
 
   const placeBlockButton = byId("world-place-block")
-  on("click", placeBlockButton, () => simulateAction("placeBlock"))
+  on("click", placeBlockButton, () => callWorldMethod("placeBlock"))
   placeBlockButton.insertAdjacentHTML("afterbegin", graphics.sprites.block.img())
   const takeBlockButton = byId("world-take-block")
-  on("click", takeBlockButton, () => simulateAction("takeBlock"))
+  on("click", takeBlockButton, () => callWorldMethod("takeBlock"))
   takeBlockButton.insertAdjacentHTML("afterbegin", graphics.sprites.block.img())
   const placeMarkButton = byId("world-place-mark")
-  on("click", placeMarkButton, () => simulateAction("placeMark"))
+  on("click", placeMarkButton, () => callWorldMethod("placeMark"))
   placeMarkButton.insertAdjacentHTML("afterbegin", graphics.sprites.mark.img())
   const takeMarkButton = byId("world-take-mark")
-  on("click", takeMarkButton, () => simulateAction("takeMark"))
+  on("click", takeMarkButton, () => callWorldMethod("takeMark"))
   takeMarkButton.insertAdjacentHTML("afterbegin", graphics.sprites.mark.img())
 
   // key controls
@@ -169,36 +202,33 @@ function initWorldControls() {
     const action = keyMap[evt.key]
     if (action) {
       evt.preventDefault()
-      simulateAction(action)
+      callWorldMethod(action)
     }
   })
 }
 
-async function simulateAction(action) {
-  if (simulation.isRunning) {
-    return
-  }
-  try {
-    await simulation.runCommand(action)
-  } catch (err) {
-    if (err instanceof Exception) {
-      error(err.translatedMessage)
-    } else {
-      error(err.message)
-      console.error(err)
-    }
-  }
-}
 
 function initEditorButtons() {
   const saveButton = byId("program-save-button")
   const programFileInput = byId("program-file-input")
 
-  const runButton = byId("run-button")
-  const stopButton = byId("stop-button")
-  const stepButton = byId("step-button")
-  const unpauseButton = byId("unpause-button")
-  const pauseButton = byId("pause-button")
+  on("click", saveButton, () => {
+    saveTextAs(editor.value, t("program.default_filename"))
+  })
+  on("change", programFileInput, async () => {
+    resetSimulation()
+    editor.value = await readFile(programFileInput.files[0])
+  })
+}
+
+
+function initSimulationControls() {
+  runButton = byId("run-button")
+  stopButton = byId("stop-button")
+  stepButton = byId("step-button")
+  unpauseButton = byId("unpause-button")
+  pauseButton = byId("pause-button")
+  simSpeedInput = byId("world-simulation-speed")
 
   disable(stopButton, stepButton, pauseButton, unpauseButton)
 
@@ -207,9 +237,14 @@ function initEditorButtons() {
     enable(stopButton, stepButton, pauseButton)
     info(t("program.message.running"))
     try {
-      const interrupted = await simulation.run(editor.value)
-      info(t(interrupted ? "program.message.canceled"
-                         : "program.message.finished"))
+      simulation = run({
+        code: editor.value,
+        world,
+        delay: calculateDelay(),
+        onExecute: ({lineno}) => editor.markLine(lineno),
+      })
+      await simulation.finished
+      info(t("program.message.finished"))
     } catch (err) {
       if (err instanceof Exception) {
         error(err.translatedMessage)
@@ -217,35 +252,36 @@ function initEditorButtons() {
         error(err.message)
         console.error(err)
       }
+      info(t("program.message.canceled"))
+    } finally {
+      resetSimulation()
     }
-    enable(runButton)
-    disable(stopButton, stepButton, pauseButton, unpauseButton)
-    editor.markLine()
   })
 
-  on("click", stopButton, () => simulation.stop())
-  on("click", stepButton, () => simulation.step())
+  on("click", stopButton, () => {
+    resetSimulation()
+    info(t("program.message.canceled"))
+  })
+  on("click", stepButton, () => {
+    simulation.step()
+  })
   on("click", pauseButton, () => {
-    simulation.pause()
     info(t("program.message.paused"))
     disable(pauseButton)
     enable(unpauseButton)
   })
   on("click", unpauseButton, () => {
-    simulation.unpause()
+    simulation.resume()
     info(t("program.message.running"))
     disable(unpauseButton)
     enable(pauseButton)
   })
-  on("click", saveButton, () => {
-    saveTextAs(editor.value, t("program.default_filename"))
-  })
-  on("change", programFileInput, async () => {
-    simulation.stop()
-    editor.value = await readFile(programFileInput.files[0])
+  on("change", simSpeedInput, () => {
+    if (simulation) {
+      simulation.setDelay(calculateDelay())
+    }
   })
 }
-
 
 
 /*** MAIN INIT ***/
@@ -255,11 +291,15 @@ function initEditorButtons() {
 
   await Promise.all([graphics.init(), domReady])
 
+  initOutput()
+  initWorldSettings()
+  initGraphicsSettings()
   initWorldControls()
   initEditorButtons()
+  initSimulationControls()
 
-  simulation = new Simulation(makeWorld(), calculateDelay())
+  resetWorld()
+  graphics.render(world)
 
   editor = new Editor(byId("editor"))
-  simulation.onExecute((_, lineno) => editor.markLine(lineno))
 })()
