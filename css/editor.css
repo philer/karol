@@ -16,6 +16,10 @@
   width: 100%;
   background: inherit;
 }
+.editor-scrollbox > div {
+  position: relative;
+  min-height: 100%;
+}
 .editor-textarea,
 .editor-highlight,
 .editor-caret-layer
@@ -45,6 +49,7 @@
   tab-size: 4;
 }
 .editor-highlight {
+  position: static;
   z-index: 2;
   pointer-events: none;
   padding-left: .5ch; /* line numbers */
@@ -52,15 +57,12 @@
 .editor-textarea {
   z-index: 0;
   resize: none;
-  opacity: 0;
+  opacity: .2;
+  height: 100%;
 }
 
 
 .editor-caret-layer {
-  /* Caret layer contains caret and selection.
-   * Selection should be underneath highlight layer (z-index),
-   * caret above. */
-  position: static;
   pointer-events: none;
   color: transparent;
 }

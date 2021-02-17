@@ -15,6 +15,12 @@ export const byTag = document.getElementsByTagName.bind(document)
 export const css = mapping =>
   Object.entries(mapping).map(entry => entry.join(":")).join(";")
 
+/** Only include classes that are string - filter out the rest */
+export const clsx = (...classes) =>
+  classes
+    .filter(cls => typeof cls === "string")
+    .join(" ")
+
 /**
  * sleep function for use with await
  * @param  {int} ms
@@ -177,3 +183,17 @@ export class Random {
     return (this.next() - 1) / 2147483646
   }
 }
+
+export function elem(tagName, attributes = {}, ...children) {
+  const element = document.createElement(tagName)
+  if (attributes instanceof Node || typeof attributes === "string") {
+    element.append(attributes)
+  } else {
+    Object.assign(element, attributes)
+  }
+  element.append(...children)
+  return element
+}
+
+// /** React helper */
+// export const useForceUpdate = () => useReducer(n => n + 1, 0)[1]

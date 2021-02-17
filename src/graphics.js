@@ -8,7 +8,7 @@
  */
 
 import * as config from "./config"
-import {css, domReady} from "./util"
+import {css} from "./util"
 import * as noise from "./util/perlin"
 
 const DEFAULT_THEME_DIR = "img/simple"
@@ -34,8 +34,8 @@ export const sprites  = {}
 const imageCache = Object.create(null)
 
 let tileWidth, tileDepth, blockHeight,
-    tileGap, tileGapZ, noiseAmplifier,
-    playerHeight
+  tileGap, tileGapZ, noiseAmplifier,
+  playerHeight
 
 let canvas
 let ctx
@@ -52,23 +52,15 @@ export function showHeightNoise(show=true) {
 }
 
 /**
- * Initialize the module. Loads graphics.
- * @return {Promise}
- */
-export async function init() {
-  return Promise.all([
-    initSprites(await config.get()),
-    initCanvas(),
-  ])
-}
-
-/**
  * Prepare canvas and drawing context
  * @return {Promise}
  */
-async function initCanvas() {
-  await domReady
-  canvas = document.getElementById("world-canvas")
+export function setCanvas(canvasElement) {
+  canvas = canvasElement
+  if (!canvas) {
+    ctx = null
+    return
+  }
   ctx = canvas.getContext("2d")
   ctx.mozImageSmoothingEnabled = false
   ctx.webkitImageSmoothingEnabled = false
@@ -86,10 +78,10 @@ async function initSprites({tile_theme, player_theme}) {
   const playerThemeDir = player_theme || tile_theme
 
   const [tileTheme, playerTheme, defaultTheme] = await Promise.all([
-      tileThemeDir + "/theme.js",
-      playerThemeDir + "/theme.js",
-      DEFAULT_THEME_DIR + "/theme.js",
-    ].map(config.get))
+    tileThemeDir + "/theme.js",
+    playerThemeDir + "/theme.js",
+    DEFAULT_THEME_DIR + "/theme.js",
+  ].map(config.get))
 
   const sizes = Object.assign({}, DEFAULT_SETTINGS, tileTheme)
   tileWidth = sizes.tile_width
@@ -129,9 +121,9 @@ function createSprite(spriteName, theme, themeDir) {
     return
   }
   if (crop.length) {
-    return new AtlasSprite(themeDir + filename, ...crop)
+    return new AtlasSprite(`${themeDir}/${filename}`, ...crop)
   } else {
-    return new Sprite(themeDir + filename)
+    return new Sprite(`${themeDir}/${filename}`)
   }
 }
 
@@ -152,8 +144,8 @@ class Sprite {
   }
   draw(ctx, x, y) {
     ctx.drawImage(this._image,
-                  x, y - this.height,
-                  this._scaledWidth, this._scaledHeight)
+      x, y - this.height,
+      this._scaledWidth, this._scaledHeight)
   }
   img(alt = "") {
     return `<img src="${this.imagePath}" alt="${alt}">`
@@ -180,10 +172,10 @@ class AtlasSprite {
   }
   draw(ctx, x, y) {
     ctx.drawImage(this._image,
-                  this._crop.x, this._crop.y,
-                  this._crop.width, this._crop.height,
-                  x + this.xOffset, y - this.height - this.yOffset,
-                  this._scaledWidth, this._scaledHeight)
+      this._crop.x, this._crop.y,
+      this._crop.width, this._crop.height,
+      x + this.xOffset, y - this.height - this.yOffset,
+      this._scaledWidth, this._scaledHeight)
   }
   img(alt = "") {
     const {x, y, width, height} = this._crop
@@ -201,11 +193,10 @@ function loadImage(path) {
   if (path in imageCache) {
     return imageCache[path]
   }
-  return imageCache[path] = new Promise(resolve => {
+  return imageCache[path] = new Promise((resolve, reject) => {
     const image = new Image()
-    image.onload = function() {
-      resolve(image)
-    }
+    image.addEventListener("load", () => resolve(image))
+    image.addEventListener("error", reject)
     image.src = path
   })
 }
@@ -221,6 +212,9 @@ function loadImage(path) {
 export const render = world => requestAnimationFrame(() => _render(world))
 
 function _render({width, length, height, player, tiles, seed}) {
+  if (!ctx) {
+    return
+  }
   let w = (width + length) * 0.5 * (tileWidth + 2 * tileGap)
   let h = (width + length) * 0.5 * (tileDepth + 1 * tileGap)
         + height * blockHeight + playerHeight
@@ -275,9 +269,15 @@ function _render({width, length, height, player, tiles, seed}) {
       }
       if (_showPlayer && player.x === x && player.y === y) {
         sprites["player_" + ORIENTATIONS[player.orientation]].draw(
-            ctx, canvasX, canvasY - z)
+          ctx, canvasX, canvasY - z)
       }
       // ctx.fillText(x + "," + y, canvasX+.4*tileWidth, canvasY);
     }
   }
 }
+
+/**
+ * Initialize the module. Loads graphics.
+ * @return {Promise}
+ */
+export const init = () => config.get().then(initSprites)

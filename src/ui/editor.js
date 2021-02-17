@@ -1,115 +1,158 @@
+import {h} from "preact"
+import {useEffect, useMemo, useRef, useReducer, useState} from "preact/hooks"
+
+import * as config from "../config"
+import {elem, noop} from "../util"
 import highlight from "../language/highlight"
 
-export class Editor {
-
-  constructor(root, indentation="    ") {
-    this.indentation = indentation
-    this.unindenRegex = new RegExp("^" + indentation.split("").join("?") + "?",
-                                   "gm")
-
-    this.scrollbox = root.getElementsByClassName("editor-scrollbox")[0]
-    this.highlighted = root.getElementsByClassName("editor-highlight")[0]
-    const textarea =  this.textarea
-                   = root.getElementsByClassName("editor-textarea")[0]
-    const caretLayer = this.caretLayer
-                     = root.getElementsByClassName("editor-caret-layer")[0]
-
-    this.beforeCaret = caretLayer.appendChild(document.createElement("span"))
-    this.caret = caretLayer.appendChild(document.createElement("span"))
-    this.caret.classList.add("editor-caret")
-    this.selection = caretLayer.appendChild(document.createElement("span"))
-    this.selection.classList.add("editor-selection")
-    this.afterSelection = caretLayer.appendChild(document.createElement("span"))
-
-    // chrome ignores keypress
-    textarea.addEventListener("keydown", evt => {
-      if (evt.key === "Tab" || evt.keyCode === 9) {
-         evt.preventDefault()
-         if (evt.shiftKey) {
-           this.unindent()
-         } else {
-           this.indent()
-         }
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "updateValue": {
+      return {
+        ...state,
+        value: action.value,
+        highlighted: highlight(action.value),
       }
-    })
+      // TODO? this.updateCaret()
+    }
+    case "updateCaret": {
+      const {selectionStart, selectionEnd, selectionDirection} = action.event.target
+      return {...state, selectionStart, selectionEnd, selectionDirection}
+      // TODO? restart caret animation
+      // https://css-tricks.com/restart-css-animation/
+    }
+    default: {
+      throw new Error(`Unknown action type '${action.type}'`)
+    }
+  }
+}
 
-    textarea.addEventListener("input", this.update.bind(this))
-    //  more events: paste propertychange
+export const Editor = props => {
+  // TODO
+  // const {indentation} = props.indentation ?? "    "
+  // const unindentRegex = useMemo(
+  //   () => new RegExp("^" + indentation.split("").join("?") + "?", "gm"),
+  //   [indentation],
+  // )
+  const onChange = props.onChange || noop
+  // TODO? might not need a reducer
+  const [{
+    value,
+    highlighted,
+    selectionStart,
+    selectionEnd,
+    selectionDirection,
+  }, dispatch] = useReducer(reducer, {
+    value: props.value || "",
+    highlighted: highlight(""),
+    selectionStart: 1,
+    selectionEnd: 0,
+    selectionDirection: "none",
+  })
 
-    const updateCaret = this.updateCaret.bind(this)
-    const deferredCaretUpdate = () => setTimeout(updateCaret, 10)
-    // Listening to both because chrome doesn't trigger keydown on arrow keys
-    // while firefox misplaces the cursor with keypress.
-    textarea.addEventListener("keypress", deferredCaretUpdate)
-    textarea.addEventListener("keydown", deferredCaretUpdate)
-
-    // The selectionchange event is not supported on textarea, for some reason.
-    // Instead we keep track of mouse movement while the button is down.
-    textarea.addEventListener("mousedown", function() {
-      this.addEventListener("mousemove", deferredCaretUpdate)
-      deferredCaretUpdate()
-    })
-    textarea.addEventListener("mouseup", function() {
-      this.removeEventListener("mousemove", deferredCaretUpdate)
-      deferredCaretUpdate()
-    })
-
-    this.update()
-    // updateCaret();
+  // useEffect(() => props.onChange(value), [value])
+  function updateValue({target: {value}}) {
+    dispatch({type: "updateValue", value})
+    onChange(value)
   }
 
-  get value() {
-    return this.textarea.value
-  }
-  set value(text) {
-    this.textarea.value = text
-    this.update()
+  function updateCaret(event) {
+    // TODO? maybe throttle
+    setTimeout(() => dispatch({type: "updateCaret", event}), 10)
   }
 
-  update() {
-    this.highlighted.innerHTML = highlight(this.textarea.value)
-    this.textarea.style.height = this.highlighted.offsetHeight + "px"
-    this.updateCaret()
+  function onKeydown(event) {
+    // TODO
+    // if (event.key === "Tab" || event.keyCode === 9) {
+    //   event.preventDefault()
+    //   if (event.shiftKey) {
+    //     unindent()
+    //   } else {
+    //     indent()
+    //   }
+    // }
+    updateCaret(event)
   }
 
-  updateCaret() {
-    const {
-      value,
-      selectionDirection,
-      selectionEnd,
-      selectionStart,
-    } = this.textarea
-
-    this.beforeCaret.innerHTML = value.slice(0, selectionStart)
-    this.selection.innerHTML = value.slice(selectionStart, selectionEnd)
-    this.afterSelection.innerHTML = value.slice(selectionEnd)
-    this.caret.insertAdjacentElement(
-      selectionDirection === "forward" ? "beforebegin" : "afterend",
-      this.selection,
-    )
-
-    // restart animation
-    this.caret.classList.remove("blink")
-    requestAnimationFrame(() => this.caret.classList.add("blink"))
+  const [isMouseDragging, setIsMouseDragging] = useState(false)
+  function startMouseDragging(event) {
+    setIsMouseDragging(true)
+    updateCaret(event)
+  }
+  function stopMouseDragging(event) {
+    setIsMouseDragging(false)
+    updateCaret(event)
   }
 
-  // gotoLine(lineno) {
-  //   const lineHeight = this.highlighted.children[0].offsetHeight;
-  //   const topLine = this.scrollbox.scrollTop / lineHeight;
-  //   this.highlighted.children[lineno - 1].scrollIntoView();
+  // TODO
+  // function markLine(lineno) {
+  //   for (const line of this.highlighted.getElementsByClassName("current")) {
+  //     line.classList.remove("current")
+  //   }
+  //   const line = this.highlighted.children[lineno - 1]
+  //   if (line) {
+  //     line.classList.add("current")
+  //   }
+  //   // TODO scrollIntoView
   // }
 
-  markLine(lineno) {
-    for (const line of this.highlighted.getElementsByClassName("current")) {
-      line.classList.remove("current")
-    }
-    const line = this.highlighted.children[lineno - 1]
-    if (line) {
-      line.classList.add("current")
-    }
-    // this.gotoLine(lineno);
-  }
+  return (
+    <div class="editor">
+      <div class="editor-scrollbox">
+        <div>
+          <code
+            class="editor-highlight"
+            dangerouslySetInnerHTML={{__html: highlighted}}
+          />
 
+          <textarea
+            class="editor-textarea"
+            spellcheck={false}
+
+            value={value}
+            selectionStart={selectionStart}
+            selectionEnd={selectionEnd}
+            selectionDirection={selectionDirection}
+
+            // Listening to both keydown & keypress because chrome doesn't trigger
+            // keydown on arrow keys while firefox misplaces the cursor with
+            // keypress.
+            onKeydown={onKeydown}
+            onKeypress={updateCaret}
+            onInput={updateValue}
+
+            // The selectionchange event is apparently not supported on textarea.
+            // Instead we keep track of mouse movement while the button is down.
+            onMousedown={startMouseDragging}
+            onMouseup={stopMouseDragging}
+            onMousemove={isMouseDragging ? updateCaret : undefined}
+          />
+
+          {/* Put caret layer behind the textarea so we can hide it via css when
+            * textarea isn't focused
+            */}
+          <pre class="editor-caret-layer">
+            {value.slice(0, selectionStart)}
+            {selectionDirection === "forward" &&
+              <span key="editor-selection" class="editor-selection">
+                {value.slice(selectionStart, selectionEnd)}
+              </span>
+            }
+            <span key="caret" class="editor-caret blink" />
+            {selectionDirection === "backward" &&
+              <span key="editor-selection" class="editor-selection">
+                {value.slice(selectionStart, selectionEnd)}
+              </span>
+            }
+            {value.slice(selectionEnd)}
+          </pre>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export class _Editor {
 
   indent() {
     const {value, selectionStart, selectionEnd, selectionDirection} = this.textarea
@@ -121,7 +164,7 @@ export class Editor {
       let lastLineEnd = value.indexOf("\n", selectionEnd)
       if (lastLineEnd < 0) lastLineEnd = value.length
       const lines = value.slice(firstLineStart, lastLineEnd)
-                        .replace(/^/gm, this.indentation)
+        .replace(/^/gm, this.indentation)
 
       this.textarea.value = value.slice(0, firstLineStart)
                           + lines
@@ -162,23 +205,28 @@ export class Editor {
 
     let firstLineUnindent = null // need this to find out how much was removed
     const lines = value.slice(firstLineStart, lastLineEnd)
-                       .replace(this.unindenRegex, match =>
-                         firstLineUnindent === null
-                           ? firstLineUnindent = match.length
-                           : "",
-                       )
+      .replace(this.unindenRegex, match =>
+        firstLineUnindent === null
+          ? firstLineUnindent = match.length
+          : "",
+      )
 
     this.textarea.value = value.slice(0, firstLineStart)
                         + lines
                         + value.slice(lastLineEnd)
 
     this.textarea.selectionStart = Math.max(firstLineStart,
-                                            selectionStart - firstLineUnindent)
+      selectionStart - firstLineUnindent)
     this.textarea.selectionEnd = Math.max(
-        firstLineStart + lines.lastIndexOf("\n") + 1,
-        selectionEnd - lastLineEnd + firstLineStart + lines.length,
+      firstLineStart + lines.lastIndexOf("\n") + 1,
+      selectionEnd - lastLineEnd + firstLineStart + lines.length,
     )
     this.textarea.selectionDirection = selectionDirection
     this.update()
   }
 }
+
+// Load editor theme css
+config.get().then(({editor_theme}) => document.head.append(
+  elem("link", {rel: "stylesheet", href: `css/editor-theme-${editor_theme || "bright"}.css`}),
+))

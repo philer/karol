@@ -31,16 +31,13 @@ export function get(url="config.js") {
     return promises[url]
   }
   return promises[url] = new Promise((resolve, reject) => {
+    const script = document.createElement("script")
     resolvers[url] = data => {
       delete resolvers[url]
       resolve(data)
-    }
-    const script = document.createElement("script")
-    script.onload = () => script.remove()
-    script.onerror = () => {
-      reject()
       script.remove()
     }
+    script.addEventListener("error", reject)
     script.src = url
     document.head.appendChild(script)
   })

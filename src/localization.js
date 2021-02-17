@@ -37,10 +37,11 @@ async function setLocales(_locales) {
   translations = mergeDeep({}, ...await Promise.all(
     locales.slice().reverse().map(l => config.get(`localization/${l}.js`)),
   ))
-  await translateDOM()
+  // await translateDOM()
 }
 
 /**
+ * DEPRECATED TODO remove
  * Replace the content of all HTML elements with a localiation data-*
  * attribute in the document.
  * Also set the lang attribute of the body.
@@ -115,4 +116,4 @@ export class Exception {
   }
 }
 
-config.get().then(cfg => setLocales(cfg.locale))
+export const init = () => config.get().then(cfg => setLocales(cfg.locale))

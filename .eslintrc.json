@@ -1,6 +1,9 @@
 {
   "root": true,
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+    "preact"
+  ],
   "parserOptions": {
     "ecmaFeatures": {"impliedStrict": true},
     "ecmaVersion": 2017,
@@ -23,6 +26,8 @@
     "prefer-template": "off",
     "quote-props": ["warn", "consistent"],
     "quotes": ["warn", "double", {"avoidEscape": true, "allowTemplateLiterals": true}],
+    "react-hooks/exhaustive-deps": "off",
+    "react/no-danger": "off",
     "semi": ["error", "never"],
     "strict": "error",
     "template-curly-spacing": ["warn", "never"]

@@ -218,7 +218,7 @@ i.fa { /* prevent page load flicker */
 .editor-buttons .icon-button + .icon-button {
   margin-left: 0;
 }
-#run-button {
+.run-button {
   font-weight: bold;
 }
 
@@ -244,14 +244,14 @@ i.fa { /* prevent page load flicker */
   justify-content: center;
   align-items: center;
 }
-canvas#world-canvas {
+canvas.world-canvas {
   max-height: 100%;
   max-width: 100%;
   /*min-height: 300px;*/
   /*min-width: 300px;*/
   image-rendering: crisp-edges;
 }
-#world-output {
+.log-output {
   /*max-height: 5em;*/
   /*min-height: 3em;*/
   height: 5em;
@@ -345,16 +345,16 @@ canvas#world-canvas {
   display: flex;
   flex-wrap: nowrap;
 
-  height: 0;
-  opacity: 0;
+  height: 3em;
+  opacity: 1;
   transition-property: height, opacity;
 
   background: rgba(255, 255, 255, .3);
   box-shadow: inset 0 0 1.3em rgba(255, 255, 255, .5);
 }
-#world-settings-toggle:checked + .world-settings {
-  height: 3em;
-  opacity: 1;
+.world-settings.hidden {
+  height: 0;
+  opacity: 0;
 }
 
 .world-settings label {
@@ -369,16 +369,16 @@ canvas#world-canvas {
   margin: 0 .25em;
   text-align: center;
 }
-#world-load-form input {
-  background-color: #eee;
-  border-radius: 3px;
-}
 .world-settings .separator {
   margin: 0 .25em;
   border: 1px solid transparent;
   border-right-color: rgba(255, 255, 255, .66);
 }
 .world-settings-close {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  background: transparent;
   cursor: pointer;
   padding: 0 .5em;
   color: white;
@@ -398,22 +398,21 @@ canvas#world-canvas {
                 rgba(203,235,255,1) 47%,
                 rgba(161,219,255,1) 100%);
 }
-#world-output {
+.log-output {
   padding: .5em 1em;
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-#world-output > p {
+.log-output > p {
   margin: 0;
   font-size: .85em;
   line-height: 1.6em;
   border-bottom: 1px dotted #ccc;
 }
-#world-output > p:last-child {
+.log-output > p:last-child {
   font-weight: bold;
   border-bottom-width: 0;
 }
-.error-message {
+.log-error {
   color: #a00;
 }
-
