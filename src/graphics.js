@@ -218,7 +218,9 @@ function loadImage(path) {
  * @param  {Array}  options.tiles   tiles data
  * @return {undefined}
  */
-export function render({width, length, height, player, tiles, seed}) {
+export const render = world => requestAnimationFrame(() => _render(world))
+
+function _render({width, length, height, player, tiles, seed}) {
   let w = (width + length) * 0.5 * (tileWidth + 2 * tileGap)
   let h = (width + length) * 0.5 * (tileDepth + 1 * tileGap)
         + height * blockHeight + playerHeight

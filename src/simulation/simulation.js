@@ -90,6 +90,8 @@ export function run(props) {
 
   function setDelay(ms) {
     delay = ms
+    // For a more fancy approach we could track the last execution time
+    // and reset the pending timeout accordingly.
   }
 
   return {finished, pause, resume, step, setDelay}
