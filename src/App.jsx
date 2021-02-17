@@ -1,6 +1,8 @@
 import {h, render, Fragment } from "preact"
 import {useEffect, useRef, useState} from "preact/hooks"
 
+import {Icon} from "./ui/icons"
+
 import {translate as t, init as initLocalization, Exception} from "./localization"
 import * as graphics from "./graphics"
 import {World /* checkKdwFormat, parseKdw, worldToKdwString */} from "./simulation/world"
@@ -134,28 +136,28 @@ function App() {
               disabled={!simulation || !isPaused}
               onClick={() => setIsPaused(false)}
             >
-              <i class="fa fa-play" />
+              <Icon faPlay />
             </button>
             <button
               class="button icon-button"
               disabled={!simulation || isPaused}
               onClick={() => setIsPaused(true)}
             >
-              <i class="fa fa-pause" />
+              <Icon faPause />
             </button>
             <button
               class="button icon-button"
               disabled={!simulation}
               onClick={() => simulation?.step()}
             >
-              <i class="fa fa-step-forward" />
+              <Icon faStepForward />
             </button>
             <button
               class="button icon-button"
               disabled={!simulation}
               onClick={haltSimulation}
             >
-              <i class="fa fa-stop" />
+              <Icon faStop />
             </button>
           </div>
         </form>
@@ -167,7 +169,7 @@ function App() {
         <div class="world-wrapper">
           <nav class="world-tools">
             <button class="button icon-button" onClick={toggleSettings}>
-              <i class="fa fa-cog" />
+              <Icon faCog />
             </button>
             <Separator />
             <button class="button" onClick={resetWorld}>{t("world.new")}</button>
@@ -253,32 +255,32 @@ function App() {
             <div class="world-controls">
               <div class="movement-controls">
                 <button id="world-turn-left">
-                  <i class="fa fa-reply" />
+                  <Icon faReply />
                 </button>
                 <div>
                   <button id="world-step">
-                    <i class="fa fa-play fa-rotate-270" />
+                    <Icon faPlay transform={{rotate: 270}} />
                   </button>
                   <button id="world-step-backwards">
-                    <i class="fa fa-play fa-rotate-90" />
+                    <Icon faPlay transform={{rotate: 90}} />
                   </button>
                 </div>
                 <button id="world-turn-right">
-                  <i class="fa fa-reply fa-flip-horizontal" />
+                  <Icon faReply transform={{flipX: true}} />
                 </button>
               </div>
               <div class="item-controls">
                 <button id="world-place-block">
-                  <i class="fa fa-sm fa-plus-circle" />
+                  <Icon sm faPlusCircle />
                 </button>
                 <button id="world-take-block">
-                  <i class="fa fa-sm fa-minus-circle" />
+                  <Icon sm faMinusCircle />
                 </button>
                 <button id="world-place-mark">
-                  <i class="fa fa-sm fa-plus-circle" />
+                  <Icon sm faPlusCircle />
                 </button>
                 <button id="world-take-mark">
-                  <i class="fa fa-sm fa-minus-circle" />
+                  <Icon sm faMinusCircle />
                 </button>
               </div>
             </div>
