@@ -27,14 +27,14 @@ const reducer = (state, action) => {
   }
 }
 
-export const Editor = props => {
+export const Editor = ({children = "", onChange = noop}) => {
   // TODO
   // const {indentation} = props.indentation ?? "    "
   // const unindentRegex = useMemo(
   //   () => new RegExp("^" + indentation.split("").join("?") + "?", "gm"),
   //   [indentation],
   // )
-  const onChange = props.onChange || noop
+
   // TODO? might not need a reducer
   const [{
     value,
@@ -43,14 +43,19 @@ export const Editor = props => {
     selectionEnd,
     selectionDirection,
   }, dispatch] = useReducer(reducer, {
-    value: props.value || "",
+    value: children,
     highlighted: highlight(""),
     selectionStart: 1,
     selectionEnd: 0,
     selectionDirection: "none",
   })
 
-  // useEffect(() => props.onChange(value), [value])
+  useEffect(
+    () => typeof children === "string"
+      && dispatch({type: "updateValue", value: children}),
+    [children],
+  )
+
   function updateValue({target: {value}}) {
     dispatch({type: "updateValue", value})
     onChange(value)

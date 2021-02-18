@@ -35,6 +35,16 @@ export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
  */
 export const event = evt => new Promise(resolve => addEventListener(evt, resolve))
 
+/** Wrap a function to automatically call evt.preventDefault() */
+export const defaultPreventer = fn => evt => {
+  if (evt) {
+    evt.preventDefault()
+  }
+  if (fn) {
+    return fn(evt)
+  }
+}
+
 /**
  * Promise fulfilled on DOMContentLoaded
  * @type {Promise}

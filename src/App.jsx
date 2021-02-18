@@ -5,12 +5,13 @@ import {Icon} from "./ui/Icon"
 
 import {translate as t, init as initLocalization, Exception} from "./localization"
 import * as graphics from "./graphics"
-import {World /* checkKdwFormat, parseKdw, worldToKdwString */} from "./simulation/world"
+import {World, checkKdwFormat, parseKdw, worldToKdwString} from "./simulation/world"
 import {run} from "./simulation/simulation"
 import {Logging, LoggingProvider, LogOutput} from "./ui/Logging"
 import {Editor} from "./ui/Editor"
 import {WorldControls} from "./ui/WorldControls"
-import {clamp, clsx} from "./util"
+import {clamp, clsx, defaultPreventer} from "./util"
+import {readFile, saveTextAs} from "./util/files"
 
 const MIN_SPEED = 1
 const MAX_SPEED = 2.5
@@ -33,6 +34,14 @@ function App() {
   }, [])
 
   const [code, setCode] = useState("")
+  const saveProgram = () =>
+    saveTextAs(code, t("program.default_filename"))
+
+  function loadProgram(evt) {
+    haltSimulation()
+    readFile(evt.target.files[0]).then(setCode)
+  }
+
 
   const [{width, length, height}, setSettings] = useState({
     width: 18,
@@ -46,9 +55,26 @@ function App() {
   const toggleSettings = () => setIsSettingsVisible(visible => !visible)
 
   const [world, setWorld] = useState(new World(width, length, height))
-  function resetWorld(evt) {
-    evt?.preventDefault()
+  const resetWorld = () =>
     setWorld(new World(width, length, height))
+
+  const saveWorld = () =>
+    saveTextAs(worldToKdwString(world), t("world.default_filename"))
+
+  async function loadWorld(evt) {
+    const text = await readFile(evt.target.files[0])
+    if (checkKdwFormat(text)) {
+      haltSimulation()
+      const newWorld = parseKdw(text)
+      setSettings({
+        width: newWorld.width,
+        length: newWorld.length,
+        height: newWorld.height,
+      })
+      setWorld(newWorld)
+    } else {
+      error("error.invalid_world_file")
+    }
   }
 
   const [isPaused, setIsPaused] = useState(false)
@@ -83,9 +109,19 @@ function App() {
     }
   }
   function haltSimulation() {
+    if (simulation) {
+      simulation.pause()
+      info("program.message.canceled")
+      setSimulation(null)
+    }
+  }
+  function pauseSimulation() {
     simulation.pause()
-    info("program.message.canceled")
-    setSimulation(null)
+    setIsPaused(true)
+  }
+  function resumeSimulation() {
+    simulation.resume()
+    setIsPaused(false)
   }
 
   const [showFlat, setShowFlat] = useState(false)
@@ -103,16 +139,22 @@ function App() {
       <section class="panel editor-panel">
         <header><h2>{t("program.code")}</h2></header>
 
-        <form class="editor-wrapper" onSubmit={evt => evt.preventDefault()}>
+        <form class="editor-wrapper" onSubmit={defaultPreventer()}>
           <div class="editor-buttons">
-            <button class="button">{t("program.save")}</button>
             <label class="button">
-              <span>{t("program.load")}</span>
-              <input type="file" class="hidden" id="program-file-input" />
+              {t("program.load")}
+              <input
+                type="file"
+                class="hidden"
+                onChange={loadProgram}
+              />
             </label>
+            <button class="button" onClick={saveProgram}>
+              {t("program.save")}
+            </button>
           </div>
 
-          <Editor onChange={setCode} />
+          <Editor onChange={setCode}>{code}</Editor>
 
           <div class="editor-buttons">
             <button
@@ -123,14 +165,14 @@ function App() {
             <button
               class="button icon-button"
               disabled={!simulation || !isPaused}
-              onClick={() => setIsPaused(false)}
+              onClick={resumeSimulation}
             >
               <Icon faPlay />
             </button>
             <button
               class="button icon-button"
               disabled={!simulation || isPaused}
-              onClick={() => setIsPaused(true)}
+              onClick={pauseSimulation}
             >
               <Icon faPause />
             </button>
@@ -157,20 +199,26 @@ function App() {
 
         <div class="world-wrapper">
           <nav class="world-tools">
-            <button class="button icon-button" onClick={toggleSettings}>
+            <button class="button icon-button" onClick={defaultPreventer(toggleSettings)}>
               <Icon faCog />
             </button>
+
             <Separator />
+
             <button class="button" onClick={resetWorld}>{t("world.new")}</button>
-            {/*
+
             <Separator />
-            <label class="button" for="world-file-input">{t("world.load")}</label>
-            <input type="file" class="hidden" id="world-file-input" />
-            <button class="button" id="world-save-button">{t("world.save")}</button>
-            */}
+
+            <label class="button">
+              {t("world.load")}
+              <input type="file" class="hidden" onChange={loadWorld} />
+            </label>
+            <button class="button" onClick={saveWorld}>{t("world.save")}</button>
+
             <Separator />
+
             <label class="button nohover">
-              <span>{t("world.speed")}</span>:
+              {t("world.speed")}:
               <input
                 type="range"
                 min={MIN_SPEED}
@@ -186,20 +234,20 @@ function App() {
 
             <form
               class={clsx("world-settings", !isSettingsVisible && "hidden")}
-              onSubmit={resetWorld}
+              onSubmit={defaultPreventer(resetWorld)}
             >
               <label>
-                <span>{t("world.width")}</span>:
+                {t("world.width")}:
                 <input type="number" name="width" min={1} max={100} value={width}
                   onChange={updateSetting} />
               </label>
               <label>
-                <span>{t("world.length")}</span>:
+                {t("world.length")}:
                 <input type="number" name="length" min={1} max={100} value={length}
                   onChange={updateSetting} />
               </label>
               <label>
-                <span>{t("world.height")}</span>:
+                {t("world.height")}:
                 <input type="number" name="height" min={1} max={25} value={height}
                   onChange={updateSetting} />
               </label>

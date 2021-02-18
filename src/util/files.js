@@ -5,8 +5,8 @@
  */
 export const readFile = file => new Promise((resolve, reject) => {
   const reader = new FileReader()
-  reader.onload = () => resolve(reader.result)
-  reader.onerror = () => reject(reader.error)
+  reader.addEventListener("load", () => resolve(reader.result))
+  reader.addEventListener("error", () => reject(reader.error))
   reader.readAsText(file)
 })
 
