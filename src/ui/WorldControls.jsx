@@ -1,5 +1,5 @@
 import {h} from "preact"
-import {useContext} from "preact/hooks"
+import {useContext, useEffect} from "preact/hooks"
 
 import {render} from "../graphics"
 import {Exception} from "../localization"
@@ -7,6 +7,22 @@ import {Logging} from "./Logging"
 import {Icon} from "./Icon"
 import {Sprite} from "./Sprite"
 
+const keyMap = {
+  ArrowUp: "step",
+  ArrowDown: "stepBackwards",
+  ArrowLeft: "turnLeft",
+  ArrowRight: "turnRight",
+
+  w: "step",
+  s: "stepBackwards",
+  a: "turnLeft",
+  d: "turnRight",
+
+  h: "placeBlock",
+  H: "takeBlock",
+  m: "placeMark",
+  M: "takeMark",
+}
 
 export const WorldControls = ({world, disabled}) => {
 
@@ -14,7 +30,6 @@ export const WorldControls = ({world, disabled}) => {
 
   const callWorldMethod = method => evt => {
     evt.preventDefault()
-    log.info(method)
     try {
       world[method]()
       render(world)
@@ -27,6 +42,26 @@ export const WorldControls = ({world, disabled}) => {
       }
     }
   }
+
+  useEffect(() => {
+    if (disabled) {
+      return
+    }
+    function onKeyDown(evt) {
+      if (evt.defaultPrevented
+        || evt.target instanceof HTMLTextAreaElement
+        || evt.target instanceof HTMLInputElement
+      ) {
+        return
+      }
+      const method = keyMap[evt.key]
+      if (method) {
+        callWorldMethod(method)(evt)
+      }
+    }
+    addEventListener("keydown", onKeyDown)
+    return () => removeEventListener("keydown", onKeyDown)
+  }, [world, disabled, log])
 
   return (
     <div class="world-controls">
