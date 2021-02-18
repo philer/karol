@@ -8,6 +8,7 @@ import {
 
   // runtime controlls
   faPlay, faPause, faStop, faStepForward,
+  faWalking, faRunning,
 
   // settings toggles
   faCog, faTimes,
@@ -25,6 +26,7 @@ const lookup = {
 
   // runtime controlls
   faPlay, faPause, faStop, faStepForward,
+  faWalking, faRunning,
 
   // settings toggles
   faCog, faTimes,

@@ -13,17 +13,17 @@ import {WorldControls} from "./ui/WorldControls"
 import {clamp, clsx, defaultPreventer} from "./util"
 import {readFile, saveTextAs} from "./util/files"
 
+
 const MIN_SPEED = 1
 const MAX_SPEED = 2.5
+const calculateDelay = speed => Math.pow(10, 4 - speed)
+
 
 const initPromises = Promise.all([
   initLocalization(),
   graphics.init(),
 ])
 
-const Separator = () => <i class="separator" />
-
-const calculateDelay = speed => Math.pow(10, 4 - speed)
 
 function App() {
   const {info, error} = useContext(Logging)
@@ -34,14 +34,17 @@ function App() {
   }, [])
 
   const [code, setCode] = useState("")
-  const saveProgram = () =>
+  function updateCode(text) {
+    haltSimulation()
+    setCode(text)
+  }
+  function saveProgram() {
     saveTextAs(code, t("program.default_filename"))
-
+  }
   function loadProgram(evt) {
     haltSimulation()
     readFile(evt.target.files[0]).then(setCode)
   }
-
 
   const [{width, length, height}, setSettings] = useState({
     width: 18,
@@ -80,8 +83,8 @@ function App() {
   const [isPaused, setIsPaused] = useState(false)
   const [speed, setSpeed] = useState((MIN_SPEED + MAX_SPEED) / 2)
   function updateSpeed(value) {
-    setSpeed(value)
     simulation?.setDelay(calculateDelay(value))
+    setSpeed(value)
   }
 
   const [simulation, setSimulation] = useState(null)
@@ -98,7 +101,6 @@ function App() {
       info("program.message.running")
       await simulation.finished
       info("program.message.finished")
-      setSimulation(null)
     } catch (err) {
       if (err instanceof Exception) {
         error(err)
@@ -106,6 +108,8 @@ function App() {
         error(err.message)
         console.error(err)
       }
+    } finally {
+      setSimulation(null)
     }
   }
   function haltSimulation() {
@@ -128,7 +132,11 @@ function App() {
   useEffect(() => graphics.showHeightNoise(!showFlat), [showFlat])
   const [showPlayer, setShowPlayer] = useState(true)
   useEffect(() => graphics.showPlayer(showPlayer), [showPlayer])
-  useEffect(() => graphics.render(world), [world, showFlat, showPlayer])  // also initial
+
+  useEffect(
+    () => !isLoading && graphics.render(world),
+    [isLoading, world, showFlat, showPlayer],
+  )  // also initial
 
   if (isLoading) {
     return <span>Loading...</span>
@@ -154,42 +162,50 @@ function App() {
             </button>
           </div>
 
-          <Editor onChange={setCode}>{code}</Editor>
+          <Editor onChange={updateCode}>{code}</Editor>
 
           <div class="editor-buttons">
-            <button
-              class="button run-button"
-              disabled={simulation}
-              onClick={runSimulation}
-            >{t("program.run")}</button>
-            <button
-              class="button icon-button"
-              disabled={!simulation || !isPaused}
-              onClick={resumeSimulation}
-            >
-              <Icon faPlay />
-            </button>
-            <button
-              class="button icon-button"
-              disabled={!simulation || isPaused}
-              onClick={pauseSimulation}
-            >
-              <Icon faPause />
-            </button>
-            <button
-              class="button icon-button"
-              disabled={!simulation}
-              onClick={() => simulation?.step()}
-            >
-              <Icon faStepForward />
-            </button>
-            <button
-              class="button icon-button"
-              disabled={!simulation}
-              onClick={haltSimulation}
-            >
-              <Icon faStop />
-            </button>
+            {simulation
+              ? <>
+                  {isPaused
+                    ? <button class="button icon-button" onClick={resumeSimulation}>
+                        <Icon faPlay />
+                      </button>
+                    : <button class="button icon-button" onClick={pauseSimulation}>
+                        <Icon faPause />
+                      </button>
+                  }
+                  <button
+                    class="button icon-button"
+                    disabled={!simulation}
+                    onClick={() => simulation?.step()}
+                  >
+                    <Icon faStepForward />
+                  </button>
+                  <button
+                    class="button icon-button"
+                    disabled={!simulation}
+                    onClick={haltSimulation}
+                  >
+                    <Icon faStop />
+                  </button>
+                </>
+              : <button class="button run-button" onClick={runSimulation}>
+                  {t("program.run")}
+                </button>
+            }
+            <label class="button nohover">
+              <Icon faWalking lg fw />
+              <input
+                type="range"
+                min={MIN_SPEED}
+                max={MAX_SPEED}
+                value={speed}
+                step="any"
+                onChange={evt => updateSpeed(evt.target.value)}
+              />
+              <Icon faRunning lg fw />
+            </label>
           </div>
         </form>
       </section>
@@ -203,31 +219,17 @@ function App() {
               <Icon faCog />
             </button>
 
-            <Separator />
+            <i class="separator" />
 
             <button class="button" onClick={resetWorld}>{t("world.new")}</button>
 
-            <Separator />
+            <i class="separator" />
 
             <label class="button">
               {t("world.load")}
               <input type="file" class="hidden" onChange={loadWorld} />
             </label>
             <button class="button" onClick={saveWorld}>{t("world.save")}</button>
-
-            <Separator />
-
-            <label class="button nohover">
-              {t("world.speed")}:
-              <input
-                type="range"
-                min={MIN_SPEED}
-                max={MAX_SPEED}
-                value={speed}
-                step="any"
-                onChange={evt => updateSpeed(evt.target.value)}
-              />
-            </label>
           </nav>
 
           <div class="world-canvas-container">
@@ -252,7 +254,7 @@ function App() {
                   onChange={updateSetting} />
               </label>
 
-              <Separator />
+              <i class="separator" />
 
               <label>
                 <input type="checkbox" checked={showFlat}
@@ -260,7 +262,7 @@ function App() {
                 <span>{t("world.flat")}</span>
               </label>
 
-              <Separator />
+              <i class="separator" />
 
               <label>
                 <input type="checkbox" checked={showPlayer}
@@ -273,8 +275,6 @@ function App() {
               <button class="world-settings-close" onClick={toggleSettings}>
                 <Icon faTimes />
               </button>
-
-              <input type="submit" class="hidden" />
             </form>
 
             <div class="world-canvas-box">

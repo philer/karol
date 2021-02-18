@@ -95,6 +95,9 @@ i.fa { /* prevent page load flicker */
   cursor: pointer;
   outline: none;
 
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
 
   color: #444;
@@ -126,6 +129,11 @@ i.fa { /* prevent page load flicker */
 .button:disabled {
   color: #aaa;
   cursor: default;
+}
+.button input[type="range"] {
+  width: 100%;
+  flex: 100% 1 1;
+  margin: 0 .5em;
 }
 .hidden {
   display: none;
@@ -220,6 +228,10 @@ i.fa { /* prevent page load flicker */
 }
 .run-button {
   font-weight: bold;
+  width: 9em;
+  min-width: 9em;
+  max-width: 9em;
+  flex: 9em 0 0; /* width = 3x .icon-button */
 }
 
 
