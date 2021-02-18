@@ -22,7 +22,9 @@ export default {
   ].filter(Boolean),
 
   plugins: [
-    nodeResolve(),  // import NPM modules
+    nodeResolve({
+      extensions: [".js", ".jsx", ".json"],
+    }),
     babel({babelHelpers: "bundled"}),
   ],
 }

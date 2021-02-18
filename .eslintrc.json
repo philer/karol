@@ -20,6 +20,7 @@
     "no-else-return": "off",
     "no-lonely-if": "off",
     "no-prototype-builtins": "off",
+    "no-unused-vars": ["error", {"argsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_"}],
     "no-useless-concat": "warn",
     "no-var": "warn",
     "prefer-arrow-callback": "warn",

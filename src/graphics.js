@@ -8,7 +8,6 @@
  */
 
 import * as config from "./config"
-import {css} from "./util"
 import * as noise from "./util/perlin"
 
 const DEFAULT_THEME_DIR = "img/simple"
@@ -147,9 +146,6 @@ class Sprite {
       x, y - this.height,
       this._scaledWidth, this._scaledHeight)
   }
-  img(alt = "") {
-    return `<img src="${this.imagePath}" alt="${alt}">`
-  }
 }
 
 /**
@@ -159,7 +155,7 @@ class Sprite {
 class AtlasSprite {
   constructor(imagePath, x, y, width, height, xOffset=0, yOffset=0) {
     this.imagePath = imagePath
-    this._crop = {x, y, width, height}
+    this.crop = {x, y, width, height}
     const scale = tileWidth / width
     this._scaledWidth = tileWidth
     this._scaledHeight = scale * height
@@ -172,20 +168,10 @@ class AtlasSprite {
   }
   draw(ctx, x, y) {
     ctx.drawImage(this._image,
-      this._crop.x, this._crop.y,
-      this._crop.width, this._crop.height,
+      this.crop.x, this.crop.y,
+      this.crop.width, this.crop.height,
       x + this.xOffset, y - this.height - this.yOffset,
       this._scaledWidth, this._scaledHeight)
-  }
-  img(alt = "") {
-    const {x, y, width, height} = this._crop
-    const style = css({
-      "object-fit": "none",
-      "object-position": `-${x}px -${y}px`,
-      "width": width + "px",
-      "height": height + "px",
-    })
-    return `<img src="${this.imagePath}" alt="${alt}" style="${style}">`
   }
 }
 

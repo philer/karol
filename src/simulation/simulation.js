@@ -96,4 +96,3 @@ export function run(props) {
 
   return {finished, pause, resume, step, setDelay}
 }
-

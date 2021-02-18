@@ -233,7 +233,7 @@ i.fa { /* prevent page load flicker */
   position: relative;
   flex: 1 1 auto;
 }
-.world-canvas-container > div {
+.world-canvas-box {
   position: absolute;
   top: 0;
   left: 0;
@@ -260,18 +260,29 @@ canvas.world-canvas {
   overflow: auto;
 }
 
-.world-canvas-container .world-controls {
-  top: auto;
-  left: auto;
+.world-controls {
+  position: absolute;
+  right: 0;
+  height: 100%;
   padding: 1.5em;
+  display: flex;
   flex-direction: column;
+  align-items: flex-end;
 }
-.world-controls div {
+.world-controls .movement-controls {
+  flex: auto 0 0;
   display: flex;
   align-items: flex-end;
 }
 .world-controls .movement-controls > div {
+  display: flex;
   flex-direction: column;
+}
+.world-controls .item-controls {
+  flex: auto 1 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .world-controls button {
   position: relative;
