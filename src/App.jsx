@@ -1,5 +1,5 @@
-import {h, render, Fragment } from "preact"
-import {useEffect, useRef, useState} from "preact/hooks"
+import {h, render, Fragment} from "preact"
+import {useContext, useEffect, useState} from "preact/hooks"
 
 import {Icon} from "./ui/Icon"
 import {Sprite} from "./ui/Sprite"
@@ -8,7 +8,8 @@ import {translate as t, init as initLocalization, Exception} from "./localizatio
 import * as graphics from "./graphics"
 import {World /* checkKdwFormat, parseKdw, worldToKdwString */} from "./simulation/world"
 import {run} from "./simulation/simulation"
-import {Editor} from "./ui/editor"
+import {Logging, LoggingProvider, LogOutput} from "./ui/Logging"
+import {Editor} from "./ui/Editor"
 import {clamp, clsx} from "./util"
 
 const MIN_SPEED = 1
@@ -24,6 +25,7 @@ const Separator = () => <i class="separator" />
 const calculateDelay = speed => Math.pow(10, 4 - speed)
 
 function App() {
+  const {info, error} = useContext(Logging)
 
   const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
@@ -103,28 +105,11 @@ function App() {
     setSimulation(null)
   }
 
-
   const [showFlat, setShowFlat] = useState(false)
   useEffect(() => graphics.showHeightNoise(!showFlat), [showFlat])
   const [showPlayer, setShowPlayer] = useState(true)
   useEffect(() => graphics.showPlayer(showPlayer), [showPlayer])
   useEffect(() => graphics.render(world), [world, showFlat, showPlayer])  // also initial
-
-  const [logMessages, setLogMessages] = useState([])
-  const log = (level, message, ...data) => setLogMessages(logMessages => [
-    ...logMessages,
-    message instanceof Exception ? {...message, level} : {level, message, data},
-  ])
-  const info = (message, ...data) => log("info", message, ...data)
-  const error = (message, ...data) => log("error", message, ...data)
-  const logOutputRef = useRef()
-  useEffect(
-    () => setTimeout(
-      logOutputRef.current?.scrollBy({top: 20, behavior: "smooth"}),
-      50,
-    ),
-    [logMessages],
-  )
 
   if (isLoading) {
     return <span>Loading...</span>
@@ -310,12 +295,7 @@ function App() {
             </div>
           </div>
 
-          <pre ref={logOutputRef} class="log-output">
-            {logMessages.map(({level, message, data}, idx) =>
-              // idx as key is fine as long as we only append
-              <p key={idx} class={"log-" + level}>{t(message, ...data)}</p>,
-            )}
-          </pre>
+          <LogOutput />
         </div>
       </section>
     </>
@@ -323,4 +303,4 @@ function App() {
 }
 
 
-render(<App />, document.body)
+render(<LoggingProvider><App /></LoggingProvider>, document.body)
