@@ -2,7 +2,6 @@ import {h, render, Fragment} from "preact"
 import {useContext, useEffect, useState} from "preact/hooks"
 
 import {Icon} from "./ui/Icon"
-import {Sprite} from "./ui/Sprite"
 
 import {translate as t, init as initLocalization, Exception} from "./localization"
 import * as graphics from "./graphics"
@@ -10,6 +9,7 @@ import {World /* checkKdwFormat, parseKdw, worldToKdwString */} from "./simulati
 import {run} from "./simulation/simulation"
 import {Logging, LoggingProvider, LogOutput} from "./ui/Logging"
 import {Editor} from "./ui/Editor"
+import {WorldControls} from "./ui/WorldControls"
 import {clamp, clsx} from "./util"
 
 const MIN_SPEED = 1
@@ -49,23 +49,6 @@ function App() {
   function resetWorld(evt) {
     evt?.preventDefault()
     setWorld(new World(width, length, height))
-  }
-  const callWorldMethod = method => evt => {
-    evt?.preventDefault()
-    if (simulation) {
-      return  // maybe allow it via config?
-    }
-    try {
-      world[method]()
-      graphics.render(world)
-    } catch (err) {
-      if (err instanceof Exception) {
-        error(err.translatedMessage)
-      } else {
-        error(err.message)
-        console.error(err)
-      }
-    }
   }
 
   const [isPaused, setIsPaused] = useState(false)
@@ -257,42 +240,7 @@ function App() {
               </canvas>
             </div>
 
-            <div class="world-controls">
-              <div class="item-controls">
-                <button onClick={callWorldMethod("placeBlock")}>
-                  <Sprite block />
-                  <Icon sm faPlusCircle />
-                </button>
-                <button onClick={callWorldMethod("takeBlock")}>
-                  <Sprite block />
-                  <Icon sm faMinusCircle />
-                </button>
-                <button onClick={callWorldMethod("placeMark")}>
-                  <Sprite mark />
-                  <Icon sm faPlusCircle />
-                </button>
-                <button onClick={callWorldMethod("takeMark")}>
-                  <Sprite mark />
-                  <Icon sm faMinusCircle />
-                </button>
-              </div>
-              <div class="movement-controls">
-                <button onClick={callWorldMethod("turnLeft")}>
-                  <Icon faReply />
-                </button>
-                <div>
-                  <button onClick={callWorldMethod("step")}>
-                    <Icon faPlay transform={{rotate: 270}} />
-                  </button>
-                  <button onClick={callWorldMethod("stepBackwards")}>
-                    <Icon faPlay transform={{rotate: 90}} />
-                  </button>
-                </div>
-                <button onClick={callWorldMethod("turnRight")}>
-                  <Icon faReply transform={{flipX: true}} />
-                </button>
-              </div>
-            </div>
+            <WorldControls world={world} disabled={simulation !== null} />
           </div>
 
           <LogOutput />
