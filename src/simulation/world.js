@@ -19,7 +19,10 @@ export class World {
 
   get forwardTile() {
     const [x, y] = World.move(this.player)
-    return this.tiles[x * this.length + y]
+    if (this.contains(x, y)) {
+      return this.tiles[x * this.length + y]
+    }
+    return null
   }
 
   /**
@@ -56,27 +59,21 @@ export class World {
 
 
   step(count=1) {
-    if (Math.abs(count) != 1) {
-      let direction = count >= 0 ? 1 : -1
-      count = Math.abs(count)
-      for (let i = 0 ; i < count ; ++i) {
-        this.step(direction)
+    const direction = count >= 0 ? 1 : -1
+    for (let i = Math.abs(count) ; i ; --i) {
+      const [targetX, targetY] = World.move(this.player, direction)
+      if (!this.contains(targetX, targetY)) {
+        throw new Exception("error.world.move_out_of_world")
       }
-      return
+      const targetTile = this.tiles[targetX * this.length + targetY]
+      if (1 < Math.abs(this.currentTile.blocks - targetTile.blocks)) {
+        throw new Exception("error.world.jump_too_high")
+      }
+      if (targetTile.cuboid) {
+        throw new Exception("error.world.move_cuboid")
+      }
+      [this.player.x, this.player.y] = [targetX, targetY]
     }
-    const z = this.tiles[this.player.x * this.length + this.player.y].blocks
-    const [x, y] = World.move(this.player, count)
-    if (!this.contains(x, y)) {
-      throw new Exception("error.world.move_out_of_world")
-    }
-    const targetTile = this.tiles[x * this.length + y]
-    if (1 < Math.abs(z - targetTile.blocks)) {
-      throw new Exception("error.world.jump_too_high")
-    }
-    if (targetTile.cuboid) {
-      throw new Exception("error.world.move_cuboid")
-    }
-    [this.player.x, this.player.y] = [x, y]
   }
 
   stepBackwards(count=1) {
