@@ -90,7 +90,7 @@ export const WorldPanel = ({onChange, isSimulationRunning}) => {
 
           <form
             class={clsx("world-settings", !isSettingsVisible && "hidden")}
-            onSubmit={defaultPreventer(resetWorld)}
+            onSubmit={defaultPreventer()}
           >
             <label>
               {t("world.width")}:

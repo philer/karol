@@ -1,5 +1,5 @@
 import {h} from "preact"
-import {useContext, useEffect} from "preact/hooks"
+import {useCallback, useContext, useEffect} from "preact/hooks"
 
 import {render} from "../graphics"
 import {Exception} from "../localization"
@@ -28,7 +28,7 @@ export const WorldControls = ({world, disabled}) => {
 
   const log = useContext(Logging)
 
-  const callWorldMethod = method => evt => {
+  const callWorldMethod = useCallback(method => evt => {
     evt.preventDefault()
     try {
       world[method]()
@@ -41,7 +41,7 @@ export const WorldControls = ({world, disabled}) => {
         console.error(err)
       }
     }
-  }
+  }, [world, log])
 
   useEffect(() => {
     if (disabled) {
@@ -61,7 +61,7 @@ export const WorldControls = ({world, disabled}) => {
     }
     addEventListener("keydown", onKeyDown)
     return () => removeEventListener("keydown", onKeyDown)
-  }, [world, disabled, log])
+  }, [disabled, callWorldMethod])
 
   return (
     <div class="world-controls">
