@@ -3,12 +3,11 @@ import {useContext, useEffect, useState} from "preact/hooks"
 
 import {translate as t, init as initLocalization, Exception} from "./localization"
 import * as graphics from "./graphics"
-import {World, checkKdwFormat, parseKdw, worldToKdwString} from "./simulation/world"
 import {run} from "./simulation/simulation"
-import {Logging, LoggingProvider, LogOutput} from "./ui/Logging"
+import {Logging, LoggingProvider} from "./ui/Logging"
 import {Editor} from "./ui/Editor"
-import {WorldControls} from "./ui/WorldControls"
-import {clamp, clsx, defaultPreventer} from "./util"
+import {WorldPanel} from "./ui/WorldPanel"
+import {defaultPreventer} from "./util"
 import {readFile, saveTextAs} from "./util/files"
 import {
   IconPlay,
@@ -17,8 +16,6 @@ import {
   IconStop,
   IconWalking,
   IconRunning,
-  IconCog,
-  IconTimes,
 } from "./ui/Icon"
 
 
@@ -34,68 +31,42 @@ const initPromises = Promise.all([
 
 
 function App() {
-  const {info, error} = useContext(Logging)
-
+  const log = useContext(Logging)
   const [isLoading, setIsLoading] = useState(true)
+  const [code, setCode] = useState("")
+  const [isPaused, setIsPaused] = useState(false)
+  const [speed, setSpeed] = useState((MIN_SPEED + MAX_SPEED) / 2)
+  const [simulation, setSimulation] = useState(null)
+
   useEffect(() => {
     initPromises.then(() => setIsLoading(false), console.error)
   }, [])
 
-  const [code, setCode] = useState("")
   function updateCode(text) {
     haltSimulation()
     setCode(text)
   }
+
   function saveProgram() {
     saveTextAs(code, t("program.default_filename"))
   }
+
   function loadProgram(evt) {
     haltSimulation()
     readFile(evt.target.files[0]).then(setCode)
   }
 
-  const [{width, length, height}, setSettings] = useState({
-    width: 18,
-    length: 7,
-    height: 5,
-  })
-  const updateSetting = ({target: {name, min, max, value}}) =>
-    setSettings(settings => ({...settings, [name]: clamp(min, max, value)}))
-
-  const [isSettingsVisible, setIsSettingsVisible] = useState(false)
-  const toggleSettings = () => setIsSettingsVisible(visible => !visible)
-
-  const [world, setWorld] = useState(new World(width, length, height))
-  const resetWorld = () =>
-    setWorld(new World(width, length, height))
-
-  const saveWorld = () =>
-    saveTextAs(worldToKdwString(world), t("world.default_filename"))
-
-  async function loadWorld(evt) {
-    const text = await readFile(evt.target.files[0])
-    if (checkKdwFormat(text)) {
-      haltSimulation()
-      const newWorld = parseKdw(text)
-      setSettings({
-        width: newWorld.width,
-        length: newWorld.length,
-        height: newWorld.height,
-      })
-      setWorld(newWorld)
-    } else {
-      error("error.invalid_world_file")
-    }
+  const [world, setWorld] = useState(null)
+  function updateWorld(newWorld) {
+    haltSimulation()
+    setWorld(newWorld)
   }
 
-  const [isPaused, setIsPaused] = useState(false)
-  const [speed, setSpeed] = useState((MIN_SPEED + MAX_SPEED) / 2)
   function updateSpeed(value) {
     simulation?.setDelay(calculateDelay(value))
     setSpeed(value)
   }
 
-  const [simulation, setSimulation] = useState(null)
   async function runSimulation() {
     try {
       const simulation = run({
@@ -106,45 +77,38 @@ function App() {
       })
       setSimulation(simulation)
       setIsPaused(false)
-      info("program.message.running")
+      log.info("program.message.running")
       await simulation.finished
-      info("program.message.finished")
+      log.info("program.message.finished")
     } catch (err) {
       if (err instanceof Exception) {
-        error(err)
+        log.error(err)
       } else {
-        error(err.message)
+        log.error(err.message)
         console.error(err)
       }
     } finally {
       setSimulation(null)
     }
   }
+
   function haltSimulation() {
     if (simulation) {
       simulation.pause()
-      info("program.message.canceled")
+      log.info("program.message.canceled")
       setSimulation(null)
     }
   }
+
   function pauseSimulation() {
     simulation.pause()
     setIsPaused(true)
   }
+
   function resumeSimulation() {
     simulation.resume()
     setIsPaused(false)
   }
-
-  const [showFlat, setShowFlat] = useState(false)
-  useEffect(() => graphics.showHeightNoise(!showFlat), [showFlat])
-  const [showPlayer, setShowPlayer] = useState(true)
-  useEffect(() => graphics.showPlayer(showPlayer), [showPlayer])
-
-  useEffect(
-    () => !isLoading && graphics.render(world),
-    [isLoading, world, showFlat, showPlayer],
-  )
 
   if (isLoading) {
     return <span>Loading...</span>
@@ -173,6 +137,7 @@ function App() {
           <Editor onChange={updateCode}>{code}</Editor>
 
           <div class="editor-buttons">
+
             {simulation
               ? <>
                   {isPaused
@@ -202,6 +167,7 @@ function App() {
                   {t("program.run")}
                 </button>
             }
+
             <label class="button nohover">
               <IconWalking lg fw />
               <input
@@ -214,94 +180,15 @@ function App() {
               />
               <IconRunning lg fw />
             </label>
+
           </div>
         </form>
       </section>
 
-      <section class="panel world-panel">
-        <header><h2>{t("world.world")}</h2></header>
-
-        <div class="world-wrapper">
-          <nav class="world-tools">
-            <button class="button icon-button" onClick={defaultPreventer(toggleSettings)}>
-              <IconCog />
-            </button>
-
-            <i class="separator" />
-
-            <button class="button" onClick={resetWorld}>{t("world.new")}</button>
-
-            <i class="separator" />
-
-            <label class="button">
-              {t("world.load")}
-              <input type="file" class="hidden" onChange={loadWorld} />
-            </label>
-            <button class="button" onClick={saveWorld}>{t("world.save")}</button>
-          </nav>
-
-          <div class="world-canvas-container">
-
-            <form
-              class={clsx("world-settings", !isSettingsVisible && "hidden")}
-              onSubmit={defaultPreventer(resetWorld)}
-            >
-              <label>
-                {t("world.width")}:
-                <input type="number" name="width" min={1} max={100} value={width}
-                  onChange={updateSetting} />
-              </label>
-              <label>
-                {t("world.length")}:
-                <input type="number" name="length" min={1} max={100} value={length}
-                  onChange={updateSetting} />
-              </label>
-              <label>
-                {t("world.height")}:
-                <input type="number" name="height" min={1} max={25} value={height}
-                  onChange={updateSetting} />
-              </label>
-
-              <i class="separator" />
-
-              <label>
-                <input type="checkbox" checked={showFlat}
-                  onChange={evt => setShowFlat(evt.target.checked)} />
-                <span>{t("world.flat")}</span>
-              </label>
-
-              <i class="separator" />
-
-              <label>
-                <input type="checkbox" checked={showPlayer}
-                  onChange={evt => setShowPlayer(evt.target.checked)} />
-                <span>{t("world.show_player")}</span>
-              </label>
-
-              <i class="expander" />
-
-              <button class="world-settings-close" onClick={toggleSettings}>
-                <IconTimes />
-              </button>
-            </form>
-
-            <div class="world-canvas-box">
-              <canvas
-                class="world-canvas"
-                ref={graphics.setCanvas}
-                width="600"
-                height="400"
-              >
-                Your Browser needs to support HTML5
-              </canvas>
-            </div>
-
-            <WorldControls world={world} disabled={simulation !== null} />
-          </div>
-
-          <LogOutput />
-        </div>
-      </section>
+      <WorldPanel
+        onChange={updateWorld}
+        isSimulationRunning={simulation !== null}
+      />
     </>
   )
 }
