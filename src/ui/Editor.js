@@ -114,11 +114,6 @@ export const Editor = ({children = "", onChange = noop}) => {
             class="editor-textarea"
             spellcheck={false}
 
-            value={value}
-            selectionStart={selectionStart}
-            selectionEnd={selectionEnd}
-            selectionDirection={selectionDirection}
-
             // Listening to both keydown & keypress because chrome doesn't trigger
             // keydown on arrow keys while firefox misplaces the cursor with
             // keypress.
@@ -131,7 +126,7 @@ export const Editor = ({children = "", onChange = noop}) => {
             onMousedown={startMouseDragging}
             onMouseup={stopMouseDragging}
             onMousemove={isMouseDragging ? updateCaret : undefined}
-          />
+          >{value}</textarea>
 
           {/* Put caret layer behind the textarea so we can hide it via css when
             * textarea isn't focused
