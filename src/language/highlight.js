@@ -37,24 +37,19 @@ const wrapToken = (text, type) =>
     ? text  // already wrapped
     : `<span class="token ${ttClasses[type]}">${text}</span>`
 
-const wrapLine = (line, idx) =>
-  '<div class="line">'
-  +   `<span class="lineno">${idx + 1}</span>`
-  +   `<span>${line}</span>`
-  + "</div>"
 
 /**
  * Add syntax highlighting HTML tags to given code snippet.
  * @param  {String} text code
  * @return {String}      code with tokens wrapped in HTML tags
  */
-export default function highlight(text) {
+export function highlight(text, markLine = false) {
   const tokens = new TokenIterator(text, true, true)
   const htmlLines = []
   let currentLine = ""
-  let value, type
+
   try {
-    for ({value, type} of tokens) {
+    for (const {value, type} of tokens) {
       if (type === TT.COMMENT || type === TT.WHITESPACE) {
         const [first, ...lines] = wrapSpaces(value).split("\n")
         currentLine += wrapToken(first, type)
@@ -66,13 +61,21 @@ export default function highlight(text) {
         currentLine += wrapToken(value, type)
       }
     }
+
+    htmlLines.push(currentLine)
+
   } catch (err) {
-    return htmlLines
-      .concat(
-        (currentLine + wrapSpaces(tokens.remainingText))
-          .split("\n"))
-      .map(wrapLine).join("")
+    const remainingText = wrapSpaces(tokens.remainingText)
+    const [currentLineTail, ...remainingLines] = remainingText.split("\n")
+    htmlLines.push(currentLine + currentLineTail, ...remainingLines)
   }
-  htmlLines.push(currentLine)
-  return htmlLines.map(wrapLine).join("")
+
+  return htmlLines
+    .map((line, idx) =>
+      `<div class="line${idx === markLine ? " marked" : ""}">`
+      +   `<span class="lineno">${idx + 1}</span>`
+      +   `<span>${line}</span>`
+      + `</div>`,
+    )
+    .join("")
 }

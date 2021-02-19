@@ -1,19 +1,15 @@
 import {h} from "preact"
-import {useEffect, useMemo, useRef, useReducer, useState} from "preact/hooks"
+import {useEffect, useReducer, useState} from "preact/hooks"
 
 import * as config from "../config"
 import {elem, noop} from "../util"
-import highlight from "../language/highlight"
+import {highlight} from "../language/highlight"
+
 
 const reducer = (state, action) => {
   switch (action.type) {
     case "updateValue": {
-      return {
-        ...state,
-        value: action.value,
-        highlighted: highlight(action.value),
-      }
-      // TODO? this.updateCaret()
+      return {...state, value: action.value}
     }
     case "updateCaret": {
       const {selectionStart, selectionEnd, selectionDirection} = action.event.target
@@ -27,7 +23,7 @@ const reducer = (state, action) => {
   }
 }
 
-export const Editor = ({children = "", onChange = noop}) => {
+export const Editor = ({children = "", onChange = noop, markLine}) => {
   // TODO
   // const {indentation} = props.indentation ?? "    "
   // const unindentRegex = useMemo(
@@ -38,13 +34,11 @@ export const Editor = ({children = "", onChange = noop}) => {
   // TODO? might not need a reducer
   const [{
     value,
-    highlighted,
     selectionStart,
     selectionEnd,
     selectionDirection,
   }, dispatch] = useReducer(reducer, {
     value: children,
-    highlighted: highlight(""),
     selectionStart: 1,
     selectionEnd: 0,
     selectionDirection: "none",
@@ -52,8 +46,8 @@ export const Editor = ({children = "", onChange = noop}) => {
 
   useEffect(
     () => typeof children === "string"
-      && dispatch({type: "updateValue", value: children}),
-    [children],
+      && dispatch({type: "updateValue", value: children, markLine}),
+    [children, markLine],
   )
 
   function updateValue({target: {value}}) {
@@ -105,10 +99,7 @@ export const Editor = ({children = "", onChange = noop}) => {
     <div class="editor">
       <div class="editor-scrollbox">
         <div>
-          <code
-            class="editor-highlight"
-            dangerouslySetInnerHTML={{__html: highlighted}}
-          />
+          <Highlight markLine={markLine}>{value}</Highlight>
 
           <textarea
             class="editor-textarea"
@@ -151,6 +142,15 @@ export const Editor = ({children = "", onChange = noop}) => {
     </div>
   )
 }
+
+
+/** Use a separate component to gain automatic memoization */
+const Highlight = ({children, markLine}) =>
+  <code
+    class="editor-highlight"
+    dangerouslySetInnerHTML={{__html: highlight(children, markLine)}}
+  />
+
 
 export class _Editor {
 

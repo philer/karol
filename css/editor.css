@@ -95,10 +95,10 @@
   display: flex;
   border-radius: 2px;
 }
-.editor-highlight .line:not(.current) {
+.editor-highlight .line:not(.marked) {
   transition: .1s background, .1s box-shadow;
 }
-.editor-highlight .line.current::before {
+.editor-highlight .line.marked::before {
   content: "➡";
   position: relative;
   left: -.33em;

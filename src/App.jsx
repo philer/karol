@@ -34,6 +34,7 @@ function App() {
   const log = useContext(Logging)
   const [isLoading, setIsLoading] = useState(true)
   const [code, setCode] = useState("")
+  const [markLine, setMarkLine] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [speed, setSpeed] = useState((MIN_SPEED + MAX_SPEED) / 2)
   const [simulation, setSimulation] = useState(null)
@@ -73,7 +74,7 @@ function App() {
         code,
         world,
         delay: calculateDelay(speed),
-        // onExecute: ({lineno}) => editor.markLine(lineno),  // TODO
+        onExecute: ({line}) => setMarkLine(line),
       })
       setSimulation(simulation)
       setIsPaused(false)
@@ -89,6 +90,7 @@ function App() {
       }
     } finally {
       setSimulation(null)
+      setMarkLine(false)
     }
   }
 
@@ -97,6 +99,7 @@ function App() {
       simulation.pause()
       log.info("program.message.canceled")
       setSimulation(null)
+      setMarkLine(false)
     }
   }
 
@@ -134,7 +137,7 @@ function App() {
             </button>
           </div>
 
-          <Editor onChange={updateCode}>{code}</Editor>
+          <Editor onChange={updateCode} markLine={markLine}>{code}</Editor>
 
           <div class="editor-buttons">
 

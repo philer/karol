@@ -17,11 +17,11 @@
 .editor-textarea:not(:focus) ~ .editor-caret-layer .editor-selection {
   background-color: #efefef;
 }
-.editor-highlight .line.current {
+.editor-highlight .line.marked {
   background-color: #eee;
   box-shadow: 0 0 0 1px #ddd;
 }
-.editor-highlight .line.current::before {
+.editor-highlight .line.marked::before {
   color: #666; /* arrow */
 }
 
