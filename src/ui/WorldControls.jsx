@@ -4,7 +4,7 @@ import {useContext, useEffect} from "preact/hooks"
 import {render} from "../graphics"
 import {Exception} from "../localization"
 import {Logging} from "./Logging"
-import {Icon} from "./Icon"
+import {IconPlusCircle, IconMinusCircle, IconReply, IconPlay} from "./Icon"
 import {Sprite} from "./Sprite"
 
 const keyMap = {
@@ -68,35 +68,35 @@ export const WorldControls = ({world, disabled}) => {
       <div class="item-controls">
         <button onClick={callWorldMethod("placeBlock")} disabled={disabled}>
           <Sprite block />
-          <Icon sm faPlusCircle />
+          <IconPlusCircle sm />
         </button>
         <button onClick={callWorldMethod("takeBlock")} disabled={disabled}>
           <Sprite block />
-          <Icon sm faMinusCircle />
+          <IconMinusCircle sm />
         </button>
         <button onClick={callWorldMethod("placeMark")} disabled={disabled}>
           <Sprite mark />
-          <Icon sm faPlusCircle />
+          <IconPlusCircle sm />
         </button>
         <button onClick={callWorldMethod("takeMark")} disabled={disabled}>
           <Sprite mark />
-          <Icon sm faMinusCircle />
+          <IconMinusCircle sm />
         </button>
       </div>
       <div class="movement-controls">
         <button onClick={callWorldMethod("turnLeft")} disabled={disabled}>
-          <Icon faReply />
+          <IconReply />
         </button>
         <div>
           <button onClick={callWorldMethod("step")} disabled={disabled}>
-            <Icon faPlay transform={{rotate: 270}} />
+            <IconPlay transform={{rotate: 270}} />
           </button>
           <button onClick={callWorldMethod("stepBackwards")} disabled={disabled}>
-            <Icon faPlay transform={{rotate: 90}} />
+            <IconPlay transform={{rotate: 90}} />
           </button>
         </div>
         <button onClick={callWorldMethod("turnRight")} disabled={disabled}>
-          <Icon faReply transform={{flipX: true}} />
+          <IconReply transform={{flipX: true}} />
         </button>
       </div>
     </div>

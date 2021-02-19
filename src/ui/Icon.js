@@ -20,22 +20,24 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 
 
-// Copy-paste all icons imported above into here.
-// Yeah, I know...
-const lookup = {
+// runtime controlls
+export const IconPlay = props => <Icon faIcon={faPlay} {...props} />
+export const IconPause = props => <Icon faIcon={faPause} {...props} />
+export const IconStop = props => <Icon faIcon={faStop} {...props} />
+export const IconStepForward = props => <Icon faIcon={faStepForward} {...props} />
+export const IconWalking = props => <Icon faIcon={faWalking} {...props} />
+export const IconRunning = props => <Icon faIcon={faRunning} {...props} />
 
-  // runtime controlls
-  faPlay, faPause, faStop, faStepForward,
-  faWalking, faRunning,
+// settings toggles
+export const IconCog = props => <Icon faIcon={faCog} {...props} />
+export const IconTimes = props => <Icon faIcon={faTimes} {...props} />
 
-  // settings toggles
-  faCog, faTimes,
-
-  // touch controls
-  faArrowUp, faArrowDown, faReply,
-  faPlusCircle, faMinusCircle,
-
-}
+// touch controls
+export const IconArrowUp = props => <Icon faIcon={faArrowUp} {...props} />
+export const IconArrowDown = props => <Icon faIcon={faArrowDown} {...props} />
+export const IconReply = props => <Icon faIcon={faReply} {...props} />
+export const IconPlusCircle = props => <Icon faIcon={faPlusCircle} {...props} />
+export const IconMinusCircle = props => <Icon faIcon={faMinusCircle} {...props} />
 
 
 /** Turn FontAwesome's abstract tree into a component tree */
@@ -56,13 +58,13 @@ const classNames = new Set([
  */
 export const Icon = props => {
   const {
+    faIcon,
     attributes = {},
     classes = [],
     styles, transform, mask, maskId, title, titleId,
     ...rest
   } = props
 
-  let faIcon
   const additionalClasses = []
 
   if (rest.hasOwnProperty("class")) {
@@ -70,17 +72,12 @@ export const Icon = props => {
     delete rest["class"]
   }
 
-  // Using booleans as icon name & classes
+  // Using booleans as icon classes
   // Delete after use so they don't leak into attributes.
   for (const [key, value] of Object.entries(rest)) {
-    if (value === true) {
-      if (lookup.hasOwnProperty(key)) {
-        faIcon = lookup[key]
-        delete rest[key]
-      } else if (classNames.has(key)) {
-        additionalClasses.push(`fa-${key}`)
-        delete rest[key]
-      }
+    if (value === true && classNames.has(key)) {
+      additionalClasses.push(`fa-${key}`)
+      delete rest[key]
     }
   }
 

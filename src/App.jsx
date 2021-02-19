@@ -1,8 +1,6 @@
 import {h, render, Fragment} from "preact"
 import {useContext, useEffect, useState} from "preact/hooks"
 
-import {Icon} from "./ui/Icon"
-
 import {translate as t, init as initLocalization, Exception} from "./localization"
 import * as graphics from "./graphics"
 import {World, checkKdwFormat, parseKdw, worldToKdwString} from "./simulation/world"
@@ -12,6 +10,16 @@ import {Editor} from "./ui/Editor"
 import {WorldControls} from "./ui/WorldControls"
 import {clamp, clsx, defaultPreventer} from "./util"
 import {readFile, saveTextAs} from "./util/files"
+import {
+  IconPlay,
+  IconPause,
+  IconStepForward,
+  IconStop,
+  IconWalking,
+  IconRunning,
+  IconCog,
+  IconTimes,
+} from "./ui/Icon"
 
 
 const MIN_SPEED = 1
@@ -136,7 +144,7 @@ function App() {
   useEffect(
     () => !isLoading && graphics.render(world),
     [isLoading, world, showFlat, showPlayer],
-  )  // also initial
+  )
 
   if (isLoading) {
     return <span>Loading...</span>
@@ -169,10 +177,10 @@ function App() {
               ? <>
                   {isPaused
                     ? <button class="button icon-button" onClick={resumeSimulation}>
-                        <Icon faPlay />
+                        <IconPlay />
                       </button>
                     : <button class="button icon-button" onClick={pauseSimulation}>
-                        <Icon faPause />
+                        <IconPause />
                       </button>
                   }
                   <button
@@ -180,14 +188,14 @@ function App() {
                     disabled={!simulation}
                     onClick={() => simulation?.step()}
                   >
-                    <Icon faStepForward />
+                    <IconStepForward />
                   </button>
                   <button
                     class="button icon-button"
                     disabled={!simulation}
                     onClick={haltSimulation}
                   >
-                    <Icon faStop />
+                    <IconStop />
                   </button>
                 </>
               : <button class="button run-button" onClick={runSimulation}>
@@ -195,7 +203,7 @@ function App() {
                 </button>
             }
             <label class="button nohover">
-              <Icon faWalking lg fw />
+              <IconWalking lg fw />
               <input
                 type="range"
                 min={MIN_SPEED}
@@ -204,7 +212,7 @@ function App() {
                 step="any"
                 onChange={evt => updateSpeed(evt.target.value)}
               />
-              <Icon faRunning lg fw />
+              <IconRunning lg fw />
             </label>
           </div>
         </form>
@@ -216,7 +224,7 @@ function App() {
         <div class="world-wrapper">
           <nav class="world-tools">
             <button class="button icon-button" onClick={defaultPreventer(toggleSettings)}>
-              <Icon faCog />
+              <IconCog />
             </button>
 
             <i class="separator" />
@@ -273,7 +281,7 @@ function App() {
               <i class="expander" />
 
               <button class="world-settings-close" onClick={toggleSettings}>
-                <Icon faTimes />
+                <IconTimes />
               </button>
             </form>
 
