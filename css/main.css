@@ -3,7 +3,7 @@
 * {
   box-sizing: border-box;
   transition-duration: .25s;
-  transition-property: background, color, text-shadow, box-shadow;
+  transition-property: background, color, text-shadow, box-shadow, opacity;
 }
 html {
   margin: 0;
@@ -316,7 +316,10 @@ canvas.world-canvas {
   border: 1px solid rgba(255, 255, 255, .5);
   box-shadow: inset 0 0 1em rgba(255, 255, 255, .33),
               1px 1px .5em rgba(0, 0, 0, .33);
+
   cursor: pointer;
+  filter: grayscale(0);
+  transition-property: filter, opacity, color, box-shadow;
 }
 .world-controls button:hover,
 .world-controls button:active,
@@ -333,6 +336,15 @@ canvas.world-canvas {
   font-size: .75em;
   right: .25em;
   bottom: .25em;
+}
+.world-controls button:disabled {
+  cursor: default;
+  pointer-events: none;
+  color: rgba(255, 255, 255, .8);
+  opacity: .667;
+  filter: grayscale(1);
+  box-shadow: inset 0 0 2em rgba(255, 255, 255, .33),
+              1px 1px .5em rgba(0, 0, 0, .25);
 }
 
 .world-tools {
