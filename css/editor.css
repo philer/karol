@@ -5,7 +5,7 @@
 
   font-size: 14px;
   line-height: 1.25em;
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 .editor-scrollbox {
   overflow: auto;
@@ -49,7 +49,6 @@
   tab-size: 4;
 }
 .editor-highlight {
-  position: static;
   z-index: 2;
   pointer-events: none;
   padding-left: .5ch; /* line numbers */
@@ -57,12 +56,13 @@
 .editor-textarea {
   z-index: 0;
   resize: none;
-  opacity: .2;
+  opacity: 0;
   height: 100%;
 }
 
 
 .editor-caret-layer {
+  position: static;
   pointer-events: none;
   color: transparent;
 }
