@@ -1,99 +1,159 @@
 import {h} from "preact"
-import {useEffect, useReducer, useState} from "preact/hooks"
+import {useEffect, useMemo, useRef, useState} from "preact/hooks"
 
 import * as config from "../config"
 import {elem, noop} from "../util"
 import {highlight} from "../language/highlight"
 
+/**
+ * How long we wait before assuming the browser has updated the textarea.
+ * This value is weird and arbitrary but since textarea doesn't trigger a proper
+ * change event I can't find a better solution right now.
+ */
+const TEXTAREA_UPDATE_DELAY = 5
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "updateValue": {
-      return {...state, value: action.value}
-    }
-    case "updateCaret": {
-      const {selectionStart, selectionEnd, selectionDirection} = action.event.target
-      return {...state, selectionStart, selectionEnd, selectionDirection}
-      // TODO? restart caret animation
-      // https://css-tricks.com/restart-css-animation/
-    }
-    default: {
-      throw new Error(`Unknown action type '${action.type}'`)
-    }
-  }
-}
+export const Editor = ({
+  children = "",
+  indentation = "    ",
+  onChange = noop,
+  markLine = false,
+}) => {
 
-export const Editor = ({children = "", onChange = noop, markLine}) => {
-  // TODO
-  // const {indentation} = props.indentation ?? "    "
-  // const unindentRegex = useMemo(
-  //   () => new RegExp("^" + indentation.split("").join("?") + "?", "gm"),
-  //   [indentation],
-  // )
-
-  // TODO? might not need a reducer
-  const [{
-    value,
-    selectionStart,
-    selectionEnd,
-    selectionDirection,
-  }, dispatch] = useReducer(reducer, {
-    value: children,
-    selectionStart: 1,
-    selectionEnd: 0,
-    selectionDirection: "none",
+  const textareaRef = useRef()
+  const [value, setValue] = useState(children)
+  const [isMouseDragging, setIsMouseDragging] = useState(false)
+  const [selection, _setSelection] = useState({
+    start: 1,
+    end: 0,
+    direction: "none",
   })
 
-  useEffect(
-    () => typeof children === "string"
-      && dispatch({type: "updateValue", value: children, markLine}),
-    [children, markLine],
-  )
-
   function updateValue({target: {value}}) {
-    dispatch({type: "updateValue", value})
+    setValue(value)
     onChange(value)
   }
 
-  function updateCaret(event) {
-    // TODO? maybe throttle
-    setTimeout(() => dispatch({type: "updateCaret", event}), 10)
+  /** Update the textarea's value directly */
+  function forceValue(text) {
+    if (text !== value) {
+      setValue(text)
+      onChange(text)
+      textareaRef.current.value = text
+    }
   }
 
-  function onKeydown(event) {
-    // TODO
-    // if (event.key === "Tab" || event.keyCode === 9) {
-    //   event.preventDefault()
-    //   if (event.shiftKey) {
-    //     unindent()
-    //   } else {
-    //     indent()
-    //   }
-    // }
-    updateCaret(event)
+  useEffect(() => typeof children === "string" && forceValue(children), [children])
+
+  /** Wait for browser to update the textarea before setting the selection */
+  const setSelection = val => setTimeout(
+    () => _setSelection(val),
+    TEXTAREA_UPDATE_DELAY,
+  )
+
+  function updateSelection({target, buttons}) {
+    setSelection(() => ({
+      start: target.selectionStart,
+      end: target.selectionEnd,
+      direction: target.selectionDirection,
+    }))
+    if (buttons !== undefined && !(buttons & 1)) {
+      //MouseEvent without primary button pressed -> stop listening for drag
+      setIsMouseDragging(false)
+    }
   }
 
-  const [isMouseDragging, setIsMouseDragging] = useState(false)
-  function startMouseDragging(event) {
+  function onMousedown(evt) {
     setIsMouseDragging(true)
-    updateCaret(event)
-  }
-  function stopMouseDragging(event) {
-    setIsMouseDragging(false)
-    updateCaret(event)
+    updateSelection(evt)
   }
 
-  // TODO
-  // function markLine(lineno) {
-  //   for (const line of this.highlighted.getElementsByClassName("current")) {
-  //     line.classList.remove("current")
-  //   }
-  //   const line = this.highlighted.children[lineno - 1]
-  //   if (line) {
-  //     line.classList.add("current")
-  //   }
-  //   // TODO scrollIntoView
-  // }
+  function onKeydown(evt) {
+    if (evt.key === "Tab" || evt.keyCode === 9) {
+      evt.preventDefault()
+      if (evt.shiftKey) {
+        unindent(selection)
+      } else {
+        indent(selection)
+      }
+    } else {
+      updateSelection(evt)
+    }
+  }
+
+  function indent({start, end, direction}) {
+    const selection = value.slice(start, end)
+
+    if (selection.includes("\n")) {
+      // Multi-line selection: Indent all affected lines.
+      const firstLineStart = value.lastIndexOf("\n", start - 1) + 1
+      let lastLineEnd = value.indexOf("\n", end)
+      if (lastLineEnd < 0) {
+        lastLineEnd = value.length
+      }
+      const lines = value
+        .slice(firstLineStart, lastLineEnd)
+        .replace(/^/gm, indentation)
+
+      forceValue(value.slice(0, firstLineStart) + lines + value.slice(lastLineEnd))
+      setSelection({
+        start: start + indentation.length,
+        end: firstLineStart - (lastLineEnd - end) + lines.length,
+        direction,
+      })
+
+    } else {
+      // Single-line selection (also empty selection):
+      // Insert a single indent, replacing the selection.
+      let indent = indentation
+
+      // When not using \t, indent to a full multiple of indentation length.
+      if (indentation !== "\t") {
+        const lineStart = value.lastIndexOf("\n", start) + 1
+        const indentLen = indentation.length
+                        - (start - lineStart) % indentation.length
+        indent = indentation.substr(0, indentLen)
+      }
+      forceValue(value.slice(0, start) + indent + value.slice(end))
+      setSelection({
+        start: start + indent.length,
+        end: start + indent.length,
+        direction,
+      })
+    }
+  }
+
+  const unindentRegex = useMemo(
+    () => new RegExp("^" + indentation.split("").join("?") + "?", "gm"),
+    [indentation],
+  )
+
+  function unindent({start, end, direction}) {
+    const firstLineStart = value.lastIndexOf("\n", start - 1) + 1
+    let lastLineEnd = value.indexOf("\n", end)
+    if (lastLineEnd < 0) {
+      lastLineEnd = value.length
+    }
+
+    let firstLineRemoved = null // need this to find out how much was removed
+    const lines = value
+      .slice(firstLineStart, lastLineEnd)
+      .replace(unindentRegex, match => {
+        if (firstLineRemoved === null) {
+          firstLineRemoved = match.length
+        }
+        return ""
+      })
+
+    forceValue(value.slice(0, firstLineStart) + lines + value.slice(lastLineEnd))
+    setSelection({
+      start: Math.max(firstLineStart, start - firstLineRemoved),
+      end: Math.max(
+        firstLineStart + lines.lastIndexOf("\n") + 1,
+        end - lastLineEnd + firstLineStart + lines.length,
+      ),
+      direction,
+    })
+  }
 
   return (
     <div class="editor">
@@ -102,40 +162,40 @@ export const Editor = ({children = "", onChange = noop, markLine}) => {
           <Highlight markLine={markLine}>{value}</Highlight>
 
           <textarea
+            ref={textareaRef}
             class="editor-textarea"
             spellcheck={false}
+
+            selectionStart={selection.start}
+            selectionEnd={selection.end}
+            selectionDirection={selection.direction}
 
             // Listening to both keydown & keypress because chrome doesn't trigger
             // keydown on arrow keys while firefox misplaces the cursor with
             // keypress.
             onKeydown={onKeydown}
-            onKeypress={updateCaret}
+            onKeypress={updateSelection}
             onInput={updateValue}
 
             // The selectionchange event is apparently not supported on textarea.
             // Instead we keep track of mouse movement while the button is down.
-            onMousedown={startMouseDragging}
-            onMouseup={stopMouseDragging}
-            onMousemove={isMouseDragging ? updateCaret : undefined}
-          >{value}</textarea>
+            onMousedown={onMousedown}
+            onMousemove={isMouseDragging ? updateSelection : undefined}
+          />
 
           {/* Put caret layer behind the textarea so we can hide it via css when
             * textarea isn't focused
             */}
           <pre class="editor-caret-layer">
-            {value.slice(0, selectionStart)}
-            {selectionDirection === "forward" &&
-              <span key="editor-selection" class="editor-selection">
-                {value.slice(selectionStart, selectionEnd)}
-              </span>
-            }
-            <span key="caret" class="editor-caret blink" />
-            {selectionDirection === "backward" &&
-              <span key="editor-selection" class="editor-selection">
-                {value.slice(selectionStart, selectionEnd)}
-              </span>
-            }
-            {value.slice(selectionEnd)}
+            {value.slice(0, selection.start)}
+            {selection.direction === "backward"
+              && <span key="caret" class="editor-caret blink" />}
+            <span key="editor-selection" class="editor-selection">
+              {value.slice(selection.start, selection.end)}
+            </span>
+            {selection.direction === "forward"
+              && <span key="caret" class="editor-caret blink" />}
+            {value.slice(selection.end)}
           </pre>
         </div>
       </div>
@@ -151,80 +211,6 @@ const Highlight = ({children, markLine}) =>
     dangerouslySetInnerHTML={{__html: highlight(children, markLine)}}
   />
 
-
-export class _Editor {
-
-  indent() {
-    const {value, selectionStart, selectionEnd, selectionDirection} = this.textarea
-    const selection = value.slice(selectionStart, selectionEnd)
-
-    if (selection.includes("\n")) {
-      // Multi-line selection: Indent all affected lines.
-      const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1
-      let lastLineEnd = value.indexOf("\n", selectionEnd)
-      if (lastLineEnd < 0) lastLineEnd = value.length
-      const lines = value.slice(firstLineStart, lastLineEnd)
-        .replace(/^/gm, this.indentation)
-
-      this.textarea.value = value.slice(0, firstLineStart)
-                          + lines
-                          + value.slice(lastLineEnd)
-
-      this.textarea.selectionStart = selectionStart + this.indentation.length
-      this.textarea.selectionEnd = firstLineStart + lines.length
-                                 - (lastLineEnd - selectionEnd)
-      this.textarea.selectionDirection = selectionDirection
-    } else {
-      // Single-line selection (also empty selection):
-      // Insert a single indentation, replacing the selection.
-
-      // When not using \t, indent to a full multiple of indentation length.
-      let indentation = this.indentation
-      if (indentation !== "\t") {
-        const lineStart = value.lastIndexOf("\n", selectionStart) + 1
-        const indentLen = indentation.length
-                        - (selectionStart - lineStart) % indentation.length
-        indentation = indentation.substr(0, indentLen)
-      }
-      this.textarea.value = value.slice(0, selectionStart)
-                          + indentation
-                          + value.slice(selectionEnd)
-
-      this.textarea.selectionStart = this.textarea.selectionEnd
-                                   = selectionStart + indentation.length
-    }
-    this.update()
-  }
-
-  unindent() {
-    const {value, selectionStart, selectionEnd, selectionDirection} = this.textarea
-
-    const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1
-    let lastLineEnd = value.indexOf("\n", selectionEnd)
-    if (lastLineEnd < 0) lastLineEnd = value.length
-
-    let firstLineUnindent = null // need this to find out how much was removed
-    const lines = value.slice(firstLineStart, lastLineEnd)
-      .replace(this.unindenRegex, match =>
-        firstLineUnindent === null
-          ? firstLineUnindent = match.length
-          : "",
-      )
-
-    this.textarea.value = value.slice(0, firstLineStart)
-                        + lines
-                        + value.slice(lastLineEnd)
-
-    this.textarea.selectionStart = Math.max(firstLineStart,
-      selectionStart - firstLineUnindent)
-    this.textarea.selectionEnd = Math.max(
-      firstLineStart + lines.lastIndexOf("\n") + 1,
-      selectionEnd - lastLineEnd + firstLineStart + lines.length,
-    )
-    this.textarea.selectionDirection = selectionDirection
-    this.update()
-  }
-}
 
 // Load editor theme css
 config.get().then(({editor_theme}) => document.head.append(

@@ -41,7 +41,8 @@
     "react/no-danger": "off",
     "semi": ["error", "never"],
     "strict": "error",
-    "template-curly-spacing": ["warn", "never"]
+    "template-curly-spacing": ["warn", "never"],
+    "operator-linebreak": ["warn", "before"]
   },
   "env": {
     "browser": true,
