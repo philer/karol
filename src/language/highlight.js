@@ -1,4 +1,5 @@
-import {TokenIterator, TokenTypes as TT} from "./parser"
+import {tokenize, TokenTypes as TT} from "./parser"
+import {Exception} from "../localization"
 
 const VISUAL_SPACE = "·<wbr>"
 
@@ -44,12 +45,11 @@ const wrapToken = (text, type) =>
  * @return {String}      code with tokens wrapped in HTML tags
  */
 export function highlight(text, markLine = false) {
-  const tokens = new TokenIterator(text, true, true)
   const htmlLines = []
   let currentLine = ""
 
   try {
-    for (const {value, type} of tokens) {
+    for (const {value, type} of tokenize(text, true, true)) {
       if (type === TT.COMMENT || type === TT.WHITESPACE) {
         const [first, ...lines] = wrapSpaces(value).split("\n")
         currentLine += wrapToken(first, type)
@@ -61,11 +61,13 @@ export function highlight(text, markLine = false) {
         currentLine += wrapToken(value, type)
       }
     }
-
     htmlLines.push(currentLine)
 
   } catch (err) {
-    const remainingText = wrapSpaces(tokens.remainingText)
+    if (!(err instanceof Exception)) {
+      throw err
+    }
+    const remainingText = wrapSpaces(err.data[0].remainingText)
     const [currentLineTail, ...remainingLines] = remainingText.split("\n")
     htmlLines.push(currentLine + currentLineTail, ...remainingLines)
   }

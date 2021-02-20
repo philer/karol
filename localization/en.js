@@ -39,9 +39,9 @@ config({
       token_read:
         "Syntax Error on line {line}, column {column}: Could not read next token.",
       unexpected_token:
-        "Parse Error on line {line}, column {column}: Unexpected token {token}.",
+        "Parse Error on line {line}, column {column}: Unexpected token '{value}'.",
       unexpected_token_instead:
-        "Parse Error on line {line}, column {column}: Unexpected token {token}, was expecting {expected} .",
+        "Parse Error on line {line}, column {column}: Unexpected token '{value}', was expecting {expected} .",
       nested_program_definition:
         "Parse Error on line {}: Can't define program in nested context.",
       nested_routine_definition:

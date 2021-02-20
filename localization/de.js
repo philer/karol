@@ -36,9 +36,9 @@ config({
       token_read:
         "Syntax-Fehler in Zeile {line}, Spalte {column}: Nächstes Wort nicht lesbar.",
       unexpected_token:
-        "Lese-Fehler in Zeile {line}, Spalte {column}: Unerwartes Wort {token}.",
+        "Lese-Fehler in Zeile {line}, Spalte {column}: Unerwartes Wort '{value}'.",
       unexpected_token_instead:
-        "Lese-Fehler in Zeile {line}, Spalte {column}: Unerwartes Wort {token}, erwarte stattdessen {expected} .",
+        "Lese-Fehler in Zeile {line}, Spalte {column}: Unerwartes Wort '{value}', erwarte stattdessen {expected} .",
       nested_program_definition:
         "Lese-Fehler in Zeile {}: Programm in verschachteltem Kontext nicht definierbar.",
       nested_routine_definition:

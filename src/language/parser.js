@@ -52,15 +52,6 @@ export const TokenTypes = Object.freeze({
   WHITESPACE, COMMENT, EOF,
 })
 
-class Token {
-  constructor(type, value, line, column) {
-    Object.assign(this, {type, value, line, column})
-  }
-  toString() {
-    return `${this.type}(${this.value})`
-  }
-}
-
 const keywordTokenTypes = {
   "wenn":       IF,
   "if":         IF,
@@ -88,8 +79,8 @@ const symbolTokenTypes = {
   ")": RPAREN,
   "[": LBRACKET,
   "]": RBRACKET,
-  "{": LBRACE,
-  "}": RBRACE,
+  // "{": LBRACE,  // comments
+  // "}": RBRACE,  // comments
   "<": LESS,
   ">": GREATER,
   "=": EQUALS,
@@ -107,146 +98,116 @@ const symbolTokenTypes = {
 const symbols = new Set(Object.keys(symbolTokenTypes))
 
 
-const reSpace = /\s/
-const reDigit = /\d/
-
-// https://stackoverflow.com/questions/30225552/regex-for-diacritics/44586972
-// https://stackoverflow.com/questions/30798522/regular-expression-not-working-for-at-least-one-european-character
-const reLetter = /[A-zÀ-ÖØ-öø-įĴ-őŔ-žǍ-ǰǴ-ǵǸ-țȞ-ȟȤ-ȳɃɆ-ɏḀ-ẞƀ-ƓƗ-ƚƝ-ơƤ-ƥƫ-ưƲ-ƶẠ-ỿ]/
-
 /**
  * Iterable lexer
  */
-export class TokenIterator {
+export function* tokenize(text, yieldWhitespace = false, yieldComments = false) {
+  const length = text.length
 
-  constructor(text, yieldWhitespace=false, yieldComments=false) {
-    this.text = text
-    this.yieldWhitespace = yieldWhitespace
-    this.yieldComments = yieldComments
-    this.position = 0
-    this.line = 1
-    this.column = 1
-    this.eof = false
-  }
+  const reSpaces = /\s+/y
+  const reComment = /\{.*?\}/sy
+  const reSinglelineComment = /\/\/.*/y
+  const reInteger = /\d+/y
 
-  /**
-   * @return {Iterator} this
-   */
-  [Symbol.iterator]() {
-    return this
-  }
+  // https://stackoverflow.com/questions/30225552/regex-for-diacritics/44586972
+  // https://stackoverflow.com/questions/30798522/regular-expression-not-working-for-at-least-one-european-character
+  const reWord = /[A-zÀ-ÖØ-öø-įĴ-őŔ-žǍ-ǰǴ-ǵǸ-țȞ-ȟȤ-ȳɃɆ-ɏḀ-ẞƀ-ƓƗ-ƚƝ-ơƤ-ƥƫ-ưƲ-ƶẠ-ỿ]+/y
 
-  /**
-   * Implement iterator protocol
-   * @return {Object}
-   */
-  next() {
-    const token = this.nextToken()
-    return {value: token, done: token.type === EOF}
-  }
+  let position = 0
+  let line = 1
+  let column = 1
 
-  /**
-   * Read the next token, forwarding the internal position
-   * accordingly.
-   * @return {Token}
-   */
-  nextToken() {
-    let token, start
+  let value = ""
+  let match, lines
 
-    // eat optional tokens
-    do {
-      const {column, line} = this
-      start = this.position
-      token = ""
+  while (position < length) {
 
-      // whitespace
-      while (this.position < this.text.length
-             && reSpace.test(this.text[this.position])) {
-        token += this.text[this.position]
-        if (this.text[this.position] === "\n") {
-          this.column = 0
-          this.line++
-        }
-        this.position++; this.column++
+    // word (identifier / keyword)
+    reWord.lastIndex = position
+    if (match = reWord.exec(text)) {
+      value = match[0]
+      yield {type: keywordTokenTypes[value.toLowerCase()] || IDENTIFIER,
+        value, line, column}
+      column += value.length
+      position += value.length
+      continue
+    }
+
+    // whitespace
+    reSpaces.lastIndex = position
+    if (match = reSpaces.exec(text)) {
+      value = match[0]
+      if (yieldWhitespace) {
+        yield {type: WHITESPACE, value, line, column}
       }
-      if (token.length) {
-        if (this.yieldWhitespace) {
-          return new Token(WHITESPACE, token, line, column)
-        }
-        continue
+      lines = value.split("\n")
+      if (lines.length > 1) {
+        line += lines.length - 1
+        column = lines[lines.length - 1].length + 1
+      } else {
+        column += value.length
       }
+      position += value.length
+      continue
+    }
 
-      token = this.text[this.position]
-
-      // single-line comment
-      if (token + this.text[start + 1] === "//") {
-        this.position = this.text.indexOf("\n", start)
-        this.column += this.position - start
-        if (this.yieldComments) {
-          return new Token(COMMENT, this.text.slice(start, this.position),
-                           line, column)
-        }
-        continue
+    // multi-line comment
+    reComment.lastIndex = position
+    if (match = reComment.exec(text)) {
+      value = match[0]
+      if (yieldComments) {
+        yield {type: COMMENT, value, line, column}
       }
-      // multi-line comment
-      if (token === "{") {
-        this.position = this.text.indexOf("}", start) + 1
-        if (this.position < start) { // open comment
-          this.position = this.text.length
-        }
-        this.column += this.position - start
-        if (this.yieldComments) {
-          return new Token(COMMENT, this.text.slice(start, this.position),
-                           line, column)
-        }
-        continue
+      lines = value.split("\n")
+      if (lines.length > 1) {
+        line += lines.length - 1
+        column = lines[lines.length - 1].length + 1
+      } else {
+        column += value.length
       }
-    } while (start < this.position)
+      position += value.length
+      continue
+    }
 
-    const {column, line} = this
+    // single-line comment
+    reSinglelineComment.lastIndex = position
+    if (match = reSinglelineComment.exec(text)) {
+      value = match[0]
+      if (yieldComments) {
+        yield {type: COMMENT, value, line, column}
+      }
+      column += value.length
+      position += value.length
+      continue
+    }
 
-    // special character
-    token = this.text[this.position]
-    if (symbols.has(token)) {
-      this.position++; this.column++
-      return new Token(symbolTokenTypes[token], token, line, column)
+    // special character (must be checked after // comments)
+    value = text[position]
+    if (symbols.has(value)) {
+      yield {type: symbolTokenTypes[value], value, line, column}
+      ++column
+      ++position
+      continue
     }
 
     // integer
-    token = this.readWhile(reDigit)
-    if (token.length) {
-      return new Token(INTEGER, token, line, column)
-    }
-
-    // word (identifier / keyword)
-    token = this.readWhile(reLetter)
-    if (token.length) {
-      return new Token(keywordTokenTypes[token.toLowerCase()] || IDENTIFIER,
-                       token, line, column)
-    }
-
-    // end of file
-    if (this.position >= this.text.length) {
-      return new Token(EOF, "", line, column)
+    reInteger.lastIndex = position
+    if (match = reInteger.exec(text)) {
+      value = match[0]
+      yield {type: INTEGER, value, line, column}
+      column += value.length
+      position += value.length
+      continue
     }
 
     // found nothing useful
-    throw new Exception("error.parser.token_read", {line, column})
+    throw new Exception("error.parser.token_read", {
+      line,
+      column,
+      remainingText: text.slice(position),
+    })
   }
-
-  readWhile(regex) {
-    let token = ""
-    while (this.position < this.text.length
-           && regex.test(this.text[this.position])) {
-      token += this.text[this.position]
-      this.position++; this.column++
-    }
-    return token
-  }
-
-  get remainingText() {
-    return this.text.slice(this.position)
-  }
+  return {type: EOF, value: "", line, column}
 }
 
 
@@ -266,13 +227,12 @@ export class Parser {
       const type = this.currentToken.type
       this.forward()
       return type
+    } else {
+      throw new Exception("error.parser.unexpected_token_instead", {
+        ...this.currentToken,
+        expected: types,
+      })
     }
-    throw new Exception("error.parser.unexpected_token_instead", {
-      token: this.currentToken,
-      line: this.currentToken.line,
-      column: this.currentToken.column,
-      expected: types,
-    })
   }
 
   maybeEat(...types) {
@@ -291,16 +251,13 @@ export class Parser {
       return value
     }
     throw new Exception("error.parser.unexpected_token_instead", {
-        token: this.currentToken,
-        line: this.currentToken.line,
-        column: this.currentToken.column,
-        expected: types,
-      })
+      ...this.currentToken,
+      expected: types,
+    })
   }
 
   readExpression() {
     switch (this.currentToken.type) {
-
       case IDENTIFIER: {
         return this.readCall()
       }
@@ -397,7 +354,7 @@ export class Parser {
       case PROGRAM:
         if (this.depth > 1) {
           throw new Exception("error.parser.nested_program_definition",
-                              this.tokens.line)
+            this.tokens.line)
         }
         this.forward()
         statement.sequence = this.readSequence()
@@ -408,7 +365,7 @@ export class Parser {
       case ROUTINE:
         if (this.depth > 1) {
           throw new Exception("error.parser.nested_program_definition",
-                              this.tokens.line)
+            this.tokens.line)
         }
         this.forward()
         statement.identifier = this.readToken(IDENTIFIER)
@@ -426,22 +383,13 @@ export class Parser {
         this.eat(ROUTINE)
         return statement
     }
-    throw new Exception("error.parser.unexpected_token", {
-      token: this.currentToken,
-      line: this.currentToken.line,
-      column: this.currentToken.column,
-    })
+    throw new Exception("error.parser.unexpected_token", this.currentToken)
   }
 }
-
 
 /**
  * Convenience funtion turns code into an abstract syntax tree (AST).
  * @param  {string} text
  * @return {Object}
  */
-export function textToAst(text) {
-  const tokens = new TokenIterator(text)
-  const parser = new Parser(tokens)
-  return parser.readSequence()
-}
+export const textToAst = text => new Parser(tokenize(text)).readSequence()
