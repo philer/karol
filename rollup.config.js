@@ -1,12 +1,12 @@
 import {nodeResolve} from "@rollup/plugin-node-resolve"
-import { babel } from "@rollup/plugin-babel"
+import typescript from "@rollup/plugin-typescript"
 import {terser} from "rollup-plugin-terser"
 
 const DEBUG = process.env.NODE_ENV !== "production"
 
 // generate config with given output name and plugins array
 export default {
-  input: "src/App.jsx",
+  input: "src/App.tsx",
 
   output: [
     {
@@ -23,8 +23,15 @@ export default {
 
   plugins: [
     nodeResolve({
-      extensions: [".js", ".jsx", ".json"],
+      extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
     }),
-    babel({babelHelpers: "bundled"}),
+    typescript({
+      jsx: "react-jsx",
+      jsxImportSource: "preact",
+      sourceMap: DEBUG,
+      noEmitOnError: false,
+      lib: ["es5", "es6", "es2017", "dom"],
+      target: "es2017",
+    }),
   ],
 }
