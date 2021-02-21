@@ -327,6 +327,9 @@ canvas.world-canvas {
   box-shadow: inset 0 0 2em rgba(255, 255, 255, .5),
               1px 1px .75em rgba(0, 0, 0, .33);
 }
+.world-controls svg {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, .33))
+}
 .world-controls button img {
   flex: 0 0 auto;
   transform: scale(.667);
