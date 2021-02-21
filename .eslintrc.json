@@ -10,32 +10,43 @@
   "extends": [
     "eslint:recommended",
     "preact",
-
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_",
+      "caughtErrors": "all",
+      "caughtErrorsIgnorePattern": "^_"
+    }],
+    "array-bracket-spacing": "warn",
     "arrow-body-style": ["error", "as-needed"],
     "arrow-parens": ["warn", "as-needed"],
     "block-scoped-var": "warn",
     "comma-dangle": ["warn", "always-multiline"],
+    "comma-spacing": "warn",
     "indent": ["error", 2, {
       "SwitchCase": 1,
       "offsetTernaryExpressions": true
     }],
+    "key-spacing": "warn",
+    "keyword-spacing": "warn",
+    "object-curly-spacing": ["warn", "never"],
     "no-cond-assign": "off",
     "no-console": ["warn", {"allow": ["warn", "error"]}],
     "no-else-return": "off",
     "no-lonely-if": "off",
     "no-prototype-builtins": "off",
-    "no-unused-vars": ["error", {
-      "argsIgnorePattern": "^_",
-      "caughtErrors": "all",
-      "caughtErrorsIgnorePattern": "^_"
-    }],
+    "no-spaced-func": "warn",
+    "no-unused-vars": "off",
     "no-useless-concat": "warn",
     "no-var": "warn",
     "prefer-arrow-callback": "warn",
     "prefer-template": "off",
-    "quote-props": ["warn", "consistent"],
+    "quote-props": ["warn", "consistent-as-needed"],
     "quotes": ["warn", "double", {
       "avoidEscape": true,
       "allowTemplateLiterals": true

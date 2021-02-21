@@ -1,5 +1,8 @@
-import {tokenize, TokenTypes as TT} from "./parser"
 import {Exception} from "../localization"
+
+import * as tokens from "./tokens"
+// eslint-disable-next-line no-duplicate-imports
+import {tokenize, TokenType} from "./tokens"
 
 const VISUAL_SPACE = "·<wbr>"
 
@@ -8,49 +11,46 @@ const VISUAL_SPACE = "·<wbr>"
  */
 const ttClasses = Object.create(null)
 
-ttClasses[TT.IDENTIFIER] = "identifier"
-ttClasses[TT.INTEGER] =  "number"
-ttClasses[TT.COMMENT] = "comment"
-ttClasses[TT.WHITESPACE] = "whitespace";
+ttClasses[tokens.IDENTIFIER] = "identifier"
+ttClasses[tokens.INTEGER] =  "number"
+ttClasses[tokens.COMMENT] = "comment"
+ttClasses[tokens.WHITESPACE] = "whitespace";
 [
-  TT.NOT,
-  TT.IF, TT.THEN, TT.ELSE,
-  TT.WHILE, TT.DO, TT.REPEAT, TT.TIMES,
-  TT.PROGRAM, TT.ROUTINE,
+  tokens.NOT,
+  tokens.IF, tokens.THEN, tokens.ELSE,
+  tokens.WHILE, tokens.DO, tokens.REPEAT, tokens.TIMES,
+  tokens.PROGRAM, tokens.ROUTINE,
 ].forEach(tt => ttClasses[tt] = "keyword");
 [
-  TT.LPAREN, TT.RPAREN, TT.LBRACKET, TT.RBRACKET, TT.LBRACE, TT.RBRACE,
-  TT.LESS, TT.GREATER, TT.EQUALS,
-  TT.ASTERISC, TT.SLASH, TT.HYPHENMINUS, TT.PLUS,
-  TT.DOT, TT.COMMA, TT.COLON, TT.SEMI,
-  TT.SINGLEQUOTE, TT.DOUBLEQUOTE,
+  tokens.LPAREN, tokens.RPAREN, tokens.LBRACKET, tokens.RBRACKET,
+  /*tokens.LBRACE, tokens.RBRACE,*/  // comments
+  tokens.LESS, tokens.GREATER, tokens.EQUALS,
+  tokens.ASTERISC, tokens.SLASH, tokens.HYPHENMINUS, tokens.PLUS,
+  tokens.DOT, tokens.COMMA, tokens.COLON, tokens.SEMI,
+  tokens.SINGLEQUOTE, tokens.DOUBLEQUOTE,
 ].forEach(tt => ttClasses[tt] = "punctuation")
 
 
 const reSpaces = / +/g
 
-const wrapSpaces = text => text.replace(reSpaces, spaces =>
+const wrapSpaces = (text: string) => text.replace(reSpaces, spaces =>
   `<span class="whitespace">${VISUAL_SPACE.repeat(spaces.length)}</span>`,
 )
 
-const wrapToken = (text, type) =>
-  type === TT.WHITESPACE
+const wrapToken = (text: string, type: TokenType) =>
+  type === tokens.WHITESPACE
     ? text  // already wrapped
     : `<span class="token ${ttClasses[type]}">${text}</span>`
 
 
-/**
- * Add syntax highlighting HTML tags to given code snippet.
- * @param  {String} text code
- * @return {String}      code with tokens wrapped in HTML tags
- */
-export function highlight(text, markLine = false) {
+/** Add syntax highlighting HTML tags to given code snippet. */
+export function highlight(text: string, markLine: number | false = false): string {
   const htmlLines = []
   let currentLine = ""
 
   try {
     for (const {value, type} of tokenize(text, true, true)) {
-      if (type === TT.COMMENT || type === TT.WHITESPACE) {
+      if (type === tokens.COMMENT || type === tokens.WHITESPACE) {
         const [first, ...lines] = wrapSpaces(value).split("\n")
         currentLine += wrapToken(first, type)
         for (const line of lines) {

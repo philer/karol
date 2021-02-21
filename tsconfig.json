@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "lib": ["es5", "es6", "es2017", "dom"],
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "target": "es2017",
+    "moduleResolution": "node",
+    "typeRoots": [
+      "node_modules/@types",
+      "src/**/*.d.ts"
+    ]
+  }
+}

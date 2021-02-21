@@ -1,16 +1,61 @@
 import {rand} from "../util"
 import {Exception} from "../localization"
 
-export class World {
+export interface WorldInteraction {
+  isLookingAtEdge: () => boolean
+  isNotLookingAtEdge: () => boolean
+  step: (count?: number) => void
+  stepBackwards: (count?: number) => void
+  turnLeft: () => void
+  turnRight: () => void
+  isLookingAtBlock: () => boolean
+  isNotLookingAtBlock: () => boolean
+  placeBlock: (count?: number) => void
+  takeBlock: (count?: number) => void
+  isOnMark: () => boolean
+  isNotOnMark: () => boolean
+  placeMark: () => void
+  takeMark: () => void
+}
 
-  constructor(width, length, height, seed, player, tiles) {
+export type Orientation = 0 | 1 | 2 | 3
+
+export interface Player {
+  x: number
+  y: number
+  orientation: Orientation
+}
+
+export interface Tile {
+  blocks: number
+  mark: boolean
+  cuboid: boolean
+}
+
+/** Check if a given string represents a valid, known *.kdw file's content. */
+// Currently not checking for the typical "KarolVersion2Deutsch" prefix.
+export const checkKdwFormat = (str: string) =>
+  /^\w+(?:\s+\d+){6}(?:\s+\w)*\s*$/.test(str)
+
+export class World implements WorldInteraction {
+  width: number
+  length: number
+  height: number
+  seed: number
+  player: Player
+  tiles: Tile[]
+
+  constructor(
+    width: number, length: number, height: number,
+    seed?: number, player?: Player, tiles?: Tile[],
+  ) {
     this.width = width
     this.length = length
     this.height = height
     this.seed = seed || rand(1<<31, -(1<<31))
     this.player = player || {x: 0, y: 0, orientation: 0}
     this.tiles = tiles || Array.from({length: width * length},
-                                     () => ({blocks: 0, mark: false}))
+      () => ({blocks: 0, mark: false, cuboid: false}))
   }
 
   get currentTile() {
@@ -25,16 +70,8 @@ export class World {
     return null
   }
 
-  /**
-   * Get coordinates of tile by offset from player position.
-   * @param  {int} options.x           current location
-   * @param  {int} options.y           current location y
-   * @param  {int} options.orientation forward direction
-   * @param  {int} forward             forward offset
-   * @param  {int} left                sideways offset
-   * @return {Array}                   [x, y] coordinates of target tile
-   */
-  static move({x, y, orientation}, forward=1, left=0) {
+  /** Get coordinates of tile by offset from player position. */
+  static move({x, y, orientation}: Player, forward=1, left=0): [number, number] {
     switch (orientation) {
       case 0: x += left; y += forward; break
       case 1: x += forward; y += left; break
@@ -45,7 +82,7 @@ export class World {
   }
 
 
-  contains(x, y) {
+  contains(x: number, y: number) {
     return x >= 0 && y >= 0 && x < this.width && y < this.length
   }
 
@@ -82,16 +119,16 @@ export class World {
 
 
   turnLeft() {
-    this.player.orientation = (this.player.orientation + 1) % 4
+    this.player.orientation = (this.player.orientation + 1) % 4 as Orientation
   }
 
   turnRight() {
-    this.player.orientation = (this.player.orientation + 3) % 4
+    this.player.orientation = (this.player.orientation + 3) % 4 as Orientation
   }
 
 
   isLookingAtBlock() {
-    return this.forwardTile && this.forwardTile.blocks > 0
+    return Boolean(this.forwardTile?.blocks)
   }
 
   isNotLookingAtBlock() {
@@ -148,67 +185,45 @@ export class World {
     }
     targetTile.mark = false
   }
-}
 
-// Currently not checking for the typical "KarolVersion2Deutsch" prefix.
-const reKdwFile = /^\w+(?:\s+\d+){6}(?:\s+\w)*\s*$/
-
-/**
- * Check if a given string represents a valid, known *.kdw file's content.
- * @param  {string} kdw
- * @return {boolean}
- */
-export const checkKdwFormat = reKdwFile.test.bind(reKdwFile)
-
-/**
- * Parse text from a *.kdw file and return a valid game state object
- * @param  {String} kdw contents of a .kdw file
- * @return {Object} game state
- */
-export function parseKdw(kdw) {
-  const parts = kdw.split(/\s+/)
-  const [width, length, height,
-         playerX, playerY, orientation] = parts.slice(1, 7).map(x => +x)
-  const tiles = []
-  for (let xy = 0 ; xy < width * length ; xy++) {
-    const offset = 7 + (height + 1) * xy
-    const colData = parts.slice(offset, offset + height + 1)
-    const tile = {
-      blocks: colData.filter(s => s === "z").length,
-      mark: colData[colData.length - 1] === "m",
+  /** Parse text from a *.kdw file and return a valid game state object */
+  static parseKdw(kdw: string) {
+    const parts = kdw.split(/\s+/)
+    const [width, length, height, playerX, playerY, orientation]
+      = parts.slice(1, 7).map(x => +x)
+    const tiles: Tile[] = []
+    for (let xy = 0 ; xy < width * length ; xy++) {
+      const offset = 7 + (height + 1) * xy
+      const colData = parts.slice(offset, offset + height + 1)
+      tiles.push({
+        blocks: colData.filter(s => s === "z").length,
+        mark: colData[colData.length - 1] === "m",
+        cuboid: colData.includes("q"),
+      })
     }
-    if (colData.includes("q")) {
-      tile.cuboid = true
-    }
-    /*else if (playerX * length + playerY === xy) {
-      tile.player = true;
-    }*/
-    tiles.push(tile)
+    return new World(width, length, height, 0,
+      {x: playerX, y: playerY, orientation: orientation as Orientation},
+      tiles)
   }
-  return new World(width, length, height, 0,
-                   {x: playerX, y: playerY, orientation},  // player
-                   tiles)
-}
 
-/**
- * Generate contents for a .kdw file readable by the legacy karol application.
- *
- * Note: As features get added, this may become impossible!
- *
- * @param  {World} world
- * @return {string}
- */
-export function worldToKdwString(world) {
-  const {width, length, height} = world
-  const {x, y, orientation} = world.player
-  let str = `KarolVersion2Deutsch ${width} ${length} ${height} ${x} ${y} ${orientation}`
-  for (const tile of world.tiles) {
-    if (tile.cuboid) {
-      str += ` q${" n".repeat(height - 1)}`
-    } else {
-      str += " z".repeat(tile.blocks) + " n".repeat(height - tile.blocks)
+  /**
+   * Generate contents for a .kdw file readable by the legacy karol application.
+   *
+   * Note: As features get added, this may become impossible!
+   */
+  toKdwString() {
+    const {width, length, height} = this
+    const {x, y, orientation} = this.player
+    let str = `KarolVersion2Deutsch ${width} ${length} ${height} ${x} ${y} ${orientation}`
+    for (const tile of this.tiles) {
+      if (tile.cuboid) {
+        str += ` q${" n".repeat(height - 1)}`
+      } else {
+        str += " z".repeat(tile.blocks) + " n".repeat(height - tile.blocks)
+      }
+      str += ` ${tile.mark ? "m" : "o"}`
     }
-    str += ` ${tile.mark ? "m" : "o"}`
+    return str
   }
-  return str
+
 }

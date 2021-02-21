@@ -1,4 +1,4 @@
-import {tokenize} from "./parser"
+import {tokenize} from "./tokens"
 
 test("tokenize empty program", () => {
   expect(Array.from(tokenize("")))

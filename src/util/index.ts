@@ -1,42 +1,26 @@
-/**
- * "No Operation" empty function - does nothing.
- * @return {undefined}
- */
-export function noop() {}
+/** "No Operation" empty function - does nothing. */
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export const noop = () => {}
 
-/**
- * Convenience abbreviations for document element getters
- */
-export const byId = document.getElementById.bind(document)
-export const byClass = document.getElementsByClassName.bind(document)
-export const byTag = document.getElementsByTagName.bind(document)
 
 /** Turn an object into a valid CSS property list */
-export const css = mapping =>
+export const css = (mapping: Record<string, string>) =>
   Object.entries(mapping).map(entry => entry.join(":")).join(";")
 
+
 /** Only include classes that are string - filter out the rest */
-export const clsx = (...classes) =>
+export const clsx = (...classes: any[]) =>
   classes
     .filter(cls => typeof cls === "string")
     .join(" ")
 
-/**
- * sleep function for use with await
- * @param  {int} ms
- * @return {Promise}
- */
-export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-/**
- * Await a global event
- * @param  {String} evt event name
- * @return {Promise}
- */
-export const event = evt => new Promise(resolve => addEventListener(evt, resolve))
+/** sleep function for use with await */
+export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 
 /** Wrap a function to automatically call evt.preventDefault() */
-export const defaultPreventer = fn => evt => {
+export const defaultPreventer = <E extends Event, T = any>(fn?: (evt: E) => T) => (evt: E) => {
   if (evt) {
     evt.preventDefault()
   }
@@ -45,156 +29,64 @@ export const defaultPreventer = fn => evt => {
   }
 }
 
-/**
- * Promise fulfilled on DOMContentLoaded
- * @type {Promise}
- */
-export const domReady = document.readyState === "loading"
-  ? event("DOMContentLoaded")
-  : Promise.resolve()
+
+/** Convert partial/relative URLs to full. */
+export const resolveUrl = (url: string) =>
+  new URL(url, document.location.href).href
+
+
+/** Check if given argument is an Object (also not an Array). */
+const isObject = (item: any) =>
+  item && typeof item === "object" && !Array.isArray(item)
 
 /**
- * Count how many times a character appears in a string.
- * @param  {String} char
- * @param  {String} str
- * @return {int}
+ * Flatten nested objects in to objects with dotted keys.
+ *
+ * Example:
+ *     > flattenKeys({foo: {bar: 42}})
+ *     {"foo.bar": 42}
  */
-export function countOccurences(char, str) {
-  let count = 0
-  str.replace(char, () => {
-    count++
-    return char
-  })
-  return count
-}
-
-
-/**
- * Check if given argument is an Object (also not an Array).
- */
-export function isObject(item) {
-  return item && typeof item === "object" && !Array.isArray(item)
-}
-
-export function* zip(...iterables) {
-  const iterators = iterables.map(it => it[Symbol.iterator]())
-  let current = iterators.map(it => it.next())
-  while (!current.some(item => item.done)) {
-    yield current.map(item => item.value)
-    current = iterators.map(it => it.next())
-  }
-}
-
-export function unzip(tuples) {
-  const trails = tuples[0].map(() => [])
-  for (const tuple of tuples) {
-    trails.forEach((trail, index) => {
-      trail.push(tuple[index])
-    })
-  }
-  return trails
-}
-
-export function objectFrom(entries) {
-  const obj = {}
-  for (const [name, value] of entries) {
-    obj[name] = value
-  }
-  return obj
-}
-
-export function assignEntries(obj, entries) {
-  for (const [name, value] of entries) {
-    obj[name] = value
-  }
-  return obj
-}
-
-/**
- * Recursively merge objects into a target. Only merges objects,
- * everything else gets overwritten by later objects in the argument
- * list.
- * @param  {Object}    target
- * @param  {...[Object]} objects
- * @return {Object}
- */
-export function mergeDeep(target, ...objects) {
-  return objects.reduce((prev, obj) => {
-    for (const key of Object.keys(obj)) {
-      if (isObject(prev[key]) && isObject(obj[key])) {
-        prev[key] = mergeDeep({}, prev[key], obj[key])
-      } else {
-        prev[key] = obj[key]
+export const flattenKeys = (obj: Record<string, any>) => {
+  const result: Record<string, any> = {}
+  for (const [key, value] of Object.entries(obj)) {
+    if (isObject(value)) {
+      for (const [innerKey, innerValue] of Object.entries(flattenKeys(value))) {
+        result[`${key}.${innerKey}`] = innerValue
       }
+    } else {
+      result[key] = value
     }
-    return prev
-  },
-  target)
+  }
+  return result
 }
 
-/**
- * Combination of Math.min and Math.max -> restrict val in between min and max.
- * @param  {mixed} min
- * @param  {mixed} max
- * @param  {mixed} val
- * @return {mixed}
- */
-export const clamp = (min, max, val) => val < min ? min : val > max ? max : val
 
-/**
- * Wrapper for Math.random to get ints
- * @param  {int} min
- * @param  {int} max
- * @return {int}
- */
-export const rand = (min, max) => Math.floor(Math.random() * Math.floor(max)) + min
+/** Combination of Math.min and Math.max -> restrict val in between min and max. */
+export const clamp = (min: number, max: number, val: number) =>
+  val < min ? min : val > max ? max : val
 
-/**
- * Turn a string into a hash (integer)
- * @param  {string} str
- * @return {int}
- */
-export function hash(str) {
+
+/** Wrapper for Math.random to get ints */
+export const rand = (min: number, max: number) =>
+  Math.floor(Math.random() * Math.floor(max)) + min
+
+
+/** Turn a string into a hash (integer) */
+export function hash(str: string) {
   // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
-  let hash = 0, i = 0, len = str.length
-  while (i < len) {
-    hash  = ((hash << 5) - hash + str.charCodeAt(i++)) << 0
+  for (let i = 0, hash = 0, len = str.length ; i < len ; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) << 0
   }
   return hash
 }
 
-/**
- * https://gist.github.com/blixt/f17b47c62508be59987b
- *
- * Creates a pseudo-random value generator. The seed must be an integer.
- *
- * Uses an optimized version of the Park-Miller PRNG.
- * http://www.firstpr.com.au/dsp/rand31/
- */
-export class Random {
-  constructor(seed) {
-    this._seed = seed % 2147483647
-    if (this._seed <= 0) {
-      this._seed += 2147483646
-    }
-  }
 
-  /**
-   * Returns a pseudo-random value between 1 and 2^32 - 2.
-   */
-  next() {
-    return this._seed = this._seed * 16807 % 2147483647
-  }
-
-  /**
-   * Returns a pseudo-random floating point number in range [0, 1).
-   */
-  nextFloat() {
-    return (this.next() - 1) / 2147483646
-  }
-}
-
-export function elem(tagName, attributes = {}, ...children) {
+/** Create a DOM Element */
+export function elem<T extends HTMLElement>(
+  tagName: string,
+  attributes: Record<string, any> = {},
+  ...children: (string | Node)[]
+) {
   const element = document.createElement(tagName)
   if (attributes instanceof Node || typeof attributes === "string") {
     element.append(attributes)
@@ -202,8 +94,9 @@ export function elem(tagName, attributes = {}, ...children) {
     Object.assign(element, attributes)
   }
   element.append(...children)
-  return element
+  return element as T
 }
+
 
 // /** React helper */
 // export const useForceUpdate = () => useReducer(n => n + 1, 0)[1]

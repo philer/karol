@@ -3,11 +3,12 @@ import {useCallback, useContext, useEffect} from "preact/hooks"
 
 import {render} from "../graphics"
 import {Exception} from "../localization"
+import type {World, WorldInteraction} from "../simulation/world"
 import {Logging} from "./Logging"
 import {IconPlusCircle, IconMinusCircle, IconReply, IconPlay} from "./Icon"
 import {Sprite} from "./Sprite"
 
-const keyMap = {
+const keyMap: Record<string, keyof WorldInteraction> = {
   ArrowUp: "step",
   ArrowDown: "stepBackwards",
   ArrowLeft: "turnLeft",
@@ -24,30 +25,38 @@ const keyMap = {
   M: "takeMark",
 }
 
-export const WorldControls = ({world, disabled}) => {
+export interface WorldControlsProps {
+  world: World
+  disabled?: boolean
+}
+
+export const WorldControls = ({world, disabled}: WorldControlsProps) => {
 
   const log = useContext(Logging)
 
-  const callWorldMethod = useCallback(method => evt => {
-    evt.preventDefault()
-    try {
-      world[method]()
-      render(world)
-    } catch (err) {
-      if (err instanceof Exception) {
-        log.error(err.translatedMessage)
-      } else {
-        log.error(err.message)
-        console.error(err)
+  const callWorldMethod = useCallback(
+    (method: keyof WorldInteraction) => (evt: KeyboardEvent | MouseEvent) => {
+      evt.preventDefault()
+      try {
+        world[method]()
+        render(world)
+      } catch (err) {
+        if (err instanceof Exception) {
+          log.error(err.translatedMessage)
+        } else {
+          log.error(err.message)
+          console.error(err)
+        }
       }
-    }
-  }, [world, log])
+    },
+    [world, log],
+  )
 
   useEffect(() => {
     if (disabled) {
       return
     }
-    function onKeyDown(evt) {
+    function onKeyDown(evt: KeyboardEvent) {
       if (evt.defaultPrevented
         || evt.target instanceof HTMLTextAreaElement
         || evt.target instanceof HTMLInputElement

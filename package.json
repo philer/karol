@@ -2,9 +2,10 @@
   "name": "karol",
   "version": "0.4.2",
   "description": "Web based version of Karol, a kids friendly tool for learning algorithms",
-  "main": "index.js",
   "author": "Philipp Miller",
   "license": "MIT",
+  "type": "module",
+  "main": "index.js",
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c --watch",
@@ -18,6 +19,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
     "@rollup/plugin-node-resolve": "^11.2.0",
     "@rollup/plugin-typescript": "^8.2.0",
+    "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.15.1",
     "@typescript-eslint/parser": "^4.15.1",
     "eslint": "^7.20.0",
@@ -26,6 +28,7 @@
     "preact": "^10.5.12",
     "rollup": "^2.39.0",
     "rollup-plugin-terser": "^7.0.2",
+    "ts-jest": "^26.5.1",
     "tslib": "^2.1.0",
     "typescript": "^4.1.5"
   }

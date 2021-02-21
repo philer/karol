@@ -15,7 +15,7 @@ config({
     player_north: "concrete_river_north",
     player_east: "concrete_river_east",
     player_south: "concrete_river_south",
-    player_west: "concrete_river_west"
+    player_west: "concrete_river_west",
   },
   images: {
     grass: ["landscape.png", 398, 265, 132, 99],
@@ -25,6 +25,6 @@ config({
     concrete_river_east: ["city.png", 529, 1419, 132, 101],
     concrete_river_south: ["city.png", 530, 101, 132, 101],
     concrete_river_west: ["city.png", 529, 1318, 132, 101],
-    building_section_windows: ["buildings.png", 595, 1230, 98, 84]
-  }
-});
+    building_section_windows: ["buildings.png", 595, 1230, 98, 84],
+  },
+})

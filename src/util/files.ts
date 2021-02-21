@@ -1,22 +1,17 @@
-/**
- * Read a text file (e.g. .kdw file)
- * @param  {File} file DOM file (from input[type="filel"])
- * @return {Promise} resolves with text content
- */
-export const readFile = file => new Promise((resolve, reject) => {
-  const reader = new FileReader()
-  reader.addEventListener("load", () => resolve(reader.result))
-  reader.addEventListener("error", () => reject(reader.error))
-  reader.readAsText(file)
-})
+/** Read a text file (e.g. .kdw file) */
+export const readFile = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.addEventListener("load", () => resolve(reader.result as string))
+    reader.addEventListener("error", () => reject(reader.error))
+    reader.readAsText(file)
+  })
 
 /**
  * Take text and a filename and (hopefully) offer it as a download
  * to the user.
- * @param  {string} text  string to be downloaded as text file
- * @param  {string} filename
  */
-export function saveTextAs(text, filename) {
+export function saveTextAs(text:string, filename:string) {
   const blob = new Blob([text], {type: "text/plain;charset=utf-8"})
   const url = URL.createObjectURL(blob)
 

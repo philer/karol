@@ -1,7 +1,28 @@
 import {Exception} from "../localization"
-import {TokenTypes as TT, textToAst} from "./parser"
+import * as tokens from "./tokens"
+import {textToAst, Call, Expression, RoutineDefinition, Sequence, Statement} from "./parser"
 
 const MAX_RECURSION_DEPTH = 100
+
+export type Value = number | boolean | undefined
+
+export interface BuiltinCall {
+  identifier: string
+  args: Value[]
+  line: number
+}
+
+export type BuiltinCalls = Generator<BuiltinCall, Value, Value>
+
+interface Builtin {
+  identifier: string
+  isBuiltin?: true
+}
+
+type SymbolTable = Record<string, Builtin | RoutineDefinition | Value>
+
+const checkBuiltin = (symbol: any): symbol is Builtin => symbol.isBuiltin
+
 
 /**
  * Run a program upon the world simulation.
@@ -9,98 +30,90 @@ const MAX_RECURSION_DEPTH = 100
  * yield actions for each step that may be executed
  * in their own time by a RunTime.
  */
-export function run(code, builtins) {
+export function run(code: string, builtins: string[]) {
   const ast = textToAst(code)
-  const symbols = Object.create(null)
+  const symbols: SymbolTable = Object.create(null)
   for (const identifier of builtins) {
     symbols[identifier] = {identifier, isBuiltin: true}
   }
   return visitSequence(ast, symbols, 0)
 }
 
-function* visitSequence(sequence, symbols, depth) {
+function* visitSequence(sequence: Sequence, symbols: SymbolTable, depth: number): BuiltinCalls {
+  let result
   for (const statement of sequence) {
-    yield* visitStatement(statement, symbols, depth)
+    result = yield* visitStatement(statement, symbols, depth)
   }
+  return result
 }
 
-function* visitStatement(statement, symbols, depth) {
+function* visitStatement(statement: Statement, symbols: SymbolTable, depth: number): BuiltinCalls {
   switch (statement.type) {
-    case TT.IDENTIFIER:
-      yield* call(statement, symbols, depth)
-      break
+    case tokens.IDENTIFIER:
+      return yield* call(statement, symbols, depth)
 
-    case TT.IF:
+    case tokens.IF:
       if (yield* visitExpression(statement.condition, symbols, depth)) {
-        yield* visitSequence(statement.sequence, symbols, depth)
+        return yield* visitSequence(statement.sequence, symbols, depth)
       } else if (statement.alternative) {
-        yield* visitSequence(statement.alternative, symbols, depth)
+        return yield* visitSequence(statement.alternative, symbols, depth)
       }
-      break
+      return
 
-    case TT.WHILE:
+    case tokens.WHILE: {
+      let result
       while (yield* visitExpression(statement.condition, symbols, depth)) {
-        yield* visitSequence(statement.sequence, symbols, depth)
+        result = yield* visitSequence(statement.sequence, symbols, depth)
       }
-      break
-
-    case TT.REPEAT: {
-      // There is currently nothing in the language that could change the
-      // result of the limit expression while the loop is running.
-      const count = yield* visitExpression(statement.count, symbols, depth)
-      for (let i = 0 ; i < count ; i++) {
-        yield* visitSequence(statement.sequence, symbols, depth)
-      }
-      break
+      return result
     }
 
-    case TT.PROGRAM:
-      yield* visitSequence(statement.sequence, symbols, depth)
-      break
+    case tokens.REPEAT: {
+      // There is currently nothing in the language that could change the
+      // result of the limit expression while the loop is running.
+      const count = (yield* visitExpression(statement.count, symbols, depth)) as number
+      let result
+      for (let i = 0 ; i < count ; i++) {
+        result = yield* visitSequence(statement.sequence, symbols, depth)
+      }
+      return result
+    }
 
-    case TT.ROUTINE:
+    case tokens.PROGRAM:
+      return yield* visitSequence(statement.sequence, symbols, depth)
+
+    case tokens.ROUTINE:
       symbols[statement.identifier.toLowerCase()] = statement
       break
 
     default:
       throw new Exception("error.runtime.unimplemented_statement_type",
+        // @ts-expect-error Parser implementation out of sync with interpreter
         statement.type)
   }
 }
 
-function* visitExpression(expression, symbols, depth) {
+function* visitExpression(expression: Expression, symbols: SymbolTable, depth: number): BuiltinCalls {
   switch (expression.type) {
-    case TT.INTEGER:
+    case tokens.INTEGER:
       return +expression.value
 
-    case TT.IDENTIFIER: {
-      const identifier = expression.identifier.toLowerCase()
-      if (!(identifier in symbols)) {
-        throw new Exception("error.runtime.undefined", expression)
-      }
-      const symbol = symbols[identifier]
-      if (symbol.isBuiltin || symbol.type === TT.IDENTIFIER) {
-        return yield* call(expression, symbols, depth)
-      }
-      return symbol
+    case tokens.IDENTIFIER: {
+      return yield* call(expression, symbols, depth)
     }
 
-    case TT.NOT:
+    case tokens.NOT:
       return ! (yield* visitExpression(expression.expression, symbols, depth))
 
     default:
       throw new Exception("error.runtime.unimplemented_expression_type",
+        // @ts-expect-error Parser implementation out of sync with interpreter
         expression.type)
   }
 }
 
-/**
- * Call a builtin or user defined routine.
- * @param  {Object} call
- * @param  {Object} symbols lookup table
- * @return {mixed}  return value of the call
- */
-function* call(call, symbols, depth) {
+/** Call a builtin or user defined routine. */
+function* call(call: Call, symbols: SymbolTable, depth: number): BuiltinCalls {
   if (depth > MAX_RECURSION_DEPTH) {
     throw new Exception("error.runtime.max_recursion_depth_exceeded",
       MAX_RECURSION_DEPTH)
@@ -112,19 +125,24 @@ function* call(call, symbols, depth) {
       {identifier, line: call.line})
   }
 
-  const args = []
+  const routine = symbols[identifier]
+  if (typeof routine !== "object") {
+    return routine
+  }
+
+  const args: Value[] = []
   for (const arg of call.arguments) {
+    // Note that results can be undefined - The language is _not_ type safe.
     args.push(yield* visitExpression(arg, symbols, depth))
   }
 
-  const routine = symbols[identifier]
-  if (routine.isBuiltin) {
+  if (checkBuiltin(routine)) {
     return yield {identifier, args, line: call.line}
   }
 
   // Making use of prototype inheritance for simplicity.
   // We could copy the entries instead but would still want Objet.create(null).
-  const localSymbols = Object.create(symbols)
+  const localSymbols: SymbolTable = Object.create(symbols)
   for (let i = 0, len = routine.argNames.length ; i < len ; ++i) {
     localSymbols[routine.argNames[i]] = args[i]
   }

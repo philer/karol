@@ -1,218 +1,76 @@
 import {Exception} from "../localization"
 
-// Token types
-// TODO Might use Symbol here, gotta check performance.
-const IDENTIFIER = "IDENTIFIER"
-const INTEGER = "INTEGER"
-const NOT = "NOT"
+import * as tokens from "./tokens"
+// eslint-disable-next-line no-duplicate-imports
+import {tokenize, Token, TokenType} from "./tokens"
 
-const IF = "IF"
-const THEN = "THEN"
-const ELSE = "ELSE"
-const WHILE = "WHILE"
-const DO = "DO"
-const REPEAT = "REPEAT"
-const TIMES = "TIMES"
-const PROGRAM = "PROGRAM"
-const ROUTINE = "ROUTINE"
-
-const LPAREN = "LPAREN"
-const RPAREN = "RPAREN"
-const LBRACKET = "LBRACKET"
-const RBRACKET = "RBRACKET"
-const LBRACE = "LBRACE"
-const RBRACE = "RBRACE"
-const LESS = "LESS"
-const GREATER = "GREATER"
-const EQUALS = "EQUALS"
-const ASTERISC = "ASTERISC"
-const SLASH = "SLASH"
-const HYPHENMINUS = "HYPHENMINUS"
-const PLUS = "PLUS"
-const DOT = "DOT"
-const COMMA = "COMMA"
-const COLON = "COLON"
-const SEMI = "SEMI"
-const SINGLEQUOTE = "SINGLEQUOTE"
-const DOUBLEQUOTE = "DOUBLEQUOTE"
-
-const WHITESPACE = "WHITESPACE"
-const COMMENT = "COMMENT"
-const EOF = "EOF"
-
-export const TokenTypes = Object.freeze({
-  IDENTIFIER, INTEGER, NOT,
-  IF, THEN, ELSE, WHILE, DO, REPEAT, TIMES,
-  PROGRAM, ROUTINE,
-  LPAREN, RPAREN, LBRACKET, RBRACKET, LBRACE, RBRACE,
-  LESS, GREATER, EQUALS,
-  ASTERISC, SLASH, HYPHENMINUS, PLUS,
-  DOT, COMMA, COLON, SEMI,
-  SINGLEQUOTE, DOUBLEQUOTE,
-  WHITESPACE, COMMENT, EOF,
-})
-
-const keywordTokenTypes = {
-  "wenn":       IF,
-  "if":         IF,
-  "dann":       THEN,
-  "then":       THEN,
-  "sonst":      ELSE,
-  "else":       ELSE,
-  "solange":    WHILE,
-  "while":      WHILE,
-  "tue":        DO,
-  "do":         DO,
-  "nicht":      NOT,
-  "not":        NOT,
-  "wiederhole": REPEAT,
-  "repeat":     REPEAT,
-  "mal":        TIMES,
-  "times":      TIMES,
-  "programm":   PROGRAM,
-  "program":    PROGRAM,
-  "anweisung":  ROUTINE,
-  "routine":    ROUTINE,
+export interface AbstractStatement {
+  type: TokenType
+  line: number
 }
-const symbolTokenTypes = {
-  "(": LPAREN,
-  ")": RPAREN,
-  "[": LBRACKET,
-  "]": RBRACKET,
-  // "{": LBRACE,  // comments
-  // "}": RBRACE,  // comments
-  "<": LESS,
-  ">": GREATER,
-  "=": EQUALS,
-  "*": ASTERISC,
-  "/": SLASH,
-  "-": HYPHENMINUS,
-  "+": PLUS,
-  ".": DOT,
-  ",": COMMA,
-  ":": COLON,
-  ";": SEMI,
-  "'": SINGLEQUOTE,
-  '"': DOUBLEQUOTE,
+export interface Call extends AbstractStatement {
+  type: "IDENTIFIER"
+  line: number
+  identifier: string
+  arguments: Expression[]
 }
-const symbols = new Set(Object.keys(symbolTokenTypes))
-
-
-/**
- * Iterable lexer
- */
-export function* tokenize(text, yieldWhitespace = false, yieldComments = false) {
-  const length = text.length
-
-  const reSpaces = /\s+/y
-  const reComment = /\{.*?\}/sy
-  const reSinglelineComment = /\/\/.*/y
-  const reInteger = /\d+/y
-
-  // https://stackoverflow.com/questions/30225552/regex-for-diacritics/44586972
-  // https://stackoverflow.com/questions/30798522/regular-expression-not-working-for-at-least-one-european-character
-  const reWord = /[A-zÀ-ÖØ-öø-įĴ-őŔ-žǍ-ǰǴ-ǵǸ-țȞ-ȟȤ-ȳɃɆ-ɏḀ-ẞƀ-ƓƗ-ƚƝ-ơƤ-ƥƫ-ưƲ-ƶẠ-ỿ]+/y
-
-  let position = 0
-  let line = 1
-  let column = 1
-
-  let value = ""
-  let match, lines
-
-  while (position < length) {
-
-    // word (identifier / keyword)
-    reWord.lastIndex = position
-    if (match = reWord.exec(text)) {
-      value = match[0]
-      yield {type: keywordTokenTypes[value.toLowerCase()] || IDENTIFIER,
-        value, line, column}
-      column += value.length
-      position += value.length
-      continue
-    }
-
-    // whitespace
-    reSpaces.lastIndex = position
-    if (match = reSpaces.exec(text)) {
-      value = match[0]
-      if (yieldWhitespace) {
-        yield {type: WHITESPACE, value, line, column}
-      }
-      lines = value.split("\n")
-      if (lines.length > 1) {
-        line += lines.length - 1
-        column = lines[lines.length - 1].length + 1
-      } else {
-        column += value.length
-      }
-      position += value.length
-      continue
-    }
-
-    // multi-line comment
-    reComment.lastIndex = position
-    if (match = reComment.exec(text)) {
-      value = match[0]
-      if (yieldComments) {
-        yield {type: COMMENT, value, line, column}
-      }
-      lines = value.split("\n")
-      if (lines.length > 1) {
-        line += lines.length - 1
-        column = lines[lines.length - 1].length + 1
-      } else {
-        column += value.length
-      }
-      position += value.length
-      continue
-    }
-
-    // single-line comment
-    reSinglelineComment.lastIndex = position
-    if (match = reSinglelineComment.exec(text)) {
-      value = match[0]
-      if (yieldComments) {
-        yield {type: COMMENT, value, line, column}
-      }
-      column += value.length
-      position += value.length
-      continue
-    }
-
-    // special character (must be checked after // comments)
-    value = text[position]
-    if (symbols.has(value)) {
-      yield {type: symbolTokenTypes[value], value, line, column}
-      ++column
-      ++position
-      continue
-    }
-
-    // integer
-    reInteger.lastIndex = position
-    if (match = reInteger.exec(text)) {
-      value = match[0]
-      yield {type: INTEGER, value, line, column}
-      column += value.length
-      position += value.length
-      continue
-    }
-
-    // found nothing useful
-    throw new Exception("error.parser.token_read", {
-      line,
-      column,
-      remainingText: text.slice(position),
-    })
-  }
-  return {type: EOF, value: "", line, column}
+export interface IntegerExpression extends AbstractStatement {
+  type: "INTEGER"
+  value: number
 }
+export interface NotExpression extends AbstractStatement {
+  type: "NOT"
+  expression: Expression
+}
+export interface IfStatement extends AbstractStatement {
+  type: "IF"
+  condition: Expression
+  sequence: Sequence
+  alternative?: Sequence
+}
+export interface WhileStatement extends AbstractStatement {
+  type: "WHILE"
+  condition: Expression
+  sequence: Sequence
+}
+export interface RepeatStatement extends AbstractStatement {
+  type: "REPEAT"
+  count: Expression
+  sequence: Sequence
+}
+export interface ProgramDefinition extends AbstractStatement {
+  type: "PROGRAM"
+  sequence: Sequence
+}
+export interface RoutineDefinition extends AbstractStatement {
+  type: "ROUTINE"
+  identifier: string
+  argNames: string[]
+  sequence: Sequence
+}
+
+export type Expression =
+  | Call
+  | IntegerExpression
+  | NotExpression
+
+export type Statement =
+  | Call
+  | IfStatement
+  | WhileStatement
+  | RepeatStatement
+  | ProgramDefinition
+  | RoutineDefinition
+
+export type Sequence = Statement[]
 
 
 export class Parser {
-  constructor(tokens) {
+  tokens: Iterator<Token>
+  currentToken: Token
+  depth: number
+
+  constructor(tokens: Iterator<Token>) {
     this.tokens = tokens
     this.depth = 0
     this.forward()
@@ -222,7 +80,7 @@ export class Parser {
     this.currentToken = this.tokens.next().value
   }
 
-  eat(...types) {
+  eat(...types: TokenType[]): TokenType {
     if (types.includes(this.currentToken.type)) {
       const type = this.currentToken.type
       this.forward()
@@ -235,7 +93,7 @@ export class Parser {
     }
   }
 
-  maybeEat(...types) {
+  maybeEat(...types: TokenType[]): TokenType | false {
     if (types.includes(this.currentToken.type)) {
       const type = this.currentToken.type
       this.forward()
@@ -244,7 +102,7 @@ export class Parser {
     return false
   }
 
-  readToken(...types) {
+  readToken(...types: TokenType[]): string {
     if (types.includes(this.currentToken.type)) {
       const value = this.currentToken.value
       this.forward()
@@ -256,50 +114,53 @@ export class Parser {
     })
   }
 
-  readExpression() {
+  readExpression(): Expression {
+    const {line} = this.currentToken
     switch (this.currentToken.type) {
-      case IDENTIFIER: {
+      case tokens.IDENTIFIER: {
         return this.readCall()
       }
-      case INTEGER: {
+
+      case tokens.INTEGER: {
         const value = +this.currentToken.value
         this.forward()
-        return {type: INTEGER, value}
+        return {type: tokens.INTEGER, line, value}
       }
-      case NOT: {
+
+      case tokens.NOT: {
         this.forward()
-        return {type: NOT, expression: this.readExpression()}
+        return {type: tokens.NOT, line, expression: this.readExpression()}
       }
-      case LPAREN: {
+
+      case tokens.LPAREN: {
         const expr = this.readExpression()
-        this.eat(RPAREN)
+        this.eat(tokens.RPAREN)
         return expr
       }
     }
+    throw new Exception("error.parser.unexpected_token", this.currentToken)
   }
 
-  readCall() {
+  readCall(): Call {
     const call = {
-      type: IDENTIFIER,
-      identifier: this.currentToken.value,
-      arguments: [],
+      type: tokens.IDENTIFIER,
       line: this.currentToken.line,
+      identifier: this.currentToken.value,
+      arguments: [] as Expression[],
     }
     this.forward()
-    if (this.maybeEat(LPAREN)) {
-      if (!this.maybeEat(RPAREN)) {
+    if (this.maybeEat(tokens.LPAREN) && !this.maybeEat(tokens.RPAREN)) {
+      call.arguments.push(this.readExpression())
+      while (this.eat(tokens.RPAREN, tokens.COMMA) === tokens.COMMA) {
         call.arguments.push(this.readExpression())
-        while (this.eat(RPAREN, COMMA) === COMMA) {
-          call.arguments.push(this.readExpression())
-        }
       }
     }
     return call
   }
 
-  readSequence() {
-    const statements = []
-    const endTokens = [ASTERISC, ELSE, EOF]
+  readSequence(): Sequence {
+    const statements: Sequence = []
+    const endTokens: TokenType[] = [tokens.ASTERISC, tokens.ELSE, tokens.EOF]
     this.depth++
     while (!endTokens.includes(this.currentToken.type)) {
       statements.push(this.readStatement())
@@ -308,88 +169,96 @@ export class Parser {
     return statements
   }
 
-  readStatement() {
-    const statement = {type: this.currentToken.type}
-    switch (this.currentToken.type) {
-      case IDENTIFIER:
+  readStatement(): Statement {
+    const {type, line} = this.currentToken
+    switch (type) {
+      case tokens.IDENTIFIER: {
         return this.readCall()
+      }
 
-      case IF:
+      case tokens.IF: {
         this.forward()
-        statement.condition = this.readExpression()
-        this.eat(THEN)
-        statement.sequence = this.readSequence()
-        if (this.currentToken.type === ELSE) {
+        const condition = this.readExpression()
+        this.eat(tokens.THEN)
+        const sequence = this.readSequence()
+        const statement: IfStatement = {type, line, condition, sequence}
+        if (this.currentToken.type === tokens.ELSE) {
           this.forward()
           statement.alternative = this.readSequence()
         }
-        this.eat(ASTERISC)
-        this.eat(IF)
+        this.eat(tokens.ASTERISC)
+        this.eat(tokens.IF)
         return statement
+      }
 
-      case WHILE:
+      case tokens.WHILE: {
         this.forward()
-        statement.condition = this.readExpression()
-        this.eat(DO)
-        statement.sequence = this.readSequence()
-        this.eat(ASTERISC)
-        this.eat(WHILE)
-        return statement
+        const condition = this.readExpression()
+        this.eat(tokens.DO)
+        const sequence = this.readSequence()
+        this.eat(tokens.ASTERISC)
+        this.eat(tokens.WHILE)
+        return {type, line, condition, sequence}
+      }
 
-      case REPEAT:
+      case tokens.REPEAT: {
+        const type: tokens.REPEAT | tokens.WHILE = tokens.REPEAT
+        let statement: WhileStatement | RepeatStatement
         this.forward()
-        if (this.currentToken.type === WHILE) {
-          statement.type = WHILE
+        if (this.currentToken.type === tokens.WHILE) {
           this.forward()
-          statement.condition = this.readExpression()
+          statement = {
+            type: tokens.WHILE,
+            line,
+            condition: this.readExpression(),
+            sequence: this.readSequence(),
+          }
         } else {
-          statement.count = this.readExpression()
-          this.eat(TIMES)
+          const count = this.readExpression()
+          this.eat(tokens.TIMES)
+          statement = {type, line, count, sequence: this.readSequence()}
         }
-        statement.sequence = this.readSequence()
-        this.eat(ASTERISC)
-        this.eat(REPEAT)
+        this.eat(tokens.ASTERISC)
+        this.eat(tokens.REPEAT)
         return statement
+      }
 
-      case PROGRAM:
+      case tokens.PROGRAM: {
         if (this.depth > 1) {
           throw new Exception("error.parser.nested_program_definition",
-            this.tokens.line)
+            this.currentToken.line)
         }
         this.forward()
-        statement.sequence = this.readSequence()
-        this.eat(ASTERISC)
-        this.eat(PROGRAM)
-        return statement
+        const sequence = this.readSequence()
+        this.eat(tokens.ASTERISC)
+        this.eat(tokens.PROGRAM)
+        return {type, line, sequence}
+      }
 
-      case ROUTINE:
+      case tokens.ROUTINE: {
         if (this.depth > 1) {
           throw new Exception("error.parser.nested_program_definition",
-            this.tokens.line)
+            this.currentToken.line)
         }
         this.forward()
-        statement.identifier = this.readToken(IDENTIFIER)
-        statement.argNames = []
-        if (this.maybeEat(LPAREN)) {
-          if (!this.maybeEat(RPAREN)) {
-            statement.argNames.push(this.readToken(IDENTIFIER))
-            while (this.eat(RPAREN, COMMA) === COMMA) {
-              statement.argNames.push(this.readToken(IDENTIFIER))
-            }
+        const identifier = this.readToken(tokens.IDENTIFIER)
+        const argNames = []
+        if (this.maybeEat(tokens.LPAREN) && !this.maybeEat(tokens.RPAREN)) {
+          argNames.push(this.readToken(tokens.IDENTIFIER))
+          while (this.eat(tokens.RPAREN, tokens.COMMA) === tokens.COMMA) {
+            argNames.push(this.readToken(tokens.IDENTIFIER))
           }
         }
-        statement.sequence = this.readSequence()
-        this.eat(ASTERISC)
-        this.eat(ROUTINE)
-        return statement
+        const sequence = this.readSequence()
+        this.eat(tokens.ASTERISC)
+        this.eat(tokens.ROUTINE)
+        return {type, line, identifier, argNames, sequence}
+      }
     }
     throw new Exception("error.parser.unexpected_token", this.currentToken)
   }
 }
 
-/**
- * Convenience funtion turns code into an abstract syntax tree (AST).
- * @param  {string} text
- * @return {Object}
- */
-export const textToAst = text => new Parser(tokenize(text)).readSequence()
+/** Convenience funtion turns code into an abstract syntax tree. */
+export const textToAst = (text: string) =>
+  new Parser(tokenize(text)).readSequence()

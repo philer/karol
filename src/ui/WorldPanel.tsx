@@ -1,7 +1,7 @@
 import {h} from "preact"
 import {useContext, useEffect, useState} from "preact/hooks"
 
-import {World, checkKdwFormat, parseKdw, worldToKdwString} from "../simulation/world"
+import {World, checkKdwFormat} from "../simulation/world"
 import * as graphics from "../graphics"
 import {translate as t} from "../localization"
 import {clamp, clsx, defaultPreventer} from "../util"
@@ -9,9 +9,15 @@ import {readFile, saveTextAs} from "../util/files"
 import {Logging, LogOutput} from "./Logging"
 import {IconCog, IconTimes} from "./Icon"
 import {WorldControls} from "./WorldControls"
+import type {ChangeEvent} from "../util/types"
 
 
-export const WorldPanel = ({onChange, isSimulationRunning}) => {
+export interface WorldPanelProps {
+  onChange: (world: World) => void
+  isSimulationRunning?: boolean
+}
+
+export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => {
   const log = useContext(Logging)
 
   const [{width, length, height}, setSettings] = useState({
@@ -27,8 +33,8 @@ export const WorldPanel = ({onChange, isSimulationRunning}) => {
   useEffect(() => onChange(world), [world])
   useEffect(() => graphics.render(world), [world, showFlat, showPlayer])
 
-  const updateSetting = ({target: {name, min, max, value}}) =>
-    setSettings(settings => ({...settings, [name]: clamp(min, max, value)}))
+  const updateSetting = ({currentTarget: {name, min, max, value}}: ChangeEvent) =>
+    setSettings(settings => ({...settings, [name]: clamp(+min, +max, +value)}))
 
   const toggleSettings = () => setIsSettingsVisible(visible => !visible)
 
@@ -36,12 +42,12 @@ export const WorldPanel = ({onChange, isSimulationRunning}) => {
     setWorld(new World(width, length, height))
 
   const saveWorld = () =>
-    saveTextAs(worldToKdwString(world), t("world.default_filename"))
+    saveTextAs(world.toKdwString(), t("world.default_filename"))
 
-  async function loadWorld(evt) {
-    const text = await readFile(evt.target.files[0])
+  async function loadWorld(evt: ChangeEvent) {
+    const text = await readFile((evt.currentTarget.files as FileList)[0])
     if (checkKdwFormat(text)) {
-      const newWorld = parseKdw(text)
+      const newWorld = World.parseKdw(text)
       setWorld(newWorld)
       setSettings({
         width: newWorld.width,
@@ -53,14 +59,14 @@ export const WorldPanel = ({onChange, isSimulationRunning}) => {
     }
   }
 
-  function updateShowFlat({target: {value}}) {
-    graphics.showHeightNoise(!value)
-    setShowFlat(value)
+  function updateShowFlat({currentTarget: {checked}}: ChangeEvent) {
+    graphics.showHeightNoise(!checked)
+    setShowFlat(checked)
   }
 
-  function updateShowPlayer({target: {value}}) {
-    graphics.showPlayer(value)
-    setShowPlayer(value)
+  function updateShowPlayer({currentTarget: {checked}}: ChangeEvent) {
+    graphics.showPlayer(checked)
+    setShowPlayer(checked)
   }
 
   return (

@@ -1,64 +1,69 @@
-import * as interpreter from "../language/interpreter"
+import {run as runInterpreter, BuiltinCall, Value} from "../language/interpreter"
 import {render} from "../graphics"
-
+import type {World, WorldInteraction} from "./world"
 import {noop} from "../util"
 
-const commandNames = {
-  "linksdrehen": "turnLeft",
-  "rechtsdrehen": "turnRight",
+const commandNames: Record<string, keyof WorldInteraction> = {
+  linksdrehen: "turnLeft",
+  rechtsdrehen: "turnRight",
 
-  "istwand": "isLookingAtEdge",
-  "nichtistwand": "isNotLookingAtEdge",
-  "schritt": "step",
-  "schrittzurück": "stepBackwards",
-  "schrittzurueck": "stepBackwards",
+  istwand: "isLookingAtEdge",
+  nichtistwand: "isNotLookingAtEdge",
+  schritt: "step",
+  schrittzurück: "stepBackwards",
+  schrittzurueck: "stepBackwards",
 
-  "istziegel": "isLookingAtBlock",
-  "nichtistziegel": "isNotLookingAtBlock",
-  "hinlegen": "placeBlock",
-  "aufheben": "takeBlock",
+  istziegel: "isLookingAtBlock",
+  nichtistziegel: "isNotLookingAtBlock",
+  hinlegen: "placeBlock",
+  aufheben: "takeBlock",
 
-  "istmarke": "isOnMark",
-  "nichtistmarke": "isNotOnMark",
-  "markesetzen": "placeMark",
-  "markelöschen": "takeMark",
-  "markeloeschen": "takeMark",
+  istmarke: "isOnMark",
+  nichtistmarke: "isNotOnMark",
+  markesetzen: "placeMark",
+  markelöschen: "takeMark",
+  markeloeschen: "takeMark",
 }
 
-export function run(props) {
-  const {
-    code,
-    world,
-    onExecute = noop,
-  } = props
+export interface RunProps {
+  code: string
+  delay: number
+  world: World
+  onExecute: (call: BuiltinCall) => void
+}
+
+export function run(props: RunProps) {
+  const {code, world, onExecute = noop} = props
   let {delay = 200} = props
 
-  let setFinished, setError
+  let setFinished: (value?: never) => void
+  let setError: (reason?: any) => void
   const finished = new Promise((resolve, reject) => {
     setFinished = resolve
     setError = reject
   })
 
-  let timeoutId = "pending"
-  let result
+  let isPaused = false
+  let timeoutId: number
+  let result: Value
 
-  const gen = interpreter.run(code, Object.keys(commandNames))
+  const gen = runInterpreter(code, Object.keys(commandNames))
 
   function tick() {
     try {
-      const {value, done} = gen.next(result)
+      const {value, done} = gen.next(result) as {value: BuiltinCall, done: boolean}
       if (done) {
         return setFinished()
       }
       onExecute(value)
       const {identifier, args} = value
-      result = world[commandNames[identifier]](...args)
+      result = world[commandNames[identifier]](...args as any) as Value
       if (result === undefined) {
         render(world)
       }
-      if (timeoutId) {
+      if (!isPaused) {
         // TODO Are there any drawbacks to using setInterval instead?
-        timeoutId = setTimeout(tick, delay)
+        timeoutId = window.setTimeout(tick, delay)
       }
     } catch (err) {
       setError(err)
@@ -68,27 +73,25 @@ export function run(props) {
   tick()
 
   function pause() {
-    clearTimeout(timeoutId)
-    timeoutId = undefined
+    if (!isPaused) {
+      clearTimeout(timeoutId)
+      isPaused = true
+    }
   }
 
   function resume() {
-    if (!timeoutId) {
-      timeoutId = "pending"
+    if (isPaused) {
+      isPaused = false
       tick()
     }
   }
 
   function step() {
-    const wasPaused = !timeoutId
-    pause()
+    clearTimeout(timeoutId)
     tick()
-    if (wasPaused) {
-      pause()
-    }
   }
 
-  function setDelay(ms) {
+  function setDelay(ms: number) {
     delay = ms
     // For a more fancy approach we could track the last execution time
     // and reset the pending timeout accordingly.

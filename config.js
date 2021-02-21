@@ -10,4 +10,4 @@ config({
 
   // options: "bright", "monokai"
   editor_theme: "monokai",
-});
+})

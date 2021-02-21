@@ -9,6 +9,46 @@
 
 import * as config from "./config"
 import * as noise from "./util/perlin"
+import type {World} from "./simulation/world"
+
+interface Config {
+  tile_theme: string
+  player_theme: string
+}
+
+export type TileSpriteName =
+  | "floor"
+  | "block"
+  | "mark"
+  | "cuboid"
+
+export type PlayerSpriteName =
+  | "player_north"
+  | "player_east"
+  | "player_south"
+  | "player_west"
+
+export type SpriteName = TileSpriteName | PlayerSpriteName
+
+const TILE_SPRITE_NAMES
+  = ["floor", "block", "mark", "cuboid"] as const
+
+const PLAYER_SPRITE_NAMES
+  = ["player_south", "player_east", "player_north", "player_west"] as const
+
+interface Theme {
+  artist?: string
+  url?: string
+  tile_width?: number
+  tile_depth?: number
+  block_height?: number
+  player_height?: number
+  tile_gap?: number
+  tile_gap_z?: number
+  noise_amplifier?: number
+  sprites: Record<SpriteName, string>
+  images: Record<string, string | [string, number, number, number, number]>
+}
 
 const DEFAULT_THEME_DIR = "img/simple"
 
@@ -23,21 +63,24 @@ const DEFAULT_SETTINGS = {
   noise_amplifier: 1,
 }
 
-const ORIENTATIONS = ["south", "east", "north", "west"]
-const PLAYER_SPRITE_NAMES = ORIENTATIONS.map(str => "player_" + str)
-const TILE_SPRITE_NAMES = ["floor", "block", "mark", "cuboid"]
 
 // drawable objects
-export const sprites  = {}
+export const sprites: Record<string, Sprite>  = {}
 
 const imageCache = Object.create(null)
 
-let tileWidth, tileDepth, blockHeight,
-  tileGap, tileGapZ, noiseAmplifier,
-  playerHeight
+let tileWidth: number
+let tileDepth: number
+let blockHeight: number
 
-let canvas
-let ctx
+let tileGap: number
+let tileGapZ: number
+let noiseAmplifier: number
+
+let playerHeight: number
+
+let canvas: HTMLCanvasElement
+let ctx: CanvasRenderingContext2D | null
 
 let _showPlayer = true
 let _showHeightNoise = true
@@ -50,37 +93,137 @@ export function showHeightNoise(show=true) {
   _showHeightNoise = show
 }
 
-/**
- * Prepare canvas and drawing context
- * @return {Promise}
- */
-export function setCanvas(canvasElement) {
+/** Prepare canvas and drawing context */
+export function setCanvas(canvasElement: HTMLCanvasElement) {
   canvas = canvasElement
   if (!canvas) {
     ctx = null
     return
   }
-  ctx = canvas.getContext("2d")
-  ctx.mozImageSmoothingEnabled = false
-  ctx.webkitImageSmoothingEnabled = false
-  ctx.msImageSmoothingEnabled = false
-  ctx.imageSmoothingEnabled = false
+  if (ctx = canvas.getContext("2d")) {
+    // @ts-expect-error Support old browsers
+    ctx.mozImageSmoothingEnabled = false
+    // @ts-expect-error Support old browsers
+    ctx.webkitImageSmoothingEnabled = false
+    // @ts-expect-error Support old browsers
+    ctx.msImageSmoothingEnabled = false
+    ctx.imageSmoothingEnabled = false
+  }
 }
+
+/** Things that can be drawn on the canvas. Allows preloading images. */
+export class Sprite {
+  imagePath: string
+  _image: HTMLImageElement
+  height: number
+  _scaledWidth: number
+  _scaledHeight: number
+
+  constructor(imagePath: string) {
+    this.imagePath = imagePath
+  }
+
+  async load() {
+    this._image = await loadImage(this.imagePath)
+    const scale = tileWidth / this._image.width
+    this._scaledWidth = tileWidth
+    this._scaledHeight = scale * this._image.height
+    this.height = this._scaledHeight - tileDepth
+  }
+
+  draw(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    ctx.drawImage(this._image,
+      x, y - this.height,
+      this._scaledWidth, this._scaledHeight)
+  }
+}
+
+/**
+ * Things that can be drawn on the canvas from a sprite sheet / atlas.
+ * Allows preloading.
+ */
+export class AtlasSprite extends Sprite {
+  crop: {x: number, y: number, width: number, height: number}
+  xOffset: number
+  yOffset: number
+
+  constructor(
+    imagePath: string, x: number, y: number, width: number, height: number,
+    xOffset=0, yOffset=0,
+  ) {
+    super(imagePath)
+    this.crop = {x, y, width, height}
+    const scale = tileWidth / width
+    this._scaledWidth = tileWidth
+    this._scaledHeight = scale * height
+    this.height = this._scaledHeight - tileDepth
+    this.xOffset = xOffset
+    this.yOffset = yOffset
+  }
+
+  async load() {
+    this._image = await loadImage(this.imagePath)
+  }
+
+  draw(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    ctx.drawImage(this._image,
+      this.crop.x, this.crop.y,
+      this.crop.width, this.crop.height,
+      x + this.xOffset, y - this.height - this.yOffset,
+      this._scaledWidth, this._scaledHeight)
+  }
+}
+
+// TODO missing sprite graphic
+export class MissingSprite extends Sprite {
+  constructor() { super("") }
+  async load() {}
+  draw() {}
+}
+
+
+function createSprite(spriteName: SpriteName, theme: Theme, themeDir: string) {
+  const spriteDefinition = theme.images[theme.sprites[spriteName]]
+  if (!spriteDefinition) {
+    console.warn(`Bad theme config: No image for sprite '${spriteName}' in ${themeDir}`)
+    return new MissingSprite()
+  }
+  if (Array.isArray(spriteDefinition)) {
+    const [filename, ...crop] = spriteDefinition
+    return new AtlasSprite(`${themeDir}/${filename}`, ...crop)
+  } else {
+    return new Sprite(`${themeDir}/${spriteDefinition}`)
+  }
+}
+
+
+function loadImage(path: string): Promise<HTMLImageElement> {
+  if (path in imageCache) {
+    return imageCache[path]
+  }
+  return imageCache[path] = new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image()
+    image.addEventListener("load", () => resolve(image))
+    image.addEventListener("error", reject)
+    image.src = path
+  })
+}
+
 
 /**
  * Load sprite theme including fallbacks
  * @param  {Object} cfg
  * @return {Promise}
  */
-async function initSprites({tile_theme, player_theme}) {
+async function initSprites({tile_theme, player_theme}: Config) {
   const tileThemeDir = tile_theme
   const playerThemeDir = player_theme || tile_theme
 
   const [tileTheme, playerTheme, defaultTheme] = await Promise.all([
-    tileThemeDir + "/theme.js",
-    playerThemeDir + "/theme.js",
-    DEFAULT_THEME_DIR + "/theme.js",
-  ].map(config.get))
+    config.get<Theme>(tileThemeDir + "/theme.js"),
+    config.get<Theme>(playerThemeDir + "/theme.js"),
+    config.get<Theme>(DEFAULT_THEME_DIR + "/theme.js"),
+  ])
 
   const sizes = Object.assign({}, DEFAULT_SETTINGS, tileTheme)
   tileWidth = sizes.tile_width
@@ -111,98 +254,18 @@ async function initSprites({tile_theme, player_theme}) {
   return Promise.all(Object.values(sprites).map(sprite => sprite.load()))
 }
 
-function createSprite(spriteName, theme, themeDir) {
-  let filename, crop
-  try {
-    [filename, ...crop] = theme.images[theme.sprites[spriteName]]
-  } catch (err) {
-    console.warn(`Bad theme config: No image for sprite '${spriteName}' in ${themeDir}`)
-    return
-  }
-  if (crop.length) {
-    return new AtlasSprite(`${themeDir}/${filename}`, ...crop)
-  } else {
-    return new Sprite(`${themeDir}/${filename}`)
-  }
+
+/** Draw a given game state to the canvas */
+export function render(world: World) {
+  requestAnimationFrame(() => _render(world))
 }
 
-/**
- * Things that can be drawn on the canvas.
- * Allows preloading images.
- */
-class Sprite {
-  constructor(imagePath) {
-    this.imagePath = imagePath
-  }
-  async load() {
-    this._image = await loadImage(this.imagePath)
-    const scale = tileWidth / this._image.width
-    this._scaledWidth = tileWidth
-    this._scaledHeight = scale * this._image.height
-    this.height = this._scaledHeight - tileDepth
-  }
-  draw(ctx, x, y) {
-    ctx.drawImage(this._image,
-      x, y - this.height,
-      this._scaledWidth, this._scaledHeight)
-  }
-}
-
-/**
- * Things that can be drawn on the canvas from a sprite sheet / atlas.
- * Allows preloading.
- */
-class AtlasSprite {
-  constructor(imagePath, x, y, width, height, xOffset=0, yOffset=0) {
-    this.imagePath = imagePath
-    this.crop = {x, y, width, height}
-    const scale = tileWidth / width
-    this._scaledWidth = tileWidth
-    this._scaledHeight = scale * height
-    this.height = this._scaledHeight - tileDepth
-    this.xOffset = xOffset
-    this.yOffset = yOffset
-  }
-  async load() {
-    this._image = await loadImage(this.imagePath)
-  }
-  draw(ctx, x, y) {
-    ctx.drawImage(this._image,
-      this.crop.x, this.crop.y,
-      this.crop.width, this.crop.height,
-      x + this.xOffset, y - this.height - this.yOffset,
-      this._scaledWidth, this._scaledHeight)
-  }
-}
-
-function loadImage(path) {
-  if (path in imageCache) {
-    return imageCache[path]
-  }
-  return imageCache[path] = new Promise((resolve, reject) => {
-    const image = new Image()
-    image.addEventListener("load", () => resolve(image))
-    image.addEventListener("error", reject)
-    image.src = path
-  })
-}
-
-
-/**
- * Draw a given game state to the canvas
- * @param  {Object} options.world   {width, length, height}
- * @param  {Object} options.player   {x, y, orientation}
- * @param  {Array}  options.tiles   tiles data
- * @return {undefined}
- */
-export const render = world => requestAnimationFrame(() => _render(world))
-
-function _render({width, length, height, player, tiles, seed}) {
+function _render({width, length, height, player, tiles, seed}: World) {
   if (!ctx) {
     return
   }
-  let w = (width + length) * 0.5 * (tileWidth + 2 * tileGap)
-  let h = (width + length) * 0.5 * (tileDepth + 1 * tileGap)
+  const w = (width + length) * 0.5 * (tileWidth + 2 * tileGap)
+  const h = (width + length) * 0.5 * (tileDepth + 1 * tileGap)
         + height * blockHeight + playerHeight
 
   if (canvas.width !== w) {
@@ -254,7 +317,7 @@ function _render({width, length, height, player, tiles, seed}) {
         }
       }
       if (_showPlayer && player.x === x && player.y === y) {
-        sprites["player_" + ORIENTATIONS[player.orientation]].draw(
+        sprites[PLAYER_SPRITE_NAMES[player.orientation]].draw(
           ctx, canvasX, canvasY - z)
       }
       // ctx.fillText(x + "," + y, canvasX+.4*tileWidth, canvasY);
@@ -262,8 +325,5 @@ function _render({width, length, height, player, tiles, seed}) {
   }
 }
 
-/**
- * Initialize the module. Loads graphics.
- * @return {Promise}
- */
-export const init = () => config.get().then(initSprites)
+/** Initialize the module. Loads graphics. */
+export const init = () => config.get<Config>().then(initSprites)

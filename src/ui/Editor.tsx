@@ -4,6 +4,7 @@ import {useEffect, useMemo, useRef, useState} from "preact/hooks"
 import * as config from "../config"
 import {elem, noop} from "../util"
 import {highlight} from "../language/highlight"
+import type {ChangeEvent} from "../util/types"
 
 /**
  * How long we wait before assuming the browser has updated the textarea.
@@ -12,29 +13,42 @@ import {highlight} from "../language/highlight"
  */
 const TEXTAREA_UPDATE_DELAY = 5
 
+export interface EditorProps {
+  children: string
+  indentation?: string
+  onChange?: (text: string) => void
+  markLine?: number | false
+}
+
+interface Selection {
+  start: number
+  end: number
+  direction: "forward" | "backward" | "none"
+}
+
 export const Editor = ({
   children = "",
   indentation = "    ",
   onChange = noop,
   markLine = false,
-}) => {
+}: EditorProps) => {
 
-  const textareaRef = useRef()
+  const textareaRef = useRef<HTMLTextAreaElement>()
   const [value, setValue] = useState(children)
   const [isMouseDragging, setIsMouseDragging] = useState(false)
-  const [selection, _setSelection] = useState({
+  const [selection, _setSelection] = useState<Selection>({
     start: 1,
     end: 0,
     direction: "none",
   })
 
-  function updateValue({target: {value}}) {
+  function updateValue({currentTarget: {value}}: ChangeEvent<HTMLTextAreaElement>) {
     setValue(value)
     onChange(value)
   }
 
   /** Update the textarea's value directly */
-  function forceValue(text) {
+  function forceValue(text: string) {
     if (text !== value) {
       setValue(text)
       onChange(text)
@@ -42,33 +56,46 @@ export const Editor = ({
     }
   }
 
-  useEffect(() => typeof children === "string" && forceValue(children), [children])
+  useEffect(() => {
+    typeof children === "string" && forceValue(children)
+  }, [children])
 
   /** Wait for browser to update the textarea before setting the selection */
-  const setSelection = val => setTimeout(
-    () => _setSelection(val),
+  const setSelection = (sel: Parameters<typeof _setSelection>[0]) => setTimeout(
+    () => _setSelection(sel),
     TEXTAREA_UPDATE_DELAY,
   )
 
-  function updateSelection({target, buttons}) {
+  function updateSelection(evt: MouseEvent | KeyboardEvent) {
+    const target = evt.target as HTMLTextAreaElement
     setSelection(() => ({
       start: target.selectionStart,
       end: target.selectionEnd,
       direction: target.selectionDirection,
     }))
+    const buttons = (evt as MouseEvent).buttons
     if (buttons !== undefined && !(buttons & 1)) {
       //MouseEvent without primary button pressed -> stop listening for drag
       setIsMouseDragging(false)
     }
   }
 
-  function onMousedown(evt) {
+  function forceSelection(selection: Selection) {
+    setSelection(selection)
+    textareaRef.current.setSelectionRange(
+      selection.start,
+      selection.end,
+      selection.direction,
+    )
+  }
+
+  function onMouseDown(evt: MouseEvent) {
     setIsMouseDragging(true)
     updateSelection(evt)
   }
 
-  function onKeydown(evt) {
-    if (evt.key === "Tab" || evt.keyCode === 9) {
+  function onKeyDown(evt: KeyboardEvent) {
+    if (evt.key === "Tab") {
       evt.preventDefault()
       if (evt.shiftKey) {
         unindent(selection)
@@ -80,7 +107,7 @@ export const Editor = ({
     }
   }
 
-  function indent({start, end, direction}) {
+  function indent({start, end, direction}: Selection) {
     const selection = value.slice(start, end)
 
     if (selection.includes("\n")) {
@@ -95,7 +122,7 @@ export const Editor = ({
         .replace(/^/gm, indentation)
 
       forceValue(value.slice(0, firstLineStart) + lines + value.slice(lastLineEnd))
-      setSelection({
+      forceSelection({
         start: start + indentation.length,
         end: firstLineStart - (lastLineEnd - end) + lines.length,
         direction,
@@ -114,7 +141,7 @@ export const Editor = ({
         indent = indentation.substr(0, indentLen)
       }
       forceValue(value.slice(0, start) + indent + value.slice(end))
-      setSelection({
+      forceSelection({
         start: start + indent.length,
         end: start + indent.length,
         direction,
@@ -127,25 +154,26 @@ export const Editor = ({
     [indentation],
   )
 
-  function unindent({start, end, direction}) {
+  function unindent({start, end, direction}: Selection) {
     const firstLineStart = value.lastIndexOf("\n", start - 1) + 1
     let lastLineEnd = value.indexOf("\n", end)
     if (lastLineEnd < 0) {
       lastLineEnd = value.length
     }
 
-    let firstLineRemoved = null // need this to find out how much was removed
+    // need this to find out how much was removed
+    let firstLineRemoved = 0
     const lines = value
       .slice(firstLineStart, lastLineEnd)
-      .replace(unindentRegex, match => {
-        if (firstLineRemoved === null) {
+      .replace(unindentRegex, (match, offset) => {
+        if (offset === 0) {
           firstLineRemoved = match.length
         }
         return ""
       })
 
     forceValue(value.slice(0, firstLineStart) + lines + value.slice(lastLineEnd))
-    setSelection({
+    forceSelection({
       start: Math.max(firstLineStart, start - firstLineRemoved),
       end: Math.max(
         firstLineStart + lines.lastIndexOf("\n") + 1,
@@ -166,21 +194,21 @@ export const Editor = ({
             class="editor-textarea"
             spellcheck={false}
 
-            selectionStart={selection.start}
-            selectionEnd={selection.end}
-            selectionDirection={selection.direction}
+            // selectionStart={selection.start}
+            // selectionEnd={selection.end}
+            // selectionDirection={selection.direction}
 
             // Listening to both keydown & keypress because chrome doesn't trigger
             // keydown on arrow keys while firefox misplaces the cursor with
             // keypress.
-            onKeydown={onKeydown}
-            onKeypress={updateSelection}
+            onKeyDown={onKeyDown}
+            onKeyPress={updateSelection}
             onInput={updateValue}
 
             // The selectionchange event is apparently not supported on textarea.
             // Instead we keep track of mouse movement while the button is down.
-            onMousedown={onMousedown}
-            onMousemove={isMouseDragging ? updateSelection : undefined}
+            onMouseDown={onMouseDown}
+            onMouseMove={isMouseDragging ? updateSelection : undefined}
           />
 
           {/* Put caret layer behind the textarea so we can hide it via css when
@@ -205,7 +233,7 @@ export const Editor = ({
 
 
 /** Use a separate component to gain automatic memoization */
-const Highlight = ({children, markLine}) =>
+const Highlight = ({children, markLine}: {children: string, markLine: number | false}) =>
   <code
     class="editor-highlight"
     dangerouslySetInnerHTML={{__html: highlight(children, markLine)}}

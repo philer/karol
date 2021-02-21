@@ -6,9 +6,11 @@ import * as graphics from "./graphics"
 import {run} from "./simulation/simulation"
 import {Logging, LoggingProvider} from "./ui/Logging"
 import {Editor} from "./ui/Editor"
+import {World} from "./simulation/world"
 import {WorldPanel} from "./ui/WorldPanel"
 import {defaultPreventer} from "./util"
 import {readFile, saveTextAs} from "./util/files"
+import type {ChangeEvent} from "./util/types"
 import {
   IconPlay,
   IconPause,
@@ -21,7 +23,7 @@ import {
 
 const MIN_SPEED = 1
 const MAX_SPEED = 2.5
-const calculateDelay = speed => Math.pow(10, 4 - speed)
+const calculateDelay = (speed: number) => Math.pow(10, 4 - speed)
 
 
 const initPromises = Promise.all([
@@ -34,16 +36,17 @@ function App() {
   const log = useContext(Logging)
   const [isLoading, setIsLoading] = useState(true)
   const [code, setCode] = useState("")
-  const [markLine, setMarkLine] = useState(false)
+  const [markLine, setMarkLine] = useState<number | false>(false)
   const [isPaused, setIsPaused] = useState(false)
   const [speed, setSpeed] = useState((MIN_SPEED + MAX_SPEED) / 2)
-  const [simulation, setSimulation] = useState(null)
+  const [world, setWorld] = useState(new World(0, 0, 0))
+  const [simulation, setSimulation] = useState<ReturnType<typeof run> | null>(null)
 
   useEffect(() => {
     initPromises.then(() => setIsLoading(false), console.error)
   }, [])
 
-  function updateCode(text) {
+  function updateCode(text: string) {
     haltSimulation()
     setCode(text)
   }
@@ -52,18 +55,17 @@ function App() {
     saveTextAs(code, t("program.default_filename"))
   }
 
-  function loadProgram(evt) {
+  function loadProgram(evt: ChangeEvent) {
     haltSimulation()
-    readFile(evt.target.files[0]).then(setCode)
+    readFile((evt.currentTarget.files as FileList)[0]).then(setCode)
   }
 
-  const [world, setWorld] = useState(null)
-  function updateWorld(newWorld) {
+  function updateWorld(newWorld: World) {
     haltSimulation()
     setWorld(newWorld)
   }
 
-  function updateSpeed(value) {
+  function updateSpeed(value: number) {
     simulation?.setDelay(calculateDelay(value))
     setSpeed(value)
   }
@@ -104,12 +106,12 @@ function App() {
   }
 
   function pauseSimulation() {
-    simulation.pause()
+    simulation?.pause()
     setIsPaused(true)
   }
 
   function resumeSimulation() {
-    simulation.resume()
+    simulation?.resume()
     setIsPaused(false)
   }
 
@@ -183,7 +185,7 @@ function App() {
                 max={MAX_SPEED}
                 value={speed}
                 step="any"
-                onChange={evt => updateSpeed(evt.target.value)}
+                onChange={evt => updateSpeed(+evt.currentTarget.value)}
               />
               <IconRunning lg fw />
             </label>

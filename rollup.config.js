@@ -14,7 +14,7 @@ export default {
       format: "iife",
       sourcemap: true,
     },
-    DEBUG && {
+    !DEBUG && {
       file: "build/core.min.js",
       format: "iife",
       plugins: [terser()],
@@ -26,12 +26,8 @@ export default {
       extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
     }),
     typescript({
-      jsx: "react-jsx",
-      jsxImportSource: "preact",
       sourceMap: DEBUG,
       noEmitOnError: false,
-      lib: ["es5", "es6", "es2017", "dom"],
-      target: "es2017",
     }),
   ],
 }
