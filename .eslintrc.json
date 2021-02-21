@@ -1,14 +1,17 @@
 {
   "root": true,
-  "extends": [
-    "eslint:recommended",
-    "preact"
-  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
   "parserOptions": {
     "ecmaFeatures": {"impliedStrict": true},
     "ecmaVersion": 2017,
     "sourceType": "module"
   },
+  "extends": [
+    "eslint:recommended",
+    "preact",
+
+  ],
   "rules": {
     "arrow-body-style": ["error", "as-needed"],
     "arrow-parens": ["warn", "as-needed"],
