@@ -166,7 +166,11 @@ function App() {
                     <IconStop />
                   </button>
                 </>
-              : <button class="button run-button" onClick={runSimulation}>
+              : <button
+                  class="button run-button"
+                  onClick={runSimulation}
+                  disabled={!code}
+                >
                   {t("program.run")}
                 </button>
             }
