@@ -85,7 +85,7 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
           </button>
           <button class={buttonStyle} onClick={resetWorld}>{t("world.reset")}</button>
 
-          <i class="separator" />
+          <i class={style.separator} />
 
           <label class={buttonStyle}>
             {t("world.load")}
