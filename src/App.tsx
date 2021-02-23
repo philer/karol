@@ -8,6 +8,7 @@ import {Logging, LoggingProvider} from "./ui/Logging"
 import {Editor} from "./ui/Editor"
 import {World} from "./simulation/world"
 import {WorldPanel} from "./ui/WorldPanel"
+import {Tooltip} from "./ui/Tooltip"
 import {defaultPreventer} from "./util"
 import {readFile, saveTextAs} from "./util/files"
 import type {ChangeEvent} from "./util/types"
@@ -173,22 +174,24 @@ function App() {
                   onClick={runSimulation}
                   disabled={!code}
                 >
-                  {t("program.run")}
+                  {t("simulation.run")}
                 </button>
             }
 
-            <label class="button nohover">
-              <IconWalking lg fw />
-              <input
-                type="range"
-                min={MIN_SPEED}
-                max={MAX_SPEED}
-                value={speed}
-                step="any"
-                onChange={evt => updateSpeed(+evt.currentTarget.value)}
-              />
-              <IconRunning lg fw />
-            </label>
+            <Tooltip above tip={t("simulation.speed")}>
+              <label class="button nohover">
+                <IconWalking lg fw />
+                <input
+                  type="range"
+                  min={MIN_SPEED}
+                  max={MAX_SPEED}
+                  value={speed}
+                  step="any"
+                  onChange={evt => updateSpeed(+evt.currentTarget.value)}
+                />
+                <IconRunning lg fw />
+              </label>
+            </Tooltip>
 
           </div>
         </form>

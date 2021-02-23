@@ -78,7 +78,7 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
           <button class="button icon-button" onClick={defaultPreventer(toggleSettings)}>
             <IconCog />
           </button>
-          <button class="button" onClick={resetWorld}>{t("world.new")}</button>
+          <button class="button" onClick={resetWorld}>{t("world.reset")}</button>
 
           <i class="separator" />
 

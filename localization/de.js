@@ -7,27 +7,39 @@ config({
     code: "Programm",
     save: "Speichern",
     load: "Öffnen",
+    default_filename: "program.kdp",
+  },
+  simulation: {
     run: "Ausführen",
+    speed: "Geschwindigkeit",
     message: {
       running: "GESTARTET...",
       paused: "PAUSIERT",
       canceled: "ABGEBROCHEN",
       finished: "FERTIG",
     },
-    default_filename: "program.kdp",
   },
   world: {
     world: "Welt",
-    new: "Neu",
+    reset: "Zurücksetzen",
     save: "Speichern",
     load: "Öffnen",
-    speed: "Geschwindigkeit",
     length: "Länge",
     width: "Breite",
     height: "Höhe",
     flat: "Flache Welt",
     show_player: "Figur anzeigen",
     default_filename: "welt.kdw",
+    action: {
+      placeBlock: "Hinlegen",
+      takeBlock: "Aufheben",
+      placeMark: "Marke setzen",
+      takeMark: "Marke löschen",
+      turnLeft: "Nach links drehen",
+      step: "Schritt vorwärts",
+      stepBackwards: "Schritt zurück",
+      turnRight: "Nach rechts drehen",
+    },
   },
   error: {
     browser_feature_not_available: "Der Browser ist veraltet und unterstützt diese Funktionalität nicht.",
@@ -65,4 +77,4 @@ config({
       action_no_mark: "Ungültige Aktion: nicht markiert",
     },
   },
-});
+})

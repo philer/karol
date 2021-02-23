@@ -10,27 +10,39 @@ config({
     code: "Code",
     save: "Save",
     load: "Load",
+    default_filename: "program.kdp",
+  },
+  simulation: {
     run: "Run",
+    speed: "Speed",
     message: {
       running: "RUNNING...",
       paused: "PAUSED",
       canceled: "CANCELED",
       finished: "DONE",
     },
-    default_filename: "program.kdp",
   },
   world: {
     world: "World",
-    new: "New",
+    reset: "Reset",
     save: "Save",
     load: "Load",
-    speed: "Speed",
     length: "Length",
     width: "Width",
     height: "Height",
     flat: "Flat World",
     show_player: "Show Player",
     default_filename: "world.kdw",
+    action: {
+      placeBlock: "Place block",
+      takeBlock: "Take block",
+      placeMark: "Place mark",
+      takeMark: "Take mark",
+      turnLeft: "Turn left",
+      step: "Step forward",
+      stepBackwards: "Step backwards",
+      turnRight: "Turn right",
+    },
   },
   error: {
     browser_feature_not_available: "Your browser does not support his feature. Consider switch to an up-to-date browser.",
@@ -68,4 +80,4 @@ config({
       action_no_mark: "Invalid action: no mark",
     },
   },
-});
+})

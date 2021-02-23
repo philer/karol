@@ -1,5 +1,6 @@
 import {nodeResolve} from "@rollup/plugin-node-resolve"
 import typescript from "@rollup/plugin-typescript"
+import postcss from "rollup-plugin-postcss"
 import {terser} from "rollup-plugin-terser"
 
 const DEBUG = process.env.NODE_ENV !== "production"
@@ -24,6 +25,12 @@ export default {
   plugins: [
     nodeResolve({
       extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
+    }),
+    postcss({
+      extract: true,
+      modules: true,
+      minimize: DEBUG,
+      // use: ['sass'],
     }),
     typescript({
       sourceMap: DEBUG,

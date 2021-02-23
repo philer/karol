@@ -2,11 +2,12 @@ import {h} from "preact"
 import {useCallback, useContext, useEffect} from "preact/hooks"
 
 import {render} from "../graphics"
-import {Exception} from "../localization"
+import {translate as t, Exception} from "../localization"
 import type {World, WorldInteraction} from "../simulation/world"
 import {Logging} from "./Logging"
 import {IconPlusCircle, IconMinusCircle, IconReply, IconPlay} from "./Icon"
 import {Sprite} from "./Sprite"
+import {Tooltip} from "./Tooltip"
 
 const keyMap: Record<string, keyof WorldInteraction> = {
   ArrowUp: "step",
@@ -75,38 +76,54 @@ export const WorldControls = ({world, disabled}: WorldControlsProps) => {
   return (
     <div class="world-controls">
       <div class="item-controls">
-        <button onClick={callWorldMethod("placeBlock")} disabled={disabled}>
-          <Sprite block />
-          <IconPlusCircle sm />
-        </button>
-        <button onClick={callWorldMethod("takeBlock")} disabled={disabled}>
-          <Sprite block />
-          <IconMinusCircle sm />
-        </button>
-        <button onClick={callWorldMethod("placeMark")} disabled={disabled}>
-          <Sprite mark />
-          <IconPlusCircle sm />
-        </button>
-        <button onClick={callWorldMethod("takeMark")} disabled={disabled}>
-          <Sprite mark />
-          <IconMinusCircle sm />
-        </button>
+        <Tooltip left tip={t("world.action.placeBlock")}>
+          <button onClick={callWorldMethod("placeBlock")} disabled={disabled}>
+            <Sprite block />
+            <IconPlusCircle sm />
+          </button>
+        </Tooltip>
+        <Tooltip left tip={t("world.action.takeBlock")}>
+          <button onClick={callWorldMethod("takeBlock")} disabled={disabled}>
+            <Sprite block />
+            <IconMinusCircle sm />
+          </button>
+        </Tooltip>
+        <Tooltip left tip={t("world.action.placeMark")}>
+          <button onClick={callWorldMethod("placeMark")} disabled={disabled}>
+            <Sprite mark />
+            <IconPlusCircle sm />
+          </button>
+        </Tooltip>
+        <Tooltip left tip={t("world.action.takeMark")}>
+          <button onClick={callWorldMethod("takeMark")} disabled={disabled}>
+            <Sprite mark />
+            <IconMinusCircle sm />
+          </button>
+        </Tooltip>
       </div>
       <div class="movement-controls">
-        <button onClick={callWorldMethod("turnLeft")} disabled={disabled}>
-          <IconReply />
-        </button>
+        <Tooltip left tip={t("world.action.turnLeft")}>
+          <button onClick={callWorldMethod("turnLeft")} disabled={disabled}>
+            <IconReply />
+          </button>
+        </Tooltip>
         <div>
-          <button onClick={callWorldMethod("step")} disabled={disabled}>
-            <IconPlay transform={{rotate: 270}} />
-          </button>
-          <button onClick={callWorldMethod("stepBackwards")} disabled={disabled}>
-            <IconPlay transform={{rotate: 90}} />
-          </button>
+          <Tooltip above tip={t("world.action.step")}>
+            <button onClick={callWorldMethod("step")} disabled={disabled}>
+              <IconPlay transform={{rotate: 270}} />
+            </button>
+          </Tooltip>
+          <Tooltip below tip={t("world.action.stepBackwards")}>
+            <button onClick={callWorldMethod("stepBackwards")} disabled={disabled}>
+              <IconPlay transform={{rotate: 90}} />
+            </button>
+          </Tooltip>
         </div>
-        <button onClick={callWorldMethod("turnRight")} disabled={disabled}>
-          <IconReply transform={{flipX: true}} />
-        </button>
+        <Tooltip left tip={t("world.action.turnRight")}>
+          <button onClick={callWorldMethod("turnRight")} disabled={disabled}>
+            <IconReply transform={{flipX: true}} />
+          </button>
+        </Tooltip>
       </div>
     </div>
   )
