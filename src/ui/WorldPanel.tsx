@@ -78,9 +78,6 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
           <button class="button icon-button" onClick={defaultPreventer(toggleSettings)}>
             <IconCog />
           </button>
-
-          <i class="separator" />
-
           <button class="button" onClick={resetWorld}>{t("world.new")}</button>
 
           <i class="separator" />
@@ -113,17 +110,11 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
               <input type="number" name="height" min={1} max={25} value={height}
                 onChange={updateSetting} />
             </label>
-
-            <i class="separator" />
-
             <label>
               <input type="checkbox" checked={showFlat}
                 onChange={updateShowFlat} />
               <span>{t("world.flat")}</span>
             </label>
-
-            <i class="separator" />
-
             <label>
               <input type="checkbox" checked={showPlayer}
                 onChange={updateShowPlayer} />
