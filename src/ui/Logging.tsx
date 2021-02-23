@@ -1,7 +1,7 @@
-import {h, createContext, ComponentChildren} from "preact"
+import {ComponentChildren, createContext, h} from "preact"
 import {useContext, useEffect, useRef, useState} from "preact/hooks"
 
-import {translate as t, Exception} from "../localization"
+import {Exception, translate as t} from "../localization"
 import {noop} from "../util"
 
 import style from "./LogOutput.css"

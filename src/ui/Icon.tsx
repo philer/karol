@@ -1,5 +1,6 @@
-import {h, VNode} from "preact"
-import {icon, IconDefinition, IconParams, Attributes, AbstractElement} from "@fortawesome/fontawesome-svg-core"
+/* eslint-disable sort-imports */
+import {VNode, h} from "preact"
+import {AbstractElement, Attributes, IconDefinition, IconParams, icon} from "@fortawesome/fontawesome-svg-core"
 
 // All icons used on the page need to be listed here.
 // Only use single statement import when tree-shaking is available,

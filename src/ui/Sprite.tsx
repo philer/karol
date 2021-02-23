@@ -1,6 +1,6 @@
 import {h} from "preact"
 
-import {sprites, AtlasSprite} from "../graphics"
+import {AtlasSprite, sprites} from "../graphics"
 import {css} from "../util"
 
 export const Sprite = ({alt = "", ...rest}) => {

@@ -1,4 +1,4 @@
-import {run as runInterpreter, BuiltinCall, Value} from "../language/interpreter"
+import {BuiltinCall, Value, run as runInterpreter} from "../language/interpreter"
 import {render} from "../graphics"
 import type {World, WorldInteraction} from "./world"
 import {noop} from "../util"

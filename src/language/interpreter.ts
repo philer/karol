@@ -1,6 +1,6 @@
 import {Exception} from "../localization"
 import * as tokens from "./tokens"
-import {textToAst, Call, Expression, RoutineDefinition, Sequence, Statement} from "./parser"
+import {Call, Expression, RoutineDefinition, Sequence, Statement, textToAst} from "./parser"
 
 const MAX_RECURSION_DEPTH = 100
 

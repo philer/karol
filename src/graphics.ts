@@ -65,7 +65,7 @@ const DEFAULT_SETTINGS = {
 
 
 // drawable objects
-export const sprites: Record<string, Sprite>  = {}
+export const sprites: Record<string, Sprite> = {}
 
 const imageCache = Object.create(null)
 
@@ -283,7 +283,7 @@ function _render({width, length, height, player, tiles, seed}: World) {
   const canvas00X = 0.5 * (length - 1) * (tileWidth + 2 * tileGap)
   let canvasX, canvasY, z
 
-  for (let x = 0 ;  x < width ; ++x) {
+  for (let x = 0 ; x < width ; ++x) {
     for (let y = 0 ; y < length ; ++y) {
       canvasX = (-y + x) * 0.5 * (tileWidth + 2 * tileGap)
               + tileGap

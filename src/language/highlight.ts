@@ -2,7 +2,7 @@ import {Exception} from "../localization"
 
 import * as tokens from "./tokens"
 // eslint-disable-next-line no-duplicate-imports
-import {tokenize, TokenType} from "./tokens"
+import {TokenType, tokenize} from "./tokens"
 
 const VISUAL_SPACE = "·<wbr>"
 
@@ -12,7 +12,7 @@ const VISUAL_SPACE = "·<wbr>"
 const ttClasses = Object.create(null)
 
 ttClasses[tokens.IDENTIFIER] = "identifier"
-ttClasses[tokens.INTEGER] =  "number"
+ttClasses[tokens.INTEGER] = "number"
 ttClasses[tokens.COMMENT] = "comment"
 ttClasses[tokens.WHITESPACE] = "whitespace";
 [
@@ -75,8 +75,8 @@ export function highlight(text: string, markLine: number | false = false): strin
   return htmlLines
     .map((line, idx) =>
       `<div class="line${idx === markLine ? " marked" : ""}">`
-      +   `<span class="lineno">${idx + 1}</span>`
-      +   `<span>${line}</span>`
+        + `<span class="lineno">${idx + 1}</span>`
+        + `<span>${line}</span>`
       + `</div>`,
     )
     .join("")

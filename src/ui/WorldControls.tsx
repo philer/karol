@@ -2,10 +2,10 @@ import {h} from "preact"
 import {useCallback, useContext, useEffect} from "preact/hooks"
 
 import {render} from "../graphics"
-import {translate as t, Exception} from "../localization"
+import {Exception, translate as t} from "../localization"
 import type {World, WorldInteraction} from "../simulation/world"
 import {Logging} from "./Logging"
-import {IconPlusCircle, IconMinusCircle, IconReply, IconPlay} from "./Icon"
+import {IconMinusCircle, IconPlay, IconPlusCircle, IconReply} from "./Icon"
 import {Sprite} from "./Sprite"
 import {Tooltip} from "./Tooltip"
 

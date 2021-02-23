@@ -2,16 +2,16 @@ import {clsx, css, flattenKeys} from "./index"
 
 test("flattenkeys", () => {
   expect(flattenKeys({
-    "key1": "value1",
-    "key2": {
-      "key21": "value21",
-      "key22": {
-        "key221": "value221",
+    key1: "value1",
+    key2: {
+      key21: "value21",
+      key22: {
+        key221: "value221",
       },
-      "key23": "value22",
+      key23: "value22",
     },
-    "key3": "value3",
-    "key4": ["value4.1", "value4.2"],
+    key3: "value3",
+    key4: ["value4.1", "value4.2"],
   })).toEqual({
     "key1": "value1",
     "key2.key21": "value21",

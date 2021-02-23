@@ -39,6 +39,7 @@
     "no-console": ["warn", {"allow": ["warn", "error"]}],
     "no-else-return": "off",
     "no-lonely-if": "off",
+    "no-multi-spaces": ["warn", {"ignoreEOLComments": true}],
     "no-prototype-builtins": "off",
     "no-spaced-func": "warn",
     "no-unused-vars": "off",
@@ -54,6 +55,13 @@
     "react-hooks/exhaustive-deps": "off",
     "react/no-danger": "off",
     "semi": ["error", "never"],
+    "sort-imports": ["warn", {
+      "ignoreDeclarationSort": true,
+      "ignoreMemberSort": false,
+      "allowSeparatedGroups": true
+    }],
+    "space-before-function-paren": ["warn", "never"],
+    "space-in-parens": ["warn", "never"],
     "strict": "error",
     "template-curly-spacing": ["warn", "never"],
     "operator-linebreak": ["warn", "before"]

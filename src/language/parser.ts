@@ -2,7 +2,7 @@ import {Exception} from "../localization"
 
 import * as tokens from "./tokens"
 // eslint-disable-next-line no-duplicate-imports
-import {tokenize, Token, TokenType} from "./tokens"
+import {Token, TokenType, tokenize} from "./tokens"
 
 export interface AbstractStatement {
   type: TokenType
