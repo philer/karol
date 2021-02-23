@@ -6,6 +6,9 @@ import {elem, noop} from "../util"
 import {highlight} from "../language/highlight"
 import type {ChangeEvent} from "../util/types"
 
+import * as style from "./Editor.css"
+
+
 /**
  * How long we wait before assuming the browser has updated the textarea.
  * This value is weird and arbitrary but since textarea doesn't trigger a proper
@@ -184,19 +187,15 @@ export const Editor = ({
   }
 
   return (
-    <div class="editor">
-      <div class="editor-scrollbox">
+    <div class={`editor ${style.root}`}>
+      <div class={style.scrollbox}>
         <div>
           <Highlight markLine={markLine}>{value}</Highlight>
 
           <textarea
             ref={textareaRef}
-            class="editor-textarea"
+            class={`editor-textarea ${style.textarea}`}
             spellcheck={false}
-
-            // selectionStart={selection.start}
-            // selectionEnd={selection.end}
-            // selectionDirection={selection.direction}
 
             // Listening to both keydown & keypress because chrome doesn't trigger
             // keydown on arrow keys while firefox misplaces the cursor with
@@ -214,15 +213,15 @@ export const Editor = ({
           {/* Put caret layer behind the textarea so we can hide it via css when
             * textarea isn't focused
             */}
-          <pre class="editor-caret-layer">
+          <pre class={style.caretLayer}>
             {value.slice(0, selection.start)}
             {selection.direction === "backward"
-              && <span key="caret" class="editor-caret blink" />}
-            <span key="editor-selection" class="editor-selection">
+              && <span key="caret" class={`editor-caret ${style.caret} ${style.blink}`} />}
+            <span key="editor-selection" class={`editor-selection ${style.selection}`}>
               {value.slice(selection.start, selection.end)}
             </span>
             {selection.direction === "forward"
-              && <span key="caret" class="editor-caret blink" />}
+              && <span key="caret" class={`editor-caret ${style.caret} ${style.blink}`} />}
             {value.slice(selection.end)}
           </pre>
         </div>
@@ -235,7 +234,7 @@ export const Editor = ({
 /** Use a separate component to gain automatic memoization */
 const Highlight = ({children, markLine}: {children: string, markLine: number | false}) =>
   <code
-    class="editor-highlight"
+    class={`highlight ${style.highlight}`}
     dangerouslySetInnerHTML={{__html: highlight(children, markLine)}}
   />
 

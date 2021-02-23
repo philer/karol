@@ -1,13 +1,13 @@
 @charset "utf-8";
 
-.editor {
+.root {
   position: relative;
 
   font-size: 14px;
   line-height: 1.25em;
   font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
-.editor-scrollbox {
+.scrollbox {
   overflow: auto;
   position: absolute;
   top: 0;
@@ -16,13 +16,13 @@
   width: 100%;
   background: inherit;
 }
-.editor-scrollbox > div {
+.scrollbox > div {
   position: relative;
   min-height: 100%;
 }
-.editor-textarea,
-.editor-highlight,
-.editor-caret-layer
+.textarea,
+.highlight,
+.caretLayer
 {
   position: absolute;
   top: 0;
@@ -48,12 +48,12 @@
   word-break: normal;
   tab-size: 4;
 }
-.editor-highlight {
+.highlight {
   z-index: 2;
   pointer-events: none;
   padding-left: .5ch; /* line numbers */
 }
-.editor-textarea {
+.textarea {
   z-index: 0;
   resize: none;
   opacity: 0;
@@ -61,7 +61,7 @@
 }
 
 
-.editor-caret-layer {
+.caretLayer {
   position: static;
   pointer-events: none;
   color: transparent;
@@ -72,33 +72,33 @@
   60% { opacity: 0; }
   100% { opacity: 0; }
 }
-.editor-caret {
+.caret {
   border: 1px solid black; /* caret color */
   margin: 0 -1px;
 }
-.editor-caret.blink {
+.caret.blink {
   animation: caretBlink .6s linear infinite alternate;
   animation-delay: .5s;
 }
-.editor-textarea:not(:focus) ~ .editor-caret-layer .editor-caret {
+.textarea:not(:focus) ~ .caretLayer .caret {
   display: none;
 }
-.editor-selection {
+.selection {
   border-radius: 2px;
 }
-.editor-selection:empty {
+.selection:empty {
   display: none;
 }
 
 
-.editor-highlight .line {
+.highlight :global(.line) {
   display: flex;
   border-radius: 2px;
 }
-.editor-highlight .line:not(.marked) {
+.highlight :global(.line:not(.marked)) {
   transition: .1s background, .1s box-shadow;
 }
-.editor-highlight .line.marked::before {
+.highlight :global(.line.marked::before) {
   content: "➡";
   position: relative;
   left: -.33em;
@@ -106,7 +106,7 @@
   font-size: 2em;
   width: 0;
 }
-.editor-highlight .lineno {
+.highlight :global(.lineno) {
   flex: 0 0 3.5ch;
   padding-right: .5ch;
   margin-right: .5ch;

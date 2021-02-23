@@ -29,7 +29,8 @@ export default {
     postcss({
       extract: true,
       modules: true,
-      minimize: DEBUG,
+      minimize: !DEBUG,
+      namedExports: true,
       // use: ['sass'],
     }),
     typescript({
