@@ -9,6 +9,8 @@ import {IconPlusCircle, IconMinusCircle, IconReply, IconPlay} from "./Icon"
 import {Sprite} from "./Sprite"
 import {Tooltip} from "./Tooltip"
 
+import * as style from "./WorldControls.css"
+
 const keyMap: Record<string, keyof WorldInteraction> = {
   ArrowUp: "step",
   ArrowDown: "stepBackwards",
@@ -74,8 +76,8 @@ export const WorldControls = ({world, disabled}: WorldControlsProps) => {
   }, [disabled, callWorldMethod])
 
   return (
-    <div class="world-controls">
-      <div class="item-controls">
+    <div class={style.root}>
+      <div class={style.itemControls}>
         <Tooltip left tip={t("world.action.placeBlock")}>
           <button onClick={callWorldMethod("placeBlock")} disabled={disabled}>
             <Sprite block />
@@ -101,7 +103,7 @@ export const WorldControls = ({world, disabled}: WorldControlsProps) => {
           </button>
         </Tooltip>
       </div>
-      <div class="movement-controls">
+      <div class={style.movementControls}>
         <Tooltip left tip={t("world.action.turnLeft")}>
           <button onClick={callWorldMethod("turnLeft")} disabled={disabled}>
             <IconReply />
