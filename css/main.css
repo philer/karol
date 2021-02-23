@@ -261,14 +261,6 @@ canvas.world-canvas {
   /*min-width: 300px;*/
   image-rendering: crisp-edges;
 }
-.log-output {
-  /*max-height: 5em;*/
-  /*min-height: 3em;*/
-  height: 5em;
-  margin: 0;
-  /*overflow-y: scroll;*/
-  overflow: auto;
-}
 
 .world-tools {
   position: relative;
@@ -355,22 +347,4 @@ canvas.world-canvas {
                 rgba(240,249,255,1) 0%,
                 rgba(203,235,255,1) 47%,
                 rgba(161,219,255,1) 100%);
-}
-.log-output {
-  padding: .5em 1em;
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-}
-
-.log-output > p {
-  margin: 0;
-  font-size: .85em;
-  line-height: 1.6em;
-  border-bottom: 1px dotted #ccc;
-}
-.log-output > p:last-child {
-  font-weight: bold;
-  border-bottom-width: 0;
-}
-.log-error {
-  color: #a00;
 }

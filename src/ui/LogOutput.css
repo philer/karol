@@ -1,0 +1,21 @@
+.root {
+  height: 5em;
+  margin: 0;
+  padding: .5em 1em;
+  overflow: auto;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+}
+
+.root > p {
+  margin: 0;
+  font-size: .85em;
+  line-height: 1.6em;
+  border-bottom: 1px dotted #ccc;
+}
+.root > p:last-child {
+  font-weight: bold;
+  border-bottom-width: 0;
+}
+
+.info {color: inherit}
+.error {color: #a00}

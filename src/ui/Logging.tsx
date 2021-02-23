@@ -4,6 +4,8 @@ import {useContext, useEffect, useRef, useState} from "preact/hooks"
 import {translate as t, Exception} from "../localization"
 import {noop} from "../util"
 
+import style from "./LogOutput.css"
+
 export type LogLevel = "info" | "error"
 
 export interface Message {
@@ -35,7 +37,7 @@ export const LoggingProvider = (props: {children: ComponentChildren}) => {
     <Logging.Provider value={{
       messages,
       info: (...args) => log("info", ...args),
-      error:  (...args) => log("error", ...args),
+      error: (...args) => log("error", ...args),
     }}>
       {props.children}
     </Logging.Provider>
@@ -52,10 +54,10 @@ export const LogOutput = () => {
   }, [messages])
 
   return (
-    <pre ref={ref} class="log-output">
+    <pre ref={ref} class={style.root}>
       {messages.map(({level, message, data}, idx) =>
         // idx as key is fine as long as we only append
-        <p key={idx} class={"log-" + level}>{t(message, ...data)}</p>,
+        <p key={idx} class={style[level]}>{t(message, ...data)}</p>,
       )}
     </pre>
   )
