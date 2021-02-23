@@ -1,0 +1,108 @@
+.root {
+  composes: panel from "../panel.css";
+  flex: 100% 1 1;
+}
+
+.wrapper {
+  composes: panelInner from "../panel.css";
+  position: relative;
+  border-radius: 3px;
+}
+.world {
+  position: relative;
+  flex: 1 1 auto;
+  background: linear-gradient(to bottom,
+                rgba(225,225,255,.1) 0%,
+                rgba(35,93,158,.4) 100%),
+              radial-gradient(ellipse at center,
+                rgba(240,249,255,1) 0%,
+                rgba(203,235,255,1) 47%,
+                rgba(161,219,255,1) 100%);
+}
+.canvasContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.canvas {
+  max-height: 100%;
+  max-width: 100%;
+  image-rendering: crisp-edges;
+}
+
+.tools {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  flex-wrap: wrap;
+
+  padding: 0 .5em;
+}
+.tools .separator {
+  margin: .5em .33em;
+  border: 1px solid white;
+  border-right-color: #ddd;
+}
+.expander {
+  flex: 1;
+}
+
+.settings {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  padding: 0 .5em;
+  overflow: auto;
+  display: flex;
+  flex-wrap: nowrap;
+
+  height: 3em;
+  opacity: 1;
+  transition-property: height, opacity;
+
+  background: rgba(255, 255, 255, .3);
+  box-shadow: inset 0 0 1.3em rgba(255, 255, 255, .5);
+}
+.settings.hidden {
+  height: 0;
+  opacity: 0;
+}
+
+.settings label {
+  display: flex;
+  align-items: center;
+  margin: 0 .25em;
+  cursor: pointer;
+}
+
+.settings input[type="number"] {
+  width: 4em;
+  margin: 0 .25em;
+  text-align: center;
+}
+.settings .separator {
+  margin: 0 .25em;
+  border: 1px solid transparent;
+  border-right-color: rgba(255, 255, 255, .66);
+}
+.settingsToggle {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 .5em;
+  color: white;
+}
+.settingsToggle svg {
+  /* text-shadow for font-awesome svg icons */
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, .3));
+}

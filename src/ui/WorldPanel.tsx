@@ -11,6 +11,8 @@ import {IconCog, IconTimes} from "./Icon"
 import {WorldControls} from "./WorldControls"
 import type {ChangeEvent} from "../util/types"
 
+import {button as buttonStyle, iconButton as iconButtonStyle} from "../button.css"
+import * as style from "./WorldPanel.css"
 
 export interface WorldPanelProps {
   onChange: (world: World) => void
@@ -70,29 +72,32 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
   }
 
   return (
-    <section class="panel world-panel">
+    <section class={style.root}>
       <header><h2>{t("world.world")}</h2></header>
 
-      <div class="world-wrapper">
-        <nav class="world-tools">
-          <button class="button icon-button" onClick={defaultPreventer(toggleSettings)}>
+      <div class={style.wrapper}>
+        <nav class={style.tools}>
+          <button
+            class={`${buttonStyle} ${iconButtonStyle}`}
+            onClick={defaultPreventer(toggleSettings)}
+          >
             <IconCog />
           </button>
-          <button class="button" onClick={resetWorld}>{t("world.reset")}</button>
+          <button class={buttonStyle} onClick={resetWorld}>{t("world.reset")}</button>
 
           <i class="separator" />
 
-          <label class="button">
+          <label class={buttonStyle}>
             {t("world.load")}
             <input type="file" class="hidden" onChange={loadWorld} />
           </label>
-          <button class="button" onClick={saveWorld}>{t("world.save")}</button>
+          <button class={buttonStyle} onClick={saveWorld}>{t("world.save")}</button>
         </nav>
 
-        <div class="world-canvas-container">
+        <div class={style.world}>
 
           <form
-            class={clsx("world-settings", !isSettingsVisible && "hidden")}
+            class={clsx(style.settings, !isSettingsVisible && style.hidden)}
             onSubmit={defaultPreventer()}
           >
             <label>
@@ -121,16 +126,16 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
               <span>{t("world.show_player")}</span>
             </label>
 
-            <i class="expander" />
+            <i class={style.expander} />
 
-            <button class="world-settings-close" onClick={toggleSettings}>
+            <button class={style.settingsToggle} onClick={toggleSettings}>
               <IconTimes />
             </button>
           </form>
 
-          <div class="world-canvas-box">
+          <div class={style.canvasContainer}>
             <canvas
-              class="world-canvas"
+              class={style.canvas}
               ref={graphics.setCanvas}
               width="600"
               height="400"

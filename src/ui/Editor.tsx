@@ -2,7 +2,7 @@ import {h} from "preact"
 import {useEffect, useMemo, useRef, useState} from "preact/hooks"
 
 import * as config from "../config"
-import {elem, noop} from "../util"
+import {clsx, elem, noop} from "../util"
 import {highlight} from "../language/highlight"
 import type {ChangeEvent} from "../util/types"
 
@@ -21,6 +21,7 @@ export interface EditorProps {
   indentation?: string
   onChange?: (text: string) => void
   markLine?: number | false
+  class?: string
 }
 
 interface Selection {
@@ -34,6 +35,7 @@ export const Editor = ({
   indentation = "    ",
   onChange = noop,
   markLine = false,
+  class: class_,
 }: EditorProps) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>()
@@ -187,7 +189,7 @@ export const Editor = ({
   }
 
   return (
-    <div class={`editor ${style.root}`}>
+    <div class={clsx("editor", class_, style.root)}>
       <div class={style.scrollbox}>
         <div>
           <Highlight markLine={markLine}>{value}</Highlight>

@@ -1,0 +1,40 @@
+.root {
+  composes: panel from "../panel.css";
+  flex: auto 1 1;
+  min-width: 30em;
+}
+.wrapper {
+  composes: panelInner from "../panel.css";
+}
+
+.editor {
+  flex: 1 1 auto;
+}
+.buttonRow {
+  display: flex;
+}
+.button {
+  composes: button from "../button.css";
+  flex: 1 1 auto;
+  margin: .5em 0 .5em .5em;
+}
+.button:last-child {
+  margin-right: .5em;
+}
+.nohover {
+  composes: nohover from "../button.css";
+}
+.iconButton {
+  composes: iconButton from "../button.css";
+  flex: 0 0 0;
+}
+.iconButton + .iconButton {
+  margin-left: 0;
+}
+.runButton {
+  font-weight: bold;
+  width: 9em;
+  min-width: 9em;
+  max-width: 9em;
+  flex: 9em 0 0; /* width = 3x .iconButton */
+}

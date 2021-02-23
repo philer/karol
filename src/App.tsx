@@ -1,7 +1,8 @@
-import {h, render, Fragment} from "preact"
+import {Fragment, h, render} from "preact"
 import {useContext, useEffect, useState} from "preact/hooks"
 
-import {translate as t, init as initLocalization, Exception} from "./localization"
+import "./global.css"
+import {Exception, init as initLocalization, translate as t} from "./localization"
 import * as graphics from "./graphics"
 import {run} from "./simulation/simulation"
 import {Logging, LoggingProvider} from "./ui/Logging"
@@ -13,14 +14,15 @@ import {defaultPreventer} from "./util"
 import {readFile, saveTextAs} from "./util/files"
 import type {ChangeEvent} from "./util/types"
 import {
-  IconPlay,
   IconPause,
+  IconPlay,
+  IconRunning,
   IconStepForward,
   IconStop,
   IconWalking,
-  IconRunning,
 } from "./ui/Icon"
 
+import * as style from "./ui/EditorPanel.css"
 
 const MIN_SPEED = 1
 const MAX_SPEED = 2.5
@@ -81,9 +83,9 @@ function App() {
       })
       setSimulation(simulation)
       setIsPaused(false)
-      log.info("program.message.running")
+      log.info("simulation.message.running")
       await simulation.finished
-      log.info("program.message.finished")
+      log.info("simulation.message.finished")
     } catch (err) {
       if (err instanceof Exception) {
         log.error(err)
@@ -100,7 +102,7 @@ function App() {
   function haltSimulation() {
     if (simulation) {
       simulation.pause()
-      log.info("program.message.canceled")
+      log.info("simulation.message.canceled")
       setSimulation(null)
       setMarkLine(false)
     }
@@ -109,6 +111,7 @@ function App() {
   function pauseSimulation() {
     simulation?.pause()
     setIsPaused(true)
+    log.info("simulation.message.paused")
   }
 
   function resumeSimulation() {
@@ -122,12 +125,12 @@ function App() {
 
   return (
     <>
-      <section class="panel editor-panel">
+      <section class={style.root}>
         <header><h2>{t("program.code")}</h2></header>
 
-        <form class="editor-wrapper" onSubmit={defaultPreventer()}>
-          <div class="editor-buttons">
-            <label class="button">
+        <form class={style.wrapper} onSubmit={defaultPreventer()}>
+          <div class={style.buttonRow}>
+            <label class={style.button}>
               {t("program.load")}
               <input
                 type="file"
@@ -135,34 +138,44 @@ function App() {
                 onChange={loadProgram}
               />
             </label>
-            <button class="button" onClick={saveProgram}>
+            <button class={style.button} onClick={saveProgram}>
               {t("program.save")}
             </button>
           </div>
 
-          <Editor onChange={updateCode} markLine={markLine}>{code}</Editor>
+          <Editor
+            class={style.editor}
+            onChange={updateCode}
+            markLine={markLine}
+          >{code}</Editor>
 
-          <div class="editor-buttons">
+          <div class={style.buttonRow}>
 
             {simulation
               ? <>
                   {isPaused
-                    ? <button class="button icon-button" onClick={resumeSimulation}>
+                    ? <button
+                        class={`${style.button} ${style.iconButton}`}
+                        onClick={resumeSimulation}
+                      >
                         <IconPlay />
                       </button>
-                    : <button class="button icon-button" onClick={pauseSimulation}>
+                    : <button
+                        class={`${style.button} ${style.iconButton}`}
+                        onClick={pauseSimulation}
+                      >
                         <IconPause />
                       </button>
                   }
                   <button
-                    class="button icon-button"
+                    class={`${style.button} ${style.iconButton}`}
                     disabled={!simulation}
                     onClick={() => simulation?.step()}
                   >
                     <IconStepForward />
                   </button>
                   <button
-                    class="button icon-button"
+                    class={`${style.button} ${style.iconButton}`}
                     disabled={!simulation}
                     onClick={haltSimulation}
                   >
@@ -170,7 +183,7 @@ function App() {
                   </button>
                 </>
               : <button
-                  class="button run-button"
+                  class={`${style.button} ${style.runButton}`}
                   onClick={runSimulation}
                   disabled={!code}
                 >
@@ -179,7 +192,7 @@ function App() {
             }
 
             <Tooltip above tip={t("simulation.speed")}>
-              <label class="button nohover">
+              <label class={`${style.button} ${style.nohover}`}>
                 <IconWalking lg fw />
                 <input
                   type="range"
