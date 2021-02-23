@@ -76,57 +76,65 @@ export const WorldControls = ({world, disabled}: WorldControlsProps) => {
   }, [disabled, callWorldMethod])
 
   return (
-    <div class={style.root}>
+    <>
       <div class={style.itemControls}>
         <Tooltip left tip={t("world.action.placeBlock")}>
-          <button onClick={callWorldMethod("placeBlock")} disabled={disabled}>
-            <Sprite block />
-            <IconPlusCircle sm />
-          </button>
+          <button
+            class={style.button}
+            onClick={callWorldMethod("placeBlock")}
+            disabled={disabled}
+          ><Sprite block /><IconPlusCircle sm /></button>
         </Tooltip>
         <Tooltip left tip={t("world.action.takeBlock")}>
-          <button onClick={callWorldMethod("takeBlock")} disabled={disabled}>
-            <Sprite block />
-            <IconMinusCircle sm />
-          </button>
+          <button
+            class={style.button}
+            onClick={callWorldMethod("takeBlock")}
+            disabled={disabled}
+          ><Sprite block /><IconMinusCircle sm /></button>
         </Tooltip>
         <Tooltip left tip={t("world.action.placeMark")}>
-          <button onClick={callWorldMethod("placeMark")} disabled={disabled}>
-            <Sprite mark />
-            <IconPlusCircle sm />
-          </button>
+          <button
+            class={style.button}
+            onClick={callWorldMethod("placeMark")}
+            disabled={disabled}
+          ><Sprite mark /><IconPlusCircle sm /></button>
         </Tooltip>
         <Tooltip left tip={t("world.action.takeMark")}>
-          <button onClick={callWorldMethod("takeMark")} disabled={disabled}>
-            <Sprite mark />
-            <IconMinusCircle sm />
-          </button>
+          <button
+            class={style.button}
+            onClick={callWorldMethod("takeMark")}
+            disabled={disabled}
+          ><Sprite mark /><IconMinusCircle sm /></button>
         </Tooltip>
       </div>
       <div class={style.movementControls}>
         <Tooltip left tip={t("world.action.turnLeft")}>
-          <button onClick={callWorldMethod("turnLeft")} disabled={disabled}>
-            <IconReply />
-          </button>
-        </Tooltip>
+          <button
+            class={style.button}
+            onClick={callWorldMethod("turnLeft")}
+            disabled={disabled}
+          ><IconReply /></button></Tooltip>
         <div>
           <Tooltip above tip={t("world.action.step")}>
-            <button onClick={callWorldMethod("step")} disabled={disabled}>
-              <IconPlay transform={{rotate: 270}} />
-            </button>
-          </Tooltip>
+            <button
+              class={style.button}
+              onClick={callWorldMethod("step")}
+              disabled={disabled}
+            ><IconPlay transform={{rotate: 270}} /></button></Tooltip>
           <Tooltip below tip={t("world.action.stepBackwards")}>
-            <button onClick={callWorldMethod("stepBackwards")} disabled={disabled}>
-              <IconPlay transform={{rotate: 90}} />
-            </button>
-          </Tooltip>
+            <button
+              class={style.button}
+              onClick={callWorldMethod("stepBackwards")}
+              disabled={disabled}
+            ><IconPlay transform={{rotate: 90}} /></button></Tooltip>
         </div>
         <Tooltip left tip={t("world.action.turnRight")}>
-          <button onClick={callWorldMethod("turnRight")} disabled={disabled}>
-            <IconReply transform={{flipX: true}} />
-          </button>
-        </Tooltip>
+          <button
+            class={style.button}
+            onClick={callWorldMethod("turnRight")}
+            disabled={disabled}
+          ><IconReply transform={{flipX: true}} /></button></Tooltip>
       </div>
-    </div>
+    </>
   )
 }

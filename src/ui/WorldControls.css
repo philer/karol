@@ -1,16 +1,11 @@
-.root {
+.movementControls, .itemControls {
   position: absolute;
   right: 0;
-  height: 100%;
-  padding: 2rem;
+  padding: 1rem;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  flex-wrap: wrap;
 }
 .movementControls {
-  flex: auto 0 0;
-  display: flex;
+  bottom: 0;
   align-items: flex-end;
 }
 .movementControls > div {
@@ -18,12 +13,13 @@
   flex-direction: column;
 }
 .itemControls {
-  flex: auto 1 1;
-  display: flex;
+  top: 5rem;
+  bottom: 5rem;
   flex-direction: column;
   justify-content: center;
+  flex-wrap: wrap-reverse;
 }
-.root button {
+.button {
   position: relative;
   display: flex;
   justify-content: center;
@@ -48,26 +44,26 @@
   filter: grayscale(0);
   transition-property: filter, opacity, color, box-shadow;
 }
-.root button:hover,
-.root button:active,
-.root button:focus {
+.button:hover,
+.button:active,
+.button:focus {
   box-shadow: inset 0 0 2em rgba(255, 255, 255, .5),
               1px 1px .75em rgba(0, 0, 0, .33);
 }
-.root svg {
+.button > svg {
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, .33))
 }
-.root button img {
+.button > img {
   flex: 0 0 auto;
   transform: scale(.667);
 }
-.root button img + svg {
+.button > img + svg {
   position: absolute;
   font-size: .75em;
   right: .25em;
   bottom: .25em;
 }
-.root button:disabled {
+.button:disabled {
   cursor: default;
   pointer-events: none;
   color: rgba(255, 255, 255, .8);
