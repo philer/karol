@@ -53,6 +53,9 @@ elif [ -d "$TARGET_DIR" ]; then
 elif ! yarn lint; then
     echo "Linting failed"
     return 1
+elif ! yarn test; then
+    echo "Tests failed"
+    return 1
 fi
 
 echo "Updating package.json..."
@@ -67,7 +70,7 @@ yarn dist
 
 echo "Copying assets..."
 mkdir -pv "$TARGET_DIR/scripts"
-cp -rv build/*.min.js "$TARGET_DIR/scripts"
+cp -rv build/*.min.* "$TARGET_DIR/scripts"
 cp -rv config.js css img localization examples package.json README.md "$TARGET_DIR"
 
 echo "Converting index.html..."
