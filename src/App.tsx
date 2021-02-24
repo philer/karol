@@ -53,7 +53,7 @@ function App() {
       info(
         <Translate
           version={version}
-          older_release={<a href="/karol-versions">{t("older_release")}</a>}
+          older_release={<a href="/karol-releases">{t("older_release")}</a>}
         >welcome</Translate>,
       )
     }, console.error)
