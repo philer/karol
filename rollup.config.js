@@ -30,7 +30,10 @@ export default {
     json(),
     postcss({
       extract: true,
-      modules: true,
+      modules: {
+        generateScopedName: DEBUG ? "[name]_[local]_[hash:base64:5]" : "[hash:base64:6]",
+      },
+      autoModules: false,
       minimize: !DEBUG,
       namedExports: true,
       // use: ['sass'],
