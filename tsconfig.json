@@ -6,6 +6,7 @@
     "moduleResolution": "node",
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "resolveJsonModule": true,
     "target": "es2017",
     "plugins": [{
       "name": "typescript-plugin-css-modules",

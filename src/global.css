@@ -82,3 +82,13 @@ input[type="range"]::-webkit-slider-thumb {
   /*position: fixed;*/
   /*left: -99999px;*/
 }
+
+a {
+  color: #55f;
+  text-decoration: none;
+}
+a:hover, a:focus, a:active {
+  outline: none;
+  color: #33f;
+  text-decoration: underline;
+}

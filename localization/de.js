@@ -3,6 +3,8 @@
  * Enable by setting locale: "de" in config.js.
  */
 config({
+  welcome: "Willkommen! 👋🤖 Ich bin online Karol v{version}. Du kannst auch eine {older_release} ausprobieren.",
+  older_release: "ältere Version",
   program: {
     code: "Programm",
     save: "Speichern",

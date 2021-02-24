@@ -1,4 +1,4 @@
-import {ComponentChildren, createContext, h} from "preact"
+import {ComponentChild, ComponentChildren, createContext, h} from "preact"
 import {useContext, useEffect, useRef, useState} from "preact/hooks"
 
 import {Exception, translate as t} from "../localization"
@@ -10,16 +10,19 @@ export type LogLevel = "info" | "error"
 
 export interface Message {
   level: LogLevel
-  message: string
-  data: any[]
+  message?: [string, ...(string|number)[]]
+  child?: ComponentChild
+  exception?: Exception
 }
 
 export interface Logger {
-  info: (message: string, ...data: any[]) => void
-  error: (message: string | Exception, ...data: any[]) => void
+  info(message: string, ...data: (string | number)[]): void
+  info(child: ComponentChild): void
+  error(message: string, ...data: (string | number)[]): void
+  error(exception: Exception): void
+  error(child: ComponentChild): void
   messages: Message[]
 }
-
 
 export const Logging = createContext<Logger>({info: noop, error: noop, messages: []})
 
@@ -27,17 +30,21 @@ export const Logging = createContext<Logger>({info: noop, error: noop, messages:
 export const LoggingProvider = (props: {children: ComponentChildren}) => {
   const [messages, setMessages] = useState<Message[]>([])
 
-  const log = (level: LogLevel, message: string | Exception, ...data: any[]) =>
+  const log = (level: LogLevel, message: ComponentChild | Exception, ...data: any[]) => {
     setMessages(messages => [
       ...messages,
-      message instanceof Exception ? {...message, level} : {level, message, data},
+      typeof message === "string"
+        ? {level, message: [message, ...data]}
+        : message instanceof Exception
+          ? {exception: message, level}
+          : {level, child: message},
     ])
-
+  }
   return (
     <Logging.Provider value={{
       messages,
-      info: (...args) => log("info", ...args),
-      error: (...args) => log("error", ...args),
+      info: (message: ComponentChild, ...args: any[]) => log("info", message, ...args),
+      error: (message: ComponentChild | Exception, ...args: any[]) => log("error", message, ...args),
     }}>
       {props.children}
     </Logging.Provider>
@@ -55,9 +62,11 @@ export const LogOutput = () => {
 
   return (
     <pre ref={ref} class={style.root}>
-      {messages.map(({level, message, data}, idx) =>
+      {messages.map(({level, message, exception, child}, idx) =>
         // idx as key is fine as long as we only append
-        <p key={idx} class={style[level]}>{t(message, ...data)}</p>,
+        <p key={idx} class={style[level]}>
+          {message ? t(...message) : exception || child}
+        </p>,
       )}
     </pre>
   )

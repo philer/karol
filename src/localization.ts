@@ -5,17 +5,15 @@ import {flattenKeys} from "./util"
 
 const INTERPOLATION_REGEX = /\{([^}]*?)\}/g
 
-let locales: string[]
 let translations: Record<string, string>
 
-async function setLocales(_locales: string[]) {
-  _locales = Array.isArray(_locales) ? _locales : [_locales]
-  if (_locales.includes("auto")) {
+async function setLocales(locales: string[]) {
+  locales = Array.isArray(locales) ? locales : [locales]
+  if (locales.includes("auto")) {
     const browserLocale = navigator.language.split(/[_-]/)[0]
-    _locales = _locales.map(locale => locale === "auto" ? browserLocale : locale)
+    locales = locales.map(locale => locale === "auto" ? browserLocale : locale)
   }
-
-  locales = Array.from(new Set(_locales.filter(Boolean)))
+  locales = Array.from(new Set(locales.filter(Boolean)))
   translations = Object.assign(Object.create(null), ...await Promise.all(
     locales
       .map(l => config.get(`localization/${l}.js`).then(flattenKeys))
@@ -42,8 +40,7 @@ function interpolate(string: string, values: any[]) {
   if (values.length === 1 && typeof values[0] === "object") {
     values = values[0]
   }
-  const iter = (typeof values[Symbol.iterator] === "function"
-    ? values : [])[Symbol.iterator]()
+  const iter = (values[Symbol.iterator] ? values : [])[Symbol.iterator]()
   return string.replace(
     INTERPOLATION_REGEX,
     (_, key) => key ? values[key] : iter.next().value,

@@ -6,6 +6,8 @@
  * and serve as reference for other languages.
  */
 config({
+  welcome: "Welcome! 👋🤖 I am online Karol v{version}. You can also try an {older_release}.",
+  older_release: "older release",
   program: {
     code: "Code",
     save: "Save",

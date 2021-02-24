@@ -10,6 +10,7 @@ import {Editor} from "./ui/Editor"
 import {World} from "./simulation/world"
 import {WorldPanel} from "./ui/WorldPanel"
 import {Tooltip} from "./ui/Tooltip"
+import {Translate} from "./ui/Translate"
 import {defaultPreventer} from "./util"
 import {readFile, saveTextAs} from "./util/files"
 import type {ChangeEvent} from "./util/types"
@@ -21,6 +22,7 @@ import {
   IconStop,
   IconWalking,
 } from "./ui/Icon"
+import {version} from "../package.json"
 
 import * as style from "./ui/EditorPanel.css"
 
@@ -36,7 +38,7 @@ const initPromises = Promise.all([
 
 
 function App() {
-  const log = useContext(Logging)
+  const {info, error} = useContext(Logging)
   const [isLoading, setIsLoading] = useState(true)
   const [code, setCode] = useState("")
   const [markLine, setMarkLine] = useState<number | false>(false)
@@ -46,7 +48,15 @@ function App() {
   const [simulation, setSimulation] = useState<ReturnType<typeof run> | null>(null)
 
   useEffect(() => {
-    initPromises.then(() => setIsLoading(false), console.error)
+    initPromises.then(() => {
+      setIsLoading(false)
+      info(
+        <Translate
+          version={version}
+          older_release={<a href="/karol-versions">{t("older_release")}</a>}
+        >welcome</Translate>,
+      )
+    }, console.error)
   }, [])
 
   function updateCode(text: string) {
@@ -83,14 +93,14 @@ function App() {
       })
       setSimulation(simulation)
       setIsPaused(false)
-      log.info("simulation.message.running")
+      info("simulation.message.running")
       await simulation.finished
-      log.info("simulation.message.finished")
+      info("simulation.message.finished")
     } catch (err) {
       if (err instanceof Exception) {
-        log.error(err)
+        error(err)
       } else {
-        log.error(err.message)
+        error(err.message)
         console.error(err)
       }
     } finally {
@@ -102,7 +112,7 @@ function App() {
   function haltSimulation() {
     if (simulation) {
       simulation.pause()
-      log.info("simulation.message.canceled")
+      info("simulation.message.canceled")
       setSimulation(null)
       setMarkLine(false)
     }
@@ -111,7 +121,7 @@ function App() {
   function pauseSimulation() {
     simulation?.pause()
     setIsPaused(true)
-    log.info("simulation.message.paused")
+    info("simulation.message.paused")
   }
 
   function resumeSimulation() {
