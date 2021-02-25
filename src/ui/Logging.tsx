@@ -1,10 +1,11 @@
 import {ComponentChild, ComponentChildren, createContext, h} from "preact"
-import {useContext, useEffect, useRef, useState} from "preact/hooks"
+import {StateUpdater, useContext, useEffect, useRef, useState} from "preact/hooks"
 
 import {Exception, translate as t} from "../localization"
 import {noop} from "../util"
 
 import style from "./LogOutput.css"
+
 
 export type LogLevel = "info" | "error"
 
@@ -21,17 +22,13 @@ export interface Logger {
   error(message: string, ...data: (string | number)[]): void
   error(exception: Exception): void
   error(child: ComponentChild): void
-  messages: Message[]
 }
 
-export const Logging = createContext<Logger>({info: noop, error: noop, messages: []})
+export class LoggerImpl implements Logger {
+  _setMessages: StateUpdater<Message[]> = noop
 
-
-export const LoggingProvider = (props: {children: ComponentChildren}) => {
-  const [messages, setMessages] = useState<Message[]>([])
-
-  const log = (level: LogLevel, message: ComponentChild | Exception, ...data: any[]) => {
-    setMessages(messages => [
+  log = (level: LogLevel, message: ComponentChild | Exception, ...data: any[]) =>
+    this._setMessages(messages => [
       ...messages,
       typeof message === "string"
         ? {level, message: [message, ...data]}
@@ -39,21 +36,37 @@ export const LoggingProvider = (props: {children: ComponentChildren}) => {
           ? {exception: message, level}
           : {level, child: message},
     ])
-  }
+
+  info = (message: ComponentChild, ...args: any[]) =>
+    this.log("info", message, ...args)
+
+  error = (message: ComponentChild | Exception, ...args: any[]) =>
+    this.log("error", message, ...args)
+}
+
+export const Logging = createContext<Logger>(new LoggerImpl())
+export const LogMessages = createContext<Message[]>([])
+
+
+export const LoggingProvider = (props: {children: ComponentChildren}) => {
+  const [logger] = useState(new LoggerImpl())
+  const [messages, setMessages] = useState<Message[]>([])
+
+  // Modify state to avoid Logger reference updates triggering re-renders
+  logger._setMessages = setMessages
+
   return (
-    <Logging.Provider value={{
-      messages,
-      info: (message: ComponentChild, ...args: any[]) => log("info", message, ...args),
-      error: (message: ComponentChild | Exception, ...args: any[]) => log("error", message, ...args),
-    }}>
-      {props.children}
+    <Logging.Provider value={logger}>
+      <LogMessages.Provider value={messages}>
+        {props.children}
+      </LogMessages.Provider>
     </Logging.Provider>
   )
 }
 
 
 export const LogOutput = () => {
-  const {messages} = useContext(Logging)
+  const messages = useContext(LogMessages)
   const ref = useRef<HTMLPreElement>()
 
   useEffect(() => {

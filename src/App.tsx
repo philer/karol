@@ -22,21 +22,14 @@ const initPromises = Promise.all([
 function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
-  const log = useContext(Logging)
 
   useEffect(() => {
-    initPromises.then(() => {
-      setIsLoading(false)
-      log.info(
-        <Translate
-          version={version}
-          older_release={<a href="/karol-releases">{t("older_release")}</a>}
-        >welcome</Translate>,
-      )
-    }).catch(err => {
-      console.error(err)
-      setHasError(true)
-    })
+    initPromises
+      .then(() => setIsLoading(false))
+      .catch(err => {
+        console.error(err)
+        setHasError(true)
+      })
   }, [])
 
   useErrorBoundary(err => {
@@ -62,9 +55,26 @@ function App() {
 
   return (
     <LoggingProvider>
+      <LogWelcome />
       <Main />
     </LoggingProvider>
   )
+}
+
+
+const LogWelcome = () => {
+  const log = useContext(Logging)
+
+  useEffect(() => {
+    log.info(
+      <Translate
+        version={version}
+        older_release={<a href="/karol-releases">{t("older_release")}</a>}
+      >welcome</Translate>,
+    )
+  }, [log])
+
+  return null
 }
 
 
