@@ -104,6 +104,7 @@ export const Main = () => {
   function resumeSimulation() {
     simulation?.resume()
     setIsPaused(false)
+    info("simulation.message.running")
   }
 
   useEffect(() => {

@@ -67,17 +67,14 @@ export const LoggingProvider = (props: {children: ComponentChildren}) => {
 
 export const LogOutput = () => {
   const messages = useContext(LogMessages)
-  const ref = useRef<HTMLPreElement>()
-
-  useEffect(() => {
-    setTimeout(() => ref.current?.scrollBy({top: 20, behavior: "smooth"}), 50)
-  }, [messages])
-
   return (
-    <pre ref={ref} class={style.root}>
+    <pre class={style.root}>
       {messages.map(({level, message, exception, child}, idx) =>
-        // idx as key is fine as long as we only append
-        <p key={idx} class={style[level]}>
+        <p
+          key={idx}  // idx as key is fine as long as we only append
+          ref={p => idx === messages.length - 1 && p?.scrollIntoView({behavior: "smooth"})}
+          class={style[level]}
+        >
           {message ? t(...message) : exception || child}
         </p>,
       )}
