@@ -1,5 +1,5 @@
 import {Fragment, h} from "preact"
-import {useContext, useState} from "preact/hooks"
+import {useContext, useEffect, useState} from "preact/hooks"
 
 import {Exception, translate as t} from "../localization"
 import {run} from "../simulation/simulation"
@@ -105,6 +105,10 @@ export const Main = () => {
     simulation?.resume()
     setIsPaused(false)
   }
+
+  useEffect(() => {
+    document.title = `${simulation ? isPaused ? "⏸️" : "▶️" : ""} Karol`
+  }, [simulation, isPaused])
 
   return (
     <>
