@@ -18,6 +18,8 @@ import {
   faArrowUp, faArrowDown, faReply,
   faPlusCircle, faMinusCircle,
 
+  // miscellaneous
+  faCircleNotch,
 } from "@fortawesome/free-solid-svg-icons"
 
 
@@ -68,6 +70,10 @@ export const IconPlusCircle = (props: IconProps) =>
   <Icon faIcon={faPlusCircle} {...props} />
 export const IconMinusCircle = (props: IconProps) =>
   <Icon faIcon={faMinusCircle} {...props} />
+
+// miscellaneous
+export const IconCircleNotch = (props: IconProps) =>
+  <Icon faIcon={faCircleNotch} {...props} />
 
 
 /** Turn FontAwesome's abstract tree into a component tree */
