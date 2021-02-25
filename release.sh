@@ -71,7 +71,7 @@ yarn dist
 echo "Copying assets..."
 mkdir -pv "$TARGET_DIR/scripts"
 cp -rv build/*.min.* "$TARGET_DIR/scripts"
-cp -rv config.js css img localization examples package.json README.md "$TARGET_DIR"
+cp -rv config.js themes localization examples package.json README.md "$TARGET_DIR"
 
 echo "Converting index.html..."
 sed -E 's#build/(.*)\.(js|css)#scripts/\1.min.\2#g' "index.html" \
