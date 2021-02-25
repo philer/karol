@@ -1,4 +1,4 @@
-.loading, .error {
+.loading, .error, :global(.bad-browser-warning) {
   position: absolute;
   top: 0;
   left: 0;
@@ -15,7 +15,7 @@
   font-size: 40px; /* spinner size */
   color: #49c;
 }
-.error {
+.error, :global(.bad-browser-warning) {
   color: #d54;
   white-space: pre;
 }

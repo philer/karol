@@ -79,5 +79,8 @@ const LogWelcome = () => {
   return null
 }
 
+// Clear old browser warning
+document.body.textContent = ""
 
+// Go!
 render(<App />, document.body)
