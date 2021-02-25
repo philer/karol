@@ -17,6 +17,7 @@ import * as style from "./App.css"
 const initPromises = Promise.all([
   graphics.init(),
   initLocalization(),
+  editor.loadTheme(),
 ])
 
 
@@ -38,10 +39,6 @@ function App() {
     setHasError(true)
   })
 
-  if (isLoading) {
-    return <div class={style.loading}><IconCircleNotch spin /></div>
-  }
-
   if (hasError) {
     return (
       <div class={style.error}>
@@ -52,6 +49,10 @@ function App() {
         </p>
       </div>
     )
+  }
+
+  if (isLoading) {
+    return <div class={style.loading}><IconCircleNotch spin /></div>
   }
 
   return (

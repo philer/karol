@@ -36,7 +36,7 @@ export function get<T = any>(url="config.js"): Promise<T> {
       resolve(data)
       script.remove()
     }
-    script.addEventListener("error", reject)
+    script.addEventListener("error", () => reject(`Failed to load '${url}'`))
     script.src = url
     document.head.appendChild(script)
   })

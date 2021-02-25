@@ -204,7 +204,7 @@ function loadImage(path: string): Promise<HTMLImageElement> {
   return imageCache[path] = new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image()
     image.addEventListener("load", () => resolve(image))
-    image.addEventListener("error", reject)
+    image.addEventListener("error", () => reject(`Failed to load '${path}'`))
     image.src = path
   })
 }
