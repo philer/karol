@@ -5,8 +5,8 @@ config({
   locale: ["auto", "en"],
 
   // graphics sprite themes
-  tile_theme: "img/neoz7",
-  player_theme: "img/botty",
+  tile_theme: "themes/neoz7",
+  player_theme: "themes/botty",
 
   // options: "bright", "monokai"
   editor_theme: "monokai",

@@ -1,10 +1,10 @@
 import {ComponentChild, ComponentChildren, createContext, h} from "preact"
-import {StateUpdater, useContext, useEffect, useRef, useState} from "preact/hooks"
+import {StateUpdater, useContext, useState} from "preact/hooks"
 
 import {Exception, translate as t} from "../localization"
 import {noop} from "../util"
 
-import style from "./LogOutput.css"
+import style from "./Logging.css"
 
 
 export type LogLevel = "info" | "error"

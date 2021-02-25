@@ -50,7 +50,7 @@ interface Theme {
   images: Record<string, string | [string, number, number, number, number]>
 }
 
-const DEFAULT_THEME_DIR = "img/simple"
+const DEFAULT_THEME_DIR = "themes/simple"
 
 // themes should provide their own settings
 const DEFAULT_SETTINGS = {

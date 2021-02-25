@@ -243,5 +243,5 @@ const Highlight = ({children, markLine}: {children: string, markLine: number | f
 
 // Load editor theme css
 config.get().then(({editor_theme}) => document.head.append(
-  elem("link", {rel: "stylesheet", href: `css/editor-theme-${editor_theme || "bright"}.css`}),
+  elem("link", {rel: "stylesheet", href: `themes/editor-${editor_theme || "bright"}.css`}),
 ))
