@@ -185,9 +185,9 @@ export const Main = () => {
                   type="range"
                   min={MIN_SPEED}
                   max={MAX_SPEED}
-                  // value={speed}
+                  value={speed}
                   step="any"
-                  onChange={evt => updateSpeed(+evt.currentTarget.value)}
+                  onInput={evt => updateSpeed(+evt.currentTarget.value)}
                 />
                 <IconRunning lg fw />
               </label>
