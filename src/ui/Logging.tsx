@@ -33,7 +33,7 @@ export class LoggerImpl implements Logger {
       typeof message === "string"
         ? {level, message: [message, ...data]}
         : message instanceof Exception
-          ? {exception: message, level}
+          ? {level, exception: message}
           : {level, child: message},
     ])
 
@@ -75,7 +75,7 @@ export const LogOutput = () => {
           ref={p => idx === messages.length - 1 && p?.scrollIntoView({behavior: "smooth"})}
           class={style[level]}
         >
-          {message ? t(...message) : exception || child}
+          {message ? t(...message) : exception ? exception.translatedMessage : child}
         </p>,
       )}
     </pre>
