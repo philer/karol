@@ -9,7 +9,7 @@
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c --watch",
-    "dist": "NODE_ENV=production rollup -c",
+    "dist": "rm -rfv build ; NODE_ENV=production rollup -c",
     "test": "jest",
     "lint": "eslint src/**/*.[jt]s{,x} --cache",
     "pre-commit": "lint"
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
+    "@rollup/plugin-html": "^0.2.3",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.2.0",
     "@rollup/plugin-typescript": "^8.2.0",
