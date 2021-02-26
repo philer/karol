@@ -8,8 +8,6 @@ import {terser} from "rollup-plugin-terser"
 
 const DEBUG = process.env.NODE_ENV !== "production"
 
-const indexHtml = readFileSync(`${__dirname}/index.html`, "utf8")
-
 // generate config with given output name and plugins array
 export default {
   input: "src/App.tsx",
@@ -42,17 +40,16 @@ export default {
     }),
     !DEBUG && terser(),
     !DEBUG && html({
-      template: ({files: {js, css}}) =>
-        indexHtml
-          .replace(/^\s+/mg, "")
-          .replace(
-            /<!--\s*#ROLLUP_CSS.*?ROLLUP_CSS#\s*-->/s,
-            css.map(({fileName}) => `<link rel="stylesheet" href="scripts/${fileName}" />`).join("\n"),
-          )
-          .replace(
-            /<!--\s*#ROLLUP_JS.*?ROLLUP_JS#\s*-->/s,
-            js.map(({fileName}) => `<script async src="scripts/${fileName}"></script>`).join("\n"),
-          ),
+      template: ({files: {js, css}}) => {
+        let indexHtml = readFileSync(`${__dirname}/index.html`, "utf8").replace(/^\s+/mg, "")
+        css.forEach(({name, fileName}) =>
+          indexHtml = indexHtml.replace(`build/${name || "App"}.css`, `script/${fileName}`),
+        )
+        js.forEach(({name, fileName}) =>
+          indexHtml = indexHtml.replace(`build/${name || "App"}.js`, `script/${fileName}`),
+        )
+        return indexHtml
+      },
     }),
   ],
 }
