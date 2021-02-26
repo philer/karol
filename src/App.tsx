@@ -80,7 +80,8 @@ const LogWelcome = () => {
 }
 
 // Clear old browser warning
-document.body.textContent = ""
+document.getElementById("bad-browser-warning")?.remove()
 
 // Go!
 render(<App />, document.body)
+
