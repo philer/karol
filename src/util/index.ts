@@ -61,6 +61,10 @@ export const flattenKeys = (obj: Record<string, any>) => {
 }
 
 
+/** Calculate sum of numbers in an array */
+export const sum = (xs: number[]) => xs.reduce((x, acc) => x + acc, 0)
+
+
 /** Combination of Math.min and Math.max -> restrict val in between min and max. */
 export const clamp = (min: number, max: number, val: number) =>
   val < min ? min : val > max ? max : val

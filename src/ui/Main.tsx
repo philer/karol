@@ -6,6 +6,7 @@ import {run} from "../simulation/simulation"
 import {World} from "../simulation/world"
 import {Logging} from "./Logging"
 import {Editor} from "./Editor"
+import {ResizeLayout, ResizePanel} from "./ResizeLayout"
 import {WorldPanel} from "./WorldPanel"
 import {Tooltip} from "./Tooltip"
 import {defaultPreventer} from "../util"
@@ -112,11 +113,11 @@ export const Main = () => {
   }, [simulation, isPaused])
 
   return (
-    <>
-      <section class={style.root}>
+    <ResizeLayout>
+      <ResizePanel key="editor" size={400} class={style.panel}>
         <header><h2>{t("program.code")}</h2></header>
 
-        <form class={style.wrapper} onSubmit={defaultPreventer()}>
+        <form class={style.panelInner} onSubmit={defaultPreventer()}>
           <div class={style.buttonRow}>
             <label class={style.button}>
               {t("program.load")}
@@ -196,12 +197,18 @@ export const Main = () => {
 
           </div>
         </form>
-      </section>
+      </ResizePanel>
 
-      <WorldPanel
-        onChange={updateWorld}
-        isSimulationRunning={simulation !== null}
-      />
-    </>
+      <ResizePanel key="world" class={style.panel}>
+        <header><h2>{t("world.world")}</h2></header>
+
+        <div class={style.panelInner}>
+          <WorldPanel
+            onChange={updateWorld}
+            isSimulationRunning={simulation !== null}
+          />
+        </div>
+      </ResizePanel>
+    </ResizeLayout>
   )
 }

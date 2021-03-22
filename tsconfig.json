@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "isolatedModules": true,
     "esModuleInterop": true,
+    "isolatedModules": true,
     "jsx": "preserve",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
-    "lib": ["es5", "es6", "es2017", "dom"],
+    "lib": ["es2017", "dom"],
     "moduleResolution": "node",
     "noImplicitAny": true,
     "resolveJsonModule": true,

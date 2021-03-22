@@ -19,8 +19,6 @@ body {
   left: .5em;
   right: .5em;
   bottom: .5em;
-  display: flex;
-  justify-content: stretch;
   padding: 0;
   margin: 0;
   background-color: #f7f7f7;

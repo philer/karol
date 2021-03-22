@@ -1,0 +1,30 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  position: relative; /* create offset parent */
+}
+.vertical {
+  flex-direction: column;
+}
+.panel {
+  transition: none;
+}
+.separator {
+  flex: 5px 0 0;
+  width: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  background: #eee;
+  color: #999;
+}
+.vertical > .separator {
+  cursor: row-resize;
+  width: auto;
+  height: 5px;
+  line-height: 5px;
+}
