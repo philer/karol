@@ -148,7 +148,7 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
         </div>
       </ResizePanel>
 
-      <ResizePanel key="log" size={150}>
+      <ResizePanel key="log" size={120}>
         <LogOutput />
       </ResizePanel>
     </ResizeLayout>

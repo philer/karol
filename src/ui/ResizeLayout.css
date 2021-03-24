@@ -15,7 +15,7 @@
   flex-direction: column;
   align-items: stretch;
   justify-content: stretch;
-  overflow: auto;
+  overflow: hidden;
 }
 .separator {
   flex: 5px 0 0;
