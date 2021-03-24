@@ -1,9 +1,5 @@
 .panel {
   padding: .5em;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: stretch;
 }
 .panel > header {
   display: flex;

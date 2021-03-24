@@ -8,6 +8,7 @@ import {clamp, clsx, defaultPreventer} from "../util"
 import {readFile, saveTextAs} from "../util/files"
 import {LogOutput, Logging} from "./Logging"
 import {IconCog, IconTimes} from "./Icon"
+import {ResizeLayout, ResizePanel} from "./ResizeLayout"
 import {WorldControls} from "./WorldControls"
 import type {ChangeEvent} from "../util/types"
 
@@ -72,80 +73,84 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
   }
 
   return (
-    <>
-      <nav class={style.tools}>
-        <button
-          class={`${buttonStyle} ${iconButtonStyle}`}
-          onClick={defaultPreventer(toggleSettings)}
-        >
-          <IconCog />
-        </button>
-        <button class={buttonStyle} onClick={resetWorld}>{t("world.reset")}</button>
-
-        <i class={style.separator} />
-
-        <label class={buttonStyle}>
-          {t("world.load")}
-          <input type="file" class="hidden" onChange={loadWorld} />
-        </label>
-        <button class={buttonStyle} onClick={saveWorld}>{t("world.save")}</button>
-      </nav>
-
-      <div class={style.world}>
-
-        <form
-          class={clsx(style.settings, !isSettingsVisible && style.hidden)}
-          onSubmit={defaultPreventer()}
-        >
-          <label>
-            {t("world.width")}:
-            <input type="number" name="width" min={1} max={100} value={width}
-              onChange={updateSetting} />
-          </label>
-          <label>
-            {t("world.length")}:
-            <input type="number" name="length" min={1} max={100} value={length}
-              onChange={updateSetting} />
-          </label>
-          <label>
-            {t("world.height")}:
-            <input type="number" name="height" min={1} max={25} value={height}
-              onChange={updateSetting} />
-          </label>
-          <label>
-            <input type="checkbox" checked={showFlat}
-              onChange={updateShowFlat} />
-            <span>{t("world.flat")}</span>
-          </label>
-          <label>
-            <input type="checkbox" checked={showPlayer}
-              onChange={updateShowPlayer} />
-            <span>{t("world.show_player")}</span>
-          </label>
-
-          <i class={style.expander} />
-
-          <button class={style.settingsToggle} onClick={toggleSettings}>
-            <IconTimes />
-          </button>
-        </form>
-
-        <div class={style.canvasContainer}>
-          <canvas
-            class={style.canvas}
-            ref={graphics.setCanvas}
-            width="600"
-            height="400"
+    <ResizeLayout vertical>
+      <ResizePanel key="world" class={style.worldPanel}>
+        <nav class={style.tools}>
+          <button
+            class={`${buttonStyle} ${iconButtonStyle}`}
+            onClick={defaultPreventer(toggleSettings)}
           >
+            <IconCog />
+          </button>
+          <button class={buttonStyle} onClick={resetWorld}>{t("world.reset")}</button>
+
+          <i class={style.separator} />
+
+          <label class={buttonStyle}>
+            {t("world.load")}
+            <input type="file" class="hidden" onChange={loadWorld} />
+          </label>
+          <button class={buttonStyle} onClick={saveWorld}>{t("world.save")}</button>
+        </nav>
+
+        <div class={style.world}>
+
+          <form
+            class={clsx(style.settings, !isSettingsVisible && style.hidden)}
+            onSubmit={defaultPreventer()}
+          >
+            <label>
+              {t("world.width")}:
+              <input type="number" name="width" min={1} max={100} value={width}
+                onChange={updateSetting} />
+            </label>
+            <label>
+              {t("world.length")}:
+              <input type="number" name="length" min={1} max={100} value={length}
+                onChange={updateSetting} />
+            </label>
+            <label>
+              {t("world.height")}:
+              <input type="number" name="height" min={1} max={25} value={height}
+                onChange={updateSetting} />
+            </label>
+            <label>
+              <input type="checkbox" checked={showFlat}
+                onChange={updateShowFlat} />
+              <span>{t("world.flat")}</span>
+            </label>
+            <label>
+              <input type="checkbox" checked={showPlayer}
+                onChange={updateShowPlayer} />
+              <span>{t("world.show_player")}</span>
+            </label>
+
+            <i class={style.expander} />
+
+            <button class={style.settingsToggle} onClick={toggleSettings}>
+              <IconTimes />
+            </button>
+          </form>
+
+          <div class={style.canvasContainer}>
+            <canvas
+              class={style.canvas}
+              ref={graphics.setCanvas}
+              width="600"
+              height="400"
+            >
             Your Browser needs to support HTML5
-          </canvas>
+            </canvas>
+          </div>
+
+          <WorldControls world={world} disabled={isSimulationRunning} />
+
         </div>
+      </ResizePanel>
 
-        <WorldControls world={world} disabled={isSimulationRunning} />
-
-      </div>
-
-      <LogOutput />
-    </>
+      <ResizePanel key="log" size={150}>
+        <LogOutput />
+      </ResizePanel>
+    </ResizeLayout>
   )
 }
