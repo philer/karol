@@ -5,7 +5,7 @@ import {clamp, clsx, sum} from "../util"
 
 import * as style from "./ResizeLayout.css"
 
-const SEPARATOR_WIDTH = 5
+const SEPARATOR_WIDTH = 1
 
 export interface ResizePanelProps {
   key: string
@@ -106,7 +106,7 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
             class={style.separator}
             onMouseDown={handleDragStart(idx)}
           >
-            {vertical ? "⋯" : "⋮"}
+            <div>{vertical ? "⋯" : "⋮"}</div>
           </div>
           }
         </Fragment>,

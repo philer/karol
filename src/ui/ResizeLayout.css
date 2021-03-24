@@ -18,18 +18,34 @@
   overflow: hidden;
 }
 .separator {
-  flex: 5px 0 0;
-  width: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 1px 0 0;
+  width: 1px;
   cursor: col-resize;
-  background: #eee;
+  background: rgba(0, 0, 0, .1);
   color: #999;
 }
 .vertical > .separator {
   cursor: row-resize;
   width: auto;
+  height: 1px;
+  line-height: 1px;
+}
+.separator > div {
+  width: 5px;
+  margin-left: -2px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+}
+.vertical > .separator > div {
+  margin-left: 0;
+  margin-top: -2px;
+  width: 100%;
   height: 5px;
-  line-height: 5px;
+}
+.separator:hover > div {
+  background: rgba(127, 127, 127, .67);
 }
