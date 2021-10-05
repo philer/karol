@@ -84,6 +84,11 @@ export function hash(str: string) {
   return hash
 }
 
+/** Zip two arrays by the shortest length */
+export const zip = <X, Y>(xs: X[], ys: Y[]): [X, Y][] =>
+  xs.slice(0, ys.length)
+    .map((x, idx) => [x, ys[idx]])
+
 
 /** Create a DOM Element */
 export function elem<T extends HTMLElement>(

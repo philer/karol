@@ -74,7 +74,7 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
 
   return (
     <ResizeLayout vertical>
-      <ResizePanel key="world" class={style.worldPanel}>
+      <ResizePanel key="world" minSize={400} class={style.worldPanel}>
         <nav class={style.tools}>
           <button
             class={`${buttonStyle} ${iconButtonStyle}`}
@@ -148,7 +148,7 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
         </div>
       </ResizePanel>
 
-      <ResizePanel key="log" size={120}>
+      <ResizePanel key="log" size={120} minSize={24}>
         <LogOutput />
       </ResizePanel>
     </ResizeLayout>
