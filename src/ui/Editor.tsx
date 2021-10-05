@@ -38,7 +38,7 @@ export const Editor = ({
   class: class_,
 }: EditorProps) => {
 
-  const textareaRef = useRef<HTMLTextAreaElement>()
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [value, setValue] = useState(children)
   const [isMouseDragging, setIsMouseDragging] = useState(false)
   const [selection, _setSelection] = useState<Selection>({
@@ -57,7 +57,9 @@ export const Editor = ({
     if (text !== value) {
       setValue(text)
       onChange(text)
-      textareaRef.current.value = text
+      if (textareaRef.current) {
+        textareaRef.current.value = text
+      }
     }
   }
 
@@ -87,7 +89,7 @@ export const Editor = ({
 
   function forceSelection(selection: Selection) {
     setSelection(selection)
-    textareaRef.current.setSelectionRange(
+    textareaRef.current?.setSelectionRange(
       selection.start,
       selection.end,
       selection.direction,
