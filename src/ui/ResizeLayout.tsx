@@ -13,7 +13,7 @@ export type CSSUnit =
 
 export type CSSLength = `${number}${CSSUnit}`
 
-export interface ResizePanelProps {
+export type ResizePanelProps = {
   key: string
   size?: number | CSSLength
   minSize?: number
@@ -24,7 +24,7 @@ export interface ResizePanelProps {
 
 export const ResizePanel = (_props: ResizePanelProps) => null
 
-interface PanelSpec {
+type PanelSpec = {
   key: string
   size: number
   max: number
@@ -40,24 +40,25 @@ const maxGrow = (panels: PanelSpec[]) =>
 const maxShrink = (panels: PanelSpec[]) =>
   panels.reduce((acc, {size, min}) => acc + size - min, 0)
 
-export interface ResizeLayoutProps {
+type DragState = {
+  target: HTMLDivElement
+  index: number
+}
+
+export type ResizeLayoutProps = {
   class?: string
   vertical?: true
   children: VNode<ResizePanelProps>[] | VNode<ResizePanelProps>
 }
 
+
+
 export const ResizeLayout = (props: ResizeLayoutProps) => {
   const {class: class_, vertical, children} = props
   const childArray = Array.isArray(children) ? children: [children]
 
-  // const panelRefs = useRef<HTMLDivElement[]>([])
-
-  const draggingRef = useRef<HTMLDivElement | null>(null)
-  const [draggingIdx, setDraggingIdx] = useState<number>(0)
   const panelDivRefs = useRef<HTMLDivElement[]>([])
-
-  // const getInitialSizes = () => childArray.map(({props: {size = 1}}) => size)
-  // const [sizes, setSizes] = useState<number[]>(getInitialSizes)
+  const dragStateRef = useRef<DragState | null>(null)
 
   const initPanelSpecs = () => childArray.map<PanelSpec>(({key, props, props: {size, minSize, maxSize}}) => ({
     key,
@@ -82,51 +83,59 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
     [childArray.map(child => child.key).join(":")],
   )
 
-  const handleDragStart = (idx: number) => ({target}: MouseEvent) => {
-    draggingRef.current = target as HTMLDivElement
-    setDraggingIdx(idx)
+  const setPanelDivRef = (idx: number) => (div: HTMLDivElement) => {
+    panelDivRefs.current[idx] = div
+  }
+
+  const handleDragStart = (index: number) => ({target}: MouseEvent) => {
+    dragStateRef.current = {
+      target: target as HTMLDivElement,
+      index,
+    }
   }
 
   const handleDragEnd = () => {
-    draggingRef.current = null
+    dragStateRef.current = null
   }
 
   function handleDrag(evt: MouseEvent) {
-    if (!(draggingRef.current && evt.buttons & 1)) {
+    if (!dragStateRef.current) {
       return
     }
-    // if (evt.target !== draggingRef.current) {
-    //   return
-    // }
+    if (!(evt.buttons & 1)) {
+      return handleDragEnd()
+    }
 
-    const requestedDistance = vertical ? evt.movementY : evt.movementX
+    const divs = panelDivRefs.current
+    const {target, index} = dragStateRef.current
+    const separatorPosition = target.getBoundingClientRect()
 
-    for (const [panel, div] of zip(panels, panelDivRefs.current)) {
+    const requestedDistance = vertical
+      ? evt.clientY - separatorPosition.top
+      : evt.clientX - separatorPosition.left
+
+    for (const [panel, div] of zip(panels, divs)) {
       panel.size = vertical ? div.offsetHeight : div.offsetWidth
     }
 
-    const frontPanels = panels.slice(0, draggingIdx)
-    const rearPanels = panels.slice(draggingIdx)
+    const frontPanels = panels.slice(0, index)
+    const rearPanels = panels.slice(index)
 
     const distance = requestedDistance < 0
       ? Math.max(-maxShrink(frontPanels), requestedDistance, -maxGrow(rearPanels))
       : Math.min(+maxGrow(frontPanels), requestedDistance, +maxShrink(rearPanels))
 
     let remaining = distance
-    zip(panels, panelDivRefs.current).forEach(([panel, div], idx) => {
+    zip(panels, divs).forEach(([panel, div], idx) => {
       const size = clamp(panel.min, panel.max, panel.size + remaining)
       remaining += panel.size - size
       panel.size = size
       panel.css.flex = `${size}px 0 0`
       div.style.setProperty("flex", panel.css.flex)
-      if (idx === draggingIdx - 1) {
+      if (idx === index - 1) {
         remaining = -distance
       }
     })
-  }
-
-  const setPanelDivRef = (idx: number) => (div: HTMLDivElement) => {
-    panelDivRefs.current[idx] = div
   }
 
   return (
