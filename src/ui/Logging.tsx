@@ -4,7 +4,7 @@ import {StateUpdater, useContext, useState} from "preact/hooks"
 import {Exception, translate as t} from "../localization"
 import {noop} from "../util"
 
-import style from "./Logging.css"
+import style from "./Logging.module.css"
 
 
 export type LogLevel = "info" | "error"

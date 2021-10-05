@@ -6,7 +6,7 @@ import {clsx, elem, noop} from "../util"
 import {highlight} from "../language/highlight"
 import type {ChangeEvent} from "../util/types"
 
-import * as style from "./Editor.css"
+import * as style from "./Editor.module.css"
 
 
 /**

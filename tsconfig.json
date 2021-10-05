@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact",
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
     "lib": ["es5", "es6", "es2017", "dom"],
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "strictNullChecks": true,
     "resolveJsonModule": true,
+    "strictNullChecks": true,
     "target": "es2017",
     "plugins": [{
       "name": "typescript-plugin-css-modules",

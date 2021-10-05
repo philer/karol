@@ -14,7 +14,7 @@
   display: flex;
 }
 .button {
-  composes: button from "../button.css";
+  composes: button from "../button.module.css";
   flex: 1 1 auto;
   margin: .5em 0 .5em .5em;
 }
@@ -22,10 +22,10 @@
   margin-right: .5em;
 }
 .nohover {
-  composes: nohover from "../button.css";
+  composes: nohover from "../button.module.css";
 }
 .iconButton {
-  composes: iconButton from "../button.css";
+  composes: iconButton from "../button.module.css";
   flex: 0 0 0;
 }
 .iconButton + .iconButton {

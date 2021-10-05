@@ -11,7 +11,7 @@ import {Translate} from "./ui/Translate"
 import {IconCircleNotch} from "./ui/Icon"
 import {version} from "../package.json"
 
-import * as style from "./App.css"
+import * as style from "./App.module.css"
 
 
 const initPromises = Promise.all([

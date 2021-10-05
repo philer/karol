@@ -1,4 +1,4 @@
-import {h} from "preact"
+import {Fragment, h} from "preact"
 import {useCallback, useContext, useEffect} from "preact/hooks"
 
 import {render} from "../graphics"
@@ -9,7 +9,7 @@ import {IconMinusCircle, IconPlay, IconPlusCircle, IconReply} from "./Icon"
 import {Sprite} from "./Sprite"
 import {Tooltip} from "./Tooltip"
 
-import * as style from "./WorldControls.css"
+import * as style from "./WorldControls.module.css"
 
 const keyMap: Record<string, keyof WorldInteraction> = {
   ArrowUp: "step",

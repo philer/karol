@@ -2,7 +2,7 @@ import {ComponentChild, VNode, cloneElement, h, toChildArray} from "preact"
 
 import {clsx} from "../util"
 
-import style from "./Tooltip.css"
+import style from "./Tooltip.module.css"
 
 export type Direction = "above" | "below" | "left" | "right"
 

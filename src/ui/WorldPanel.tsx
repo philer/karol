@@ -11,8 +11,8 @@ import {IconCog, IconTimes} from "./Icon"
 import {WorldControls} from "./WorldControls"
 import type {ChangeEvent} from "../util/types"
 
-import {button as buttonStyle, iconButton as iconButtonStyle} from "../button.css"
-import * as style from "./WorldPanel.css"
+import {button as buttonStyle, iconButton as iconButtonStyle} from "../button.module.css"
+import * as style from "./WorldPanel.module.css"
 
 export interface WorldPanelProps {
   onChange: (world: World) => void

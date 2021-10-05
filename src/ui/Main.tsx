@@ -20,7 +20,7 @@ import {
   IconWalking,
 } from "./Icon"
 
-import * as style from "./Main.css"
+import * as style from "./Main.module.css"
 
 const MIN_SPEED = 1
 const MAX_SPEED = 2.5

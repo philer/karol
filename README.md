@@ -28,9 +28,9 @@ Mobile Safari may have some glitches and should be improved in the future.
 Dependencies and build tools are managed via `yarn` or `npm`. The following uses `yarn`, `npm` has mostly the same syntax.
 
 1. Run `yarn` (or `npm install`) to install all development dependencies.
-2. Run `yarn build` to build the bundles and `yarn dist` to generate minified bundles for production.
-3. While editing, you can use `yarn watch` for automatic builds on file change.
-4. Run `yarn lint` to check syntax and `yarn test` to run tests.
+2. Run `yarn dist` to generate a production bundle.
+3. … or run `yarn dev` to start a development server with automatic reload while working on code.
+4. Run `yarn typecheck` to check code, `yarn lint` to check formatting and `yarn test` to run tests.
 
 Check `package.json` for more commands under the `scripts` key.
 
