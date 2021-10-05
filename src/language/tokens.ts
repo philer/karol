@@ -1,86 +1,52 @@
 import {Exception} from "../localization"
 
 // Token types
-export type IDENTIFIER = "IDENTIFIER"
-export const IDENTIFIER: IDENTIFIER = "IDENTIFIER"
-export type INTEGER = "INTEGER"
-export const INTEGER: INTEGER = "INTEGER"
-export type NOT = "NOT"
-export const NOT: NOT = "NOT"
-export type IF = "IF"
-export const IF: IF = "IF"
-export type THEN = "THEN"
-export const THEN: THEN = "THEN"
-export type ELSE = "ELSE"
-export const ELSE: ELSE = "ELSE"
-export type WHILE = "WHILE"
-export const WHILE: WHILE = "WHILE"
-export type DO = "DO"
-export const DO: DO = "DO"
-export type REPEAT = "REPEAT"
-export const REPEAT: REPEAT = "REPEAT"
-export type TIMES = "TIMES"
-export const TIMES: TIMES = "TIMES"
-export type PROGRAM = "PROGRAM"
-export const PROGRAM: PROGRAM = "PROGRAM"
-export type ROUTINE = "ROUTINE"
-export const ROUTINE: ROUTINE = "ROUTINE"
-export type LPAREN = "LPAREN"
-export const LPAREN: LPAREN = "LPAREN"
-export type RPAREN = "RPAREN"
-export const RPAREN: RPAREN = "RPAREN"
-export type LBRACKET = "LBRACKET"
-export const LBRACKET: LBRACKET = "LBRACKET"
-export type RBRACKET = "RBRACKET"
-export const RBRACKET: RBRACKET = "RBRACKET"
-// export type LBRACE = "LBRACE"
-// export const LBRACE: LBRACE = "LBRACE"  // comments
-// export type RBRACE = "RBRACE"
-// export const RBRACE: RBRACE = "RBRACE"  // comments
-export type LESS = "LESS"
-export const LESS: LESS = "LESS"
-export type GREATER = "GREATER"
-export const GREATER: GREATER = "GREATER"
-export type EQUALS = "EQUALS"
-export const EQUALS: EQUALS = "EQUALS"
-export type ASTERISC = "ASTERISC"
-export const ASTERISC: ASTERISC = "ASTERISC"
-export type SLASH = "SLASH"
-export const SLASH: SLASH = "SLASH"
-export type HYPHENMINUS = "HYPHENMINUS"
-export const HYPHENMINUS: HYPHENMINUS = "HYPHENMINUS"
-export type PLUS = "PLUS"
-export const PLUS: PLUS = "PLUS"
-export type DOT = "DOT"
-export const DOT: DOT = "DOT"
-export type COMMA = "COMMA"
-export const COMMA: COMMA = "COMMA"
-export type COLON = "COLON"
-export const COLON: COLON = "COLON"
-export type SEMI = "SEMI"
-export const SEMI: SEMI = "SEMI"
-export type SINGLEQUOTE = "SINGLEQUOTE"
-export const SINGLEQUOTE: SINGLEQUOTE = "SINGLEQUOTE"
-export type DOUBLEQUOTE = "DOUBLEQUOTE"
-export const DOUBLEQUOTE: DOUBLEQUOTE = "DOUBLEQUOTE"
-export type WHITESPACE = "WHITESPACE"
-export const WHITESPACE: WHITESPACE = "WHITESPACE"
-export type COMMENT = "COMMENT"
-export const COMMENT: COMMENT = "COMMENT"
-export type EOF = "EOF"
-export const EOF: EOF = "EOF"
+export const IDENTIFIER = "IDENTIFIER" as const
+export const INTEGER = "INTEGER" as const
+export const NOT = "NOT" as const
+export const IF = "IF" as const
+export const THEN = "THEN" as const
+export const ELSE = "ELSE" as const
+export const WHILE = "WHILE" as const
+export const DO = "DO" as const
+export const REPEAT = "REPEAT" as const
+export const TIMES = "TIMES" as const
+export const PROGRAM = "PROGRAM" as const
+export const ROUTINE = "ROUTINE" as const
+export const LPAREN = "LPAREN" as const
+export const RPAREN = "RPAREN" as const
+export const LBRACKET = "LBRACKET" as const
+export const RBRACKET = "RBRACKET" as const
+// export const LBRACE = "LBRACE" as const  // comments
+// export const RBRACE = "RBRACE" as const  // comments
+export const LESS = "LESS" as const
+export const GREATER = "GREATER" as const
+export const EQUALS = "EQUALS" as const
+export const ASTERISC = "ASTERISC" as const
+export const SLASH = "SLASH" as const
+export const HYPHENMINUS = "HYPHENMINUS" as const
+export const PLUS = "PLUS" as const
+export const DOT = "DOT" as const
+export const COMMA = "COMMA" as const
+export const COLON = "COLON" as const
+export const SEMI = "SEMI" as const
+export const SINGLEQUOTE = "SINGLEQUOTE" as const
+export const DOUBLEQUOTE = "DOUBLEQUOTE" as const
+export const WHITESPACE = "WHITESPACE" as const
+export const COMMENT = "COMMENT" as const
+export const EOF = "EOF" as const
 
 export type TokenType =
-  | IDENTIFIER | INTEGER | NOT
-  | IF | THEN | ELSE
-  | WHILE | DO | REPEAT | TIMES
-  | PROGRAM | ROUTINE
-  | LPAREN | RPAREN | LBRACKET | RBRACKET /* | LBRACE | RBRACE */
-  | LESS | GREATER | EQUALS
-  | ASTERISC | SLASH | HYPHENMINUS | PLUS
-  | DOT | COMMA | COLON | SEMI
-  | SINGLEQUOTE | DOUBLEQUOTE
-  | WHITESPACE | COMMENT | EOF
+  | "IDENTIFIER" | "INTEGER" | "NOT"
+  | "IF" | "THEN" | "ELSE"
+  | "WHILE" | "DO" | "REPEAT" | "TIMES"
+  | "PROGRAM" | "ROUTINE"
+  | "LPAREN" | "RPAREN" | "LBRACKET" | "RBRACKET" /* | LBRACE | RBRACE */
+  | "LESS" | "GREATER" | "EQUALS"
+  | "ASTERISC" | "SLASH" | "HYPHENMINUS" | "PLUS"
+  | "DOT" | "COMMA" | "COLON" | "SEMI"
+  | "SINGLEQUOTE" | "DOUBLEQUOTE"
+  | "WHITESPACE" | "COMMENT" | "EOF"
 
 const keywordTokenTypes: Record<string, TokenType> = {
   wenn: IF,

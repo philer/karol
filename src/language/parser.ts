@@ -202,7 +202,7 @@ export class Parser {
       }
 
       case tokens.REPEAT: {
-        const type: tokens.REPEAT | tokens.WHILE = tokens.REPEAT
+        const type: "REPEAT" | "WHILE" = tokens.REPEAT
         let statement: WhileStatement | RepeatStatement
         this.forward()
         if (this.currentToken.type === tokens.WHILE) {
