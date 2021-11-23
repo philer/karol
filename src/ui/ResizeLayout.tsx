@@ -56,35 +56,61 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
   const {class: class_, vertical, children} = props
   const childArray = Array.isArray(children) ? children: [children]
 
-  const dragStateRef = useRef<DragState | null>(null)
-
-  const initPanelSpecs = () => childArray.map<PanelSpec>(({key, props, props: {size, minSize, maxSize}}) => ({
-    key,
-    children: props.children,
-    class: props.class,
-    size: -1,
-    min: minSize ?? 0,
-    max: maxSize ?? Infinity,
-    div: null as unknown as HTMLDivElement,
-    css: {
-      [`min-${vertical ? "height" : "width"}`]: minSize ? `${minSize}px` : "0",
-      [`max-${vertical ? "height" : "width"}`]: maxSize ? `${maxSize}px` : "100%",
-      flex: size === undefined
-        ? "auto 1 1"
-        : typeof size === "number" ? `${size}px 0 0` : `${size} 0 0`
-      ,
-    },
-  }))
-  const [panels, setPanels] = useState<PanelSpec[]>(initPanelSpecs)
-
+  // We're maintaining most of our state in a PanelSpec[] array, which will be
+  // mutated in place by various operations that need to be fast.
+  // Using react state setters triggers re-renders, causing significant lag.
+  const initPanels = () => childArray.map<PanelSpec>(
+    ({key, props, props: {size, minSize, maxSize}}) => ({
+      key,
+      children: props.children,
+      class: props.class,
+      size: -1,
+      min: minSize ?? 0,
+      max: maxSize ?? Infinity,
+      div: null as unknown as HTMLDivElement,
+      css: {
+        [`min-${vertical ? "height" : "width"}`]: minSize ? `${minSize}px` : "0",
+        [`max-${vertical ? "height" : "width"}`]: maxSize ? `${maxSize}px` : "100%",
+        flex: size === undefined
+          ? "auto 1 1"
+          : typeof size === "number" ? `${size}px 0 0` : `${size} 0 0`
+        ,
+      },
+    }),
+  )
+  const [panels, setPanels] = useState(initPanels)
   useEffect(
-    () => setPanels(initPanelSpecs()),
+    () => setPanels(initPanels()),
     [childArray.map(child => child.key).join(":")],
   )
 
+  // We track panel sizes via ResizeObserver. A dedicated Map<div, PanelSpec>
+  // allows quick updates.
+  const [divsToPanels] = useState(() => new Map())
+  const [resizeObserver] = useState(() => new ResizeObserver(entries => {
+    for (const {target, contentRect} of entries) {
+      const panel = divsToPanels.get(target as HTMLDivElement)
+      if (panel) {
+        panel.size = vertical ? contentRect.height : contentRect.width
+      }
+    }
+  }))
+
+  // Keep panels, resizeObserver and divsToPanel up-to-date with DOM state
   const setPanelDiv = (idx: number) => (div: HTMLDivElement) => {
-    panels[idx].div = div
+    const panel = panels[idx]
+    if (div) {
+      resizeObserver.observe(div)
+    }
+    if (panel.div) {
+      resizeObserver.unobserve(panel.div)
+    }
+    panel.div = div
+    divsToPanels.set(div, panel)
   }
+
+  // Track active dragging action
+  const dragStateRef = useRef<DragState | null>(null)
 
   const handleDragStart = (index: number) => ({target}: MouseEvent) => {
     dragStateRef.current = {
@@ -97,7 +123,7 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
     dragStateRef.current = null
   }
 
-  function handleDrag(evt: MouseEvent) {
+  const handleDrag = (evt: MouseEvent) => {
     if (!dragStateRef.current) {
       return
     }
@@ -112,10 +138,6 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
       ? evt.clientY - separatorPosition.top
       : evt.clientX - separatorPosition.left
 
-    for (const panel of panels) {
-      panel.size = vertical ? panel.div.offsetHeight : panel.div.offsetWidth
-    }
-
     const frontPanels = panels.slice(0, index)
     const rearPanels = panels.slice(index)
 
@@ -124,16 +146,16 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
       : Math.min(+maxGrow(frontPanels), requestedDistance, +maxShrink(rearPanels))
 
     let remaining = distance
-    frontPanels.reverse().concat(rearPanels).forEach((panel, idx) => {
+    const updatePanel = (panel: PanelSpec) => {
       const size = clamp(panel.min, panel.max, panel.size + remaining)
       remaining += panel.size - size
       panel.size = size
       panel.css.flex = `${size}px 0 0`
       panel.div.style.setProperty("flex", panel.css.flex)
-      if (idx === index - 1) {
-        remaining = -distance
-      }
-    })
+    }
+    frontPanels.reverse().forEach(updatePanel)
+    remaining = -distance
+    rearPanels.slice(0, -1).forEach(updatePanel)
   }
 
   return (
