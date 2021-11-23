@@ -1,7 +1,7 @@
 import {ComponentChildren, Fragment, JSX, VNode, h} from "preact"
 import {useEffect, useRef, useState} from "preact/hooks"
 
-import {clamp, clsx, zip} from "../util"
+import {clamp, clsx} from "../util"
 
 import * as style from "./ResizeLayout.module.css"
 
@@ -31,6 +31,7 @@ type PanelSpec = {
   min: number
   class?: string
   css: JSX.CSSProperties
+  div: HTMLDivElement
   children: ComponentChildren
 }
 
@@ -51,13 +52,10 @@ export type ResizeLayoutProps = {
   children: VNode<ResizePanelProps>[] | VNode<ResizePanelProps>
 }
 
-
-
 export const ResizeLayout = (props: ResizeLayoutProps) => {
   const {class: class_, vertical, children} = props
   const childArray = Array.isArray(children) ? children: [children]
 
-  const panelDivRefs = useRef<HTMLDivElement[]>([])
   const dragStateRef = useRef<DragState | null>(null)
 
   const initPanelSpecs = () => childArray.map<PanelSpec>(({key, props, props: {size, minSize, maxSize}}) => ({
@@ -67,6 +65,7 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
     size: -1,
     min: minSize ?? 0,
     max: maxSize ?? Infinity,
+    div: null as unknown as HTMLDivElement,
     css: {
       [`min-${vertical ? "height" : "width"}`]: minSize ? `${minSize}px` : "0",
       [`max-${vertical ? "height" : "width"}`]: maxSize ? `${maxSize}px` : "100%",
@@ -83,8 +82,8 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
     [childArray.map(child => child.key).join(":")],
   )
 
-  const setPanelDivRef = (idx: number) => (div: HTMLDivElement) => {
-    panelDivRefs.current[idx] = div
+  const setPanelDiv = (idx: number) => (div: HTMLDivElement) => {
+    panels[idx].div = div
   }
 
   const handleDragStart = (index: number) => ({target}: MouseEvent) => {
@@ -106,7 +105,6 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
       return handleDragEnd()
     }
 
-    const divs = panelDivRefs.current
     const {target, index} = dragStateRef.current
     const separatorPosition = target.getBoundingClientRect()
 
@@ -114,8 +112,8 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
       ? evt.clientY - separatorPosition.top
       : evt.clientX - separatorPosition.left
 
-    for (const [panel, div] of zip(panels, divs)) {
-      panel.size = vertical ? div.offsetHeight : div.offsetWidth
+    for (const panel of panels) {
+      panel.size = vertical ? panel.div.offsetHeight : panel.div.offsetWidth
     }
 
     const frontPanels = panels.slice(0, index)
@@ -126,12 +124,12 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
       : Math.min(+maxGrow(frontPanels), requestedDistance, +maxShrink(rearPanels))
 
     let remaining = distance
-    zip(panels, divs).forEach(([panel, div], idx) => {
+    frontPanels.reverse().concat(rearPanels).forEach((panel, idx) => {
       const size = clamp(panel.min, panel.max, panel.size + remaining)
       remaining += panel.size - size
       panel.size = size
       panel.css.flex = `${size}px 0 0`
-      div.style.setProperty("flex", panel.css.flex)
+      panel.div.style.setProperty("flex", panel.css.flex)
       if (idx === index - 1) {
         remaining = -distance
       }
@@ -140,11 +138,7 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
 
   return (
     <div
-      class={clsx(
-        class_,
-        style.container,
-        vertical && style.vertical,
-      )}
+      class={clsx(class_, style.container, vertical && style.vertical)}
       onMouseMove={handleDrag}
       onMouseUp={handleDragEnd}
     >
@@ -159,7 +153,7 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
             </div>
           )}
           <div
-            ref={setPanelDivRef(idx)}
+            ref={setPanelDiv(idx)}
             class={clsx(style.panel, class_)}
             style={css}
           >
