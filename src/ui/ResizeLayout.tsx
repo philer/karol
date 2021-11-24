@@ -88,10 +88,17 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
   // allows quick updates.
   const [divsToPanels] = useState(() => new Map())
   const [resizeObserver] = useState(() => new ResizeObserver(entries => {
-    for (const {target, contentRect} of entries) {
+    for (const {target} of entries) {
       const panel = divsToPanels.get(target as HTMLDivElement)
       if (panel) {
-        panel.size = vertical ? contentRect.height : contentRect.width
+        // Using getBoundingClientRect here is suboptimal for performance reasons.
+        // The best alternative would be ResizeObserverEntry.borderBoxSize,
+        // however this API is very recent and not sufficiently supported by
+        // Browsers as of 2021.
+        // The slightly older ResizeObserverEntry.contentRect unfortunately does
+        // not consider paddings and borders and thus may yield incorrect results.
+        const rect = target.getBoundingClientRect()
+        panel.size = vertical ? rect.height : rect.width
       }
     }
   }))
