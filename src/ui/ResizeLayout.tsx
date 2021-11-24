@@ -132,11 +132,11 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
     }
 
     const {target, index} = dragStateRef.current
-    const separatorPosition = target.getBoundingClientRect()
+    const separatorRect = target.getBoundingClientRect()
 
     const requestedDistance = vertical
-      ? evt.clientY - separatorPosition.top
-      : evt.clientX - separatorPosition.left
+      ? evt.clientY - separatorRect.top - .5 * separatorRect.height
+      : evt.clientX - separatorRect.left - .5 * separatorRect.width
 
     const frontPanels = panels.slice(0, index)
     const rearPanels = panels.slice(index)
