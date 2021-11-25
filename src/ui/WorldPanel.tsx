@@ -44,6 +44,8 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
   const resetWorld = () =>
     setWorld(new World(width, length, height))
 
+  useEffect(resetWorld, [width, length, height])
+
   const saveWorld = () =>
     saveTextAs(world.toKdwString(), t("world.default_filename"))
 
