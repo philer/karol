@@ -1,7 +1,7 @@
 import {ComponentChildren, Fragment, JSX, VNode, h} from "preact"
 import {useEffect, useRef, useState} from "preact/hooks"
 
-import {clamp, clsx} from "../util"
+import {clamp, clsx, zip} from "../util"
 
 import * as style from "./ResizeLayout.module.css"
 
@@ -22,17 +22,16 @@ export type ResizePanelProps = {
   children?: ComponentChildren
 }
 
-export const ResizePanel = (_props: ResizePanelProps) => null
+export const ResizePanel = (_props: ResizePanelProps) => {
+  throw new Error("Parent of <ResizePanel> must be <ResizeLayout>")
+}
 
 type PanelSpec = {
-  key: string
   size: number
   max: number
   min: number
-  class?: string
   css: JSX.CSSProperties
   div: HTMLDivElement
-  children: ComponentChildren
 }
 
 const maxGrow = (panels: PanelSpec[]) =>
@@ -60,10 +59,7 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
   // mutated in place by various operations that need to be fast.
   // Using react state setters triggers re-renders, causing significant lag.
   const initPanels = () => childArray.map<PanelSpec>(
-    ({key, props, props: {size, minSize, maxSize}}) => ({
-      key,
-      children: props.children,
-      class: props.class,
+    ({props: {size, minSize, maxSize}}) => ({
       size: -1,
       min: minSize ?? 0,
       max: maxSize ?? Infinity,
@@ -171,24 +167,25 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
       onMouseMove={handleDrag}
       onMouseUp={handleDragEnd}
     >
-      {panels.map(({key, css, children, class: class_}, idx) =>
-        <Fragment key={key}>
-          {idx > 0 && (
+      {zip(childArray, panels).map(
+        ([{key, props}, panel], idx) =>
+          <Fragment key={key}>
+            {idx > 0 && (
+              <div
+                class={style.separator}
+                onMouseDown={handleDragStart(idx)}
+              >
+                <div>{vertical ? "⋯" : "⋮"}</div>
+              </div>
+            )}
             <div
-              class={style.separator}
-              onMouseDown={handleDragStart(idx)}
+              ref={setPanelDiv(idx)}
+              class={clsx(style.panel, props.class)}
+              style={panel.css}
             >
-              <div>{vertical ? "⋯" : "⋮"}</div>
+              {props.children}
             </div>
-          )}
-          <div
-            ref={setPanelDiv(idx)}
-            class={clsx(style.panel, class_)}
-            style={css}
-          >
-            {children}
-          </div>
-        </Fragment>,
+          </Fragment>,
       )}
     </div>
   )
