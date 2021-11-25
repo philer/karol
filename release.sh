@@ -69,9 +69,12 @@ echo "Building production assets..."
 yarn dist
 
 echo "Copying assets..."
-mkdir -pv "$TARGET_DIR/scripts"
-cp -rv build/*.min.* "$TARGET_DIR/scripts"
-cp -rv build/index.html config.js themes localization examples package.json README.md "$TARGET_DIR"
+mkdir -pv "$TARGET_DIR"
+cp -rv dist/* "$TARGET_DIR"
+cp -rv config.js themes localization examples package.json README.md "$TARGET_DIR"
+
+echo "Adjusting index.html..."
+sed -i 's/type="module" crossorigin/defer/g' "$TARGET_DIR/index.html"
 
 echo "Creating archives..."
 cd "$RELEASES_DIR"
