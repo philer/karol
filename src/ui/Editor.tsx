@@ -3,7 +3,7 @@ import {useEffect, useMemo, useRef, useState} from "preact/hooks"
 
 import * as config from "../config"
 import {clsx, elem, noop} from "../util"
-import {highlight} from "../language/highlight"
+import {Marks, highlight} from "../language/highlight"
 import type {ChangeEvent} from "../util/types"
 
 import * as style from "./Editor.module.css"
@@ -20,7 +20,7 @@ export interface EditorProps {
   children: string
   indentation?: string
   onChange?: (text: string) => void
-  markLine?: number | false
+  marks?: Marks
   class?: string
 }
 
@@ -34,7 +34,7 @@ export const Editor = ({
   children = "",
   indentation = "    ",
   onChange = noop,
-  markLine = false,
+  marks,
   class: class_,
 }: EditorProps) => {
 
@@ -194,7 +194,7 @@ export const Editor = ({
     <div class={clsx("editor", class_, style.root)}>
       <div class={style.scrollbox}>
         <div>
-          <Highlight markLine={markLine}>{value}</Highlight>
+          <Highlight marks={marks}>{value}</Highlight>
 
           <textarea
             ref={textareaRef}
@@ -237,10 +237,10 @@ export const Editor = ({
 
 
 /** Use a separate component to gain automatic memoization */
-const Highlight = ({children, markLine}: {children: string, markLine: number | false}) =>
+const Highlight = ({children, marks}: {children: string, marks?: Marks}) =>
   <code
-    class={`highlight ${style.highlight}`}
-    dangerouslySetInnerHTML={{__html: highlight(children, markLine)}}
+    class={clsx("highlight", style.highlight)}
+    dangerouslySetInnerHTML={{__html: highlight(children, marks)}}
   />
 
 

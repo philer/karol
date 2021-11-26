@@ -10,9 +10,7 @@ export const css = (mapping: Record<string, string>) =>
 
 /** Only include classes that are string - filter out the rest */
 export const clsx = (...classes: any[]) =>
-  classes
-    .filter(cls => typeof cls === "string")
-    .join(" ")
+  classes.filter(Boolean).join(" ")
 
 
 /** sleep function for use with await */
@@ -105,7 +103,3 @@ export function elem<T extends HTMLElement>(
   element.append(...children)
   return element as T
 }
-
-
-// /** React helper */
-// export const useForceUpdate = () => useReducer(n => n + 1, 0)[1]

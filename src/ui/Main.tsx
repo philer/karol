@@ -6,6 +6,7 @@ import {run} from "../simulation/simulation"
 import {World} from "../simulation/world"
 import {Logging} from "./Logging"
 import {Editor} from "./Editor"
+import type {Marks} from "../language/highlight"
 import {ResizeLayout, ResizePanel} from "./ResizeLayout"
 import {WorldPanel} from "./WorldPanel"
 import {Tooltip} from "./Tooltip"
@@ -29,9 +30,9 @@ const calculateDelay = (speed: number) => Math.pow(10, 4 - speed)
 
 
 export const Main = () => {
-  const {info, error} = useContext(Logging)
+  const log = useContext(Logging)
   const [code, setCode] = useState("")
-  const [markLine, setMarkLine] = useState<number | false>(false)
+  const [editorMarks, setEditorMarks] = useState<Marks>({})
   const [isPaused, setIsPaused] = useState(false)
   const [speed, setSpeed] = useState((MIN_SPEED + MAX_SPEED) / 2)
   const [world, setWorld] = useState(new World(0, 0, 0))
@@ -40,6 +41,7 @@ export const Main = () => {
   function updateCode(text: string) {
     haltSimulation()
     setCode(text)
+    setEditorMarks({})
   }
 
   function saveProgram() {
@@ -67,45 +69,46 @@ export const Main = () => {
         code,
         world,
         delay: calculateDelay(speed),
-        onExecute: ({line}) => setMarkLine(line),
+        onExecute: ({line}) => setEditorMarks({[line]: "current"}),
       })
       setSimulation(simulation)
       setIsPaused(false)
-      info("simulation.message.running")
+      log.info("simulation.message.running")
       await simulation.finished
-      info("simulation.message.finished")
+      setEditorMarks({})
+      log.info("simulation.message.finished")
     } catch (err) {
       if (err instanceof Exception) {
-        error(err)
+        log.error(err)
+        setEditorMarks({[err.data[0].line]: "error"})
       } else {
-        error(err.message)
+        log.error(err.message)
         console.error(err)
       }
     } finally {
       setSimulation(null)
-      setMarkLine(false)
     }
   }
 
   function haltSimulation() {
     if (simulation) {
       simulation.pause()
-      info("simulation.message.canceled")
+      log.info("simulation.message.canceled")
       setSimulation(null)
-      setMarkLine(false)
+      setEditorMarks({})
     }
   }
 
   function pauseSimulation() {
     simulation?.pause()
     setIsPaused(true)
-    info("simulation.message.paused")
+    log.info("simulation.message.paused")
   }
 
   function resumeSimulation() {
     simulation?.resume()
     setIsPaused(false)
-    info("simulation.message.running")
+    log.info("simulation.message.running")
   }
 
   useEffect(() => {
@@ -135,7 +138,7 @@ export const Main = () => {
           <Editor
             class={style.editor}
             onChange={updateCode}
-            markLine={markLine}
+            marks={editorMarks}
           >{code}</Editor>
 
           <div class={style.buttonRow}>

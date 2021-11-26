@@ -1,4 +1,5 @@
 import {Exception} from "../localization"
+import {clsx} from "../util"
 
 import * as tokens from "./tokens"
 // eslint-disable-next-line no-duplicate-imports
@@ -43,8 +44,11 @@ const wrapToken = (text: string, type: TokenType) =>
     : `<span class="token ${ttClasses[type]}">${text}</span>`
 
 
+export type Mark = "current" | "error"
+export type Marks = Record<number, Mark>
+
 /** Add syntax highlighting HTML tags to given code snippet. */
-export function highlight(text: string, markLine: number | false = false): string {
+export function highlight(text: string, marks: Marks = {}): string {
   const htmlLines = []
   let currentLine = ""
 
@@ -67,16 +71,22 @@ export function highlight(text: string, markLine: number | false = false): strin
     if (!(err instanceof Exception)) {
       throw err
     }
-    const remainingText = wrapSpaces(err.data[0].remainingText)
-    const [currentLineTail, ...remainingLines] = remainingText.split("\n")
-    htmlLines.push(currentLine + currentLineTail, ...remainingLines)
+    const {remainingText} = err.data[0]
+    const [currentWord] = remainingText.split(/\s/, 1)
+    const [currentLineTail, ...remainingLines]= wrapSpaces(
+      remainingText.slice(currentWord.length),
+    ).split("\n")
+    htmlLines.push(
+      currentLine + `<span class="error">${currentWord}</span>` + currentLineTail,
+      ...remainingLines,
+    )
   }
 
   return htmlLines
     .map((line, idx) =>
-      `<div class="line${idx === markLine ? " marked" : ""}">`
+      `<div class="${clsx("line", marks[idx + 1] && "marked", marks[idx + 1])}">`
         + `<span class="lineno">${idx + 1}</span>`
-        + `<span>${line}</span>`
+        + `<span class="line-content">${line}</span>`
       + `</div>`,
     )
     .join("")

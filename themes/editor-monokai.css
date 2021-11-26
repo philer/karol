@@ -18,12 +18,12 @@
 .editor-textarea:not(:focus) ~ .editor-caret-layer .editor-selection {
   background-color: #39382e;
 }
-.editor-highlight .line.marked {
+.highlight .current {
   background-color: rgba(255, 255, 255, .1);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .2);
 }
-.editor-highlight .line.marked::before {
-  color: #f8f8f2; /* arrow */
+.highlight .current .lineno::after {
+  color: #d8d8d2; /* arrow */
 }
 
 .editor .lineno {

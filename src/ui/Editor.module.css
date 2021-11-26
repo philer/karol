@@ -28,7 +28,7 @@
   width: 100%;
   min-height: 100%;
   display: block;
-  padding: .5em 1em .5em 4.5ch;
+  padding: .5em 1em .5em 5.5ch;
   margin: 0;
   overflow: hidden; /* inconsistent scroll bars mess up the width */
 
@@ -49,7 +49,7 @@
 .highlight {
   z-index: 2;
   pointer-events: none;
-  padding-left: .5ch; /* line numbers */
+  padding-left: 0.5ch; /* line numbers */
 }
 .textarea {
   z-index: 0;
@@ -93,22 +93,34 @@
   display: flex;
   border-radius: 2px;
 }
-.highlight :global(.line:not(.marked)) {
-  transition: .1s background, .1s box-shadow;
-}
-.highlight :global(.line.marked::before) {
-  content: "➡";
-  position: relative;
-  left: -.33em;
-  font-weight: bold;
-  font-size: 2em;
-  width: 0;
-}
 .highlight :global(.lineno) {
-  flex: 0 0 3.5ch;
-  padding-right: .5ch;
+  position: relative;
+  flex: 0 0 4.5ch;
+  padding-right: 1.5ch;
   margin-right: .5ch;
   border-right: 1px solid #ddd;
   text-align: right;
   color: grey;
+}
+.highlight :global(.line:not(.current, .error)) {
+  transition: .1s background, .1s box-shadow;
+}
+.highlight :global(.marked .lineno::after) {
+  position: absolute;
+  right: 0;
+  font-size: 1.3em;
+}
+.highlight :global(.current .lineno::after) {
+  content: "➡";
+}
+.highlight :global(.error .lineno::after) {
+  content: "✕";
+  color: red;
+}
+.highlight :global(.line-content .error),
+.highlight :global(.error .line-content span) {
+  text-decoration: wavy underline #f00a;
+}
+.highlight :global(.error .line-content .whitespace) {
+  text-decoration: none;
 }
