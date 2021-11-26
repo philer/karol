@@ -198,6 +198,7 @@ export const Editor = ({
 
           <textarea
             ref={textareaRef}
+            value={value}
             class={`editor-textarea ${style.textarea}`}
             spellcheck={false}
 
