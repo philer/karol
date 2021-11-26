@@ -237,11 +237,24 @@ export const Editor = ({
 
 
 /** Use a separate component to gain automatic memoization */
-const Highlight = ({children, marks}: {children: string, marks?: Marks}) =>
-  <code
-    class={clsx("highlight", style.highlight)}
-    dangerouslySetInnerHTML={{__html: highlight(children, marks)}}
-  />
+const Highlight = ({children, marks}: {children: string, marks?: Marks}) => {
+  const codeRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (marks && Object.keys(marks).length === 1) {
+      const [line] = Object.keys(marks)
+      codeRef.current?.children[+line - 1]?.scrollIntoView({block: "nearest"})
+    }
+  }, [codeRef.current, marks])
+
+  return (
+    <code
+      ref={codeRef}
+      class={clsx("highlight", style.highlight)}
+      dangerouslySetInnerHTML={{__html: highlight(children, marks)}}
+    />
+  )
+}
 
 
 // Load editor theme css
