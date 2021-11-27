@@ -101,12 +101,6 @@ export function setCanvas(canvasElement: HTMLCanvasElement) {
     return
   }
   if (ctx = canvas.getContext("2d")) {
-    // @ts-expect-error Support old browsers
-    ctx.mozImageSmoothingEnabled = false
-    // @ts-expect-error Support old browsers
-    ctx.webkitImageSmoothingEnabled = false
-    // @ts-expect-error Support old browsers
-    ctx.msImageSmoothingEnabled = false
     ctx.imageSmoothingEnabled = false
   }
 }
@@ -210,11 +204,7 @@ function loadImage(path: string): Promise<HTMLImageElement> {
 }
 
 
-/**
- * Load sprite theme including fallbacks
- * @param  {Object} cfg
- * @return {Promise}
- */
+/** Load sprite theme including fallbacks */
 async function initSprites({tile_theme, player_theme}: Config) {
   const tileThemeDir = tile_theme
   const playerThemeDir = player_theme || tile_theme
