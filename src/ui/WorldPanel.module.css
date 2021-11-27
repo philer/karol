@@ -1,6 +1,5 @@
 .worldPanel {
   overflow: visible;  /* tooltips */
-  min-height: 500px;
 }
 .world {
   position: relative;

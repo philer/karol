@@ -7,11 +7,13 @@ import * as style from "./ResizeLayout.module.css"
 
 export type CSSUnit =
   | "%"
-  | "em" | "rem" | "ex" | "ch" | "lh"
   | "vw" | "vh" | "vmin" | "vmax"
+  | "em" | "rem" | "ex" | "ch" | "lh"
   | "px" | "pt" | "cm" | "pc" | "in" | "mm" | "Q"
 
 export type CSSLength = `${number}${CSSUnit}`
+
+const relativeCssLengthRegex = /^\d+(%|vw|vh|vmin|vmax)$/
 
 export type ResizePanelProps = {
   key: string
@@ -69,8 +71,11 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
         [`max-${vertical ? "height" : "width"}`]: maxSize ? `${maxSize}px` : "100%",
         flex: size === undefined
           ? "auto 1 1"
-          : typeof size === "number" ? `${size}px 0 0` : `${size} 0 0`
-        ,
+          : typeof size === "number"
+            ? `${size}px 0 0`
+            : relativeCssLengthRegex.test(`${size}`)
+              ? `${size} 1 1`
+              : `${size} 0 0`,
       },
     }),
   )
@@ -153,12 +158,12 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
       const size = clamp(panel.min, panel.max, panel.size + remaining)
       remaining += panel.size - size
       panel.size = size
-      panel.css.flex = `${size}px 0 0`
-      panel.div.style.setProperty("flex", panel.css.flex)
+      panel.css.flexBasis = `${size}px`
+      panel.div.style.setProperty("flex-basis", panel.css.flexBasis)
     }
     frontPanels.reverse().forEach(updatePanel)
     remaining = -distance
-    rearPanels.slice(0, -1).forEach(updatePanel)
+    rearPanels.forEach(updatePanel)
   }
 
   return (

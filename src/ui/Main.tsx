@@ -117,7 +117,7 @@ export const Main = () => {
 
   return (
     <ResizeLayout>
-      <ResizePanel key="editor" size={500} minSize={300} class={style.panel}>
+      <ResizePanel key="editor" size="25em" minSize={300} class={style.panel}>
         <header><h2>{t("program.code")}</h2></header>
 
         <form class={style.panelInner} onSubmit={defaultPreventer()}>
