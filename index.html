@@ -3,11 +3,21 @@
   <head>
     <meta charset="utf-8">
     <title>Karol</title>
+    <script type="module" src="/src/App.tsx"></script>
   </head>
   <body>
-    <p id="bad-browser-warning">
-      This application requires JavaScript and a modern Browser.
-    </p>
-    <script type="module" src="/src/App.tsx"></script>
+    <div id="bad-browser-warning">
+      <p>Looks like the page isn't loading properly. 🤔</p>
+      <p>
+        This application requires JavaScript and a modern browser (try Firefox or Chromium).
+        <br />
+        If you are using an up-to-date browser and the error doesn't go away, you can try an
+        <a href="/karol-releases">older Karol Release</a>.
+      </p>
+      <p>
+        If you think something is broken, please let me know on
+        <a href="https://github.com/philer/karol/issues">Github</a>.
+      </p>
+    </div>
   </body>
 </html>

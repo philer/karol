@@ -42,9 +42,19 @@ function App() {
   if (hasError) {
     return (
       <div class={style.error}>
-        <p>Something went wrong. 🤔</p>
+        <p>Looks like something went wrong. 🤔</p>
         <p>
-          You can check the browser console (F12) and let me know on{" "}
+          To continue, try reloading the page.
+          <br />
+          If the error doesn't go away, you can try an
+          {" "}
+          <a href="/karol-releases">older Karol Release</a>.
+        </p>
+        <p>
+          To find out more, you can check the browser console (press F12).
+          <br />
+          If you think something is broken, please let me know on
+          {" "}
           <a href="https://github.com/philer/karol/issues">Github</a>.
         </p>
       </div>

@@ -16,6 +16,5 @@
   color: #49c;
 }
 .error, :global(#bad-browser-warning) {
-  color: #d54;
-  white-space: pre;
+  color: #c43;
 }
