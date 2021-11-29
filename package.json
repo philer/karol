@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
+    "@fortawesome/free-regular-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
     "@types/jest": "^27.0.2",
     "@typescript-eslint/eslint-plugin": "^4.15.1",

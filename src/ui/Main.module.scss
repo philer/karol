@@ -1,50 +1,57 @@
-.panel {
-  padding: .5em;
-  min-width: 300px;
+@use "../button.module.scss";
 
-  > header {
-    display: flex;
-    align-items: center;
-    padding: 0 .25em;
-    color: #444;
-    text-shadow: 1px 1px 0 white;
-
-    > h2 {
-      margin: 0;
-      padding: 0 .5em;
-      font-weight: normal;
-      display: inline-block;
-    }
-
-    &::before, &::after {
-      content: "";
-      display: inline-block;
-      vertical-align: middle;
-      border: 1px solid white;
-      border-color: #ddd white white #ddd;
-    }
-    &::before {
-      width: 2em;
-    }
-    &::after {
-      flex: 1;
-    }
-  }
+.root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
 }
 
-.panelInner {
-  margin-top: .5em;
+.editorPanel {
+  position: relative;
+  z-index: 10;
+  flex: 0 0 auto;
+  min-width: 20em;
+  background-color: #555;
+  /*border: 1px solid #ddd;*/
+  box-shadow: 0 0 8px rgba(0, 0, 0, .5),
+              1px 0 2px rgba(0, 0, 0, .3);
 
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: stretch;
+  form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+  }
+  header {
+    justify-content: space-between;
+  }
+  h2 {
+    font-weight: normal;
+    margin: 0 .5em;
+    color: white;
+    /*font-family: monospace;*/
+  }
+  .button { @extend .button; }
+  .iconButton { @extend .iconButton; }
+  .button, .iconButton {
+    background-color:  #666;
+    text-shadow: none;
+    color: white;
+    border-color: #777;
 
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, .1),
-              0 0 2px rgba(0, 0, 0, .1);
+    &:disabled {
+      color: #aaa;
+    }
+
+    &:not(:disabled):not(.nohover):hover {
+      background-color: #777;
+    }
+  }
+  .iconButton svg {
+    filter: none;
+  }
 }
 
 .editor {

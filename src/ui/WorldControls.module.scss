@@ -1,66 +1,58 @@
+@use "../button.module.scss";
+
 .movementControls, .itemControls {
-  position: absolute;
-  right: 0;
   padding: 1rem;
   display: flex;
-}
-.movementControls {
-  bottom: 0;
-  align-items: flex-end;
-
-  > div {
-    display: flex;
-    flex-direction: column;
-  }
+  gap: .5em;
 }
 .itemControls {
-  top: 5rem;
-  bottom: 5rem;
+  grid-area: actions;
   flex-direction: column;
   justify-content: center;
   flex-wrap: wrap-reverse;
 }
+.movementControls {
+  grid-area: movement;
+  place-self: end end;
+
+  display: grid;
+  grid-template: ". forward ." 1fr "left back right" 1fr / 1fr 1fr 1fr;
+
+  button:nth-child(1) { grid-area: left }
+  button:nth-child(2) { grid-area: forward }
+  button:nth-child(3) { grid-area: back }
+  button:nth-child(4) { grid-area: right }
+}
 
 .button {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @extend .button;
   font-size: 2rem;
   width: 4rem;
   height: 4rem;
-  margin: .5rem;
+  // margin: .5rem;
   padding: 0;
   -webkit-appearance: none;
   appearance: none;
-  background: rgba(255, 255, 255, .2);
+  background: rgba(255, 255, 255, .33);
   color: white;
-  border: none;
-  outline: none;
-  border-radius: 3px;
+
   border: 1px solid rgba(255, 255, 255, .5);
-  box-shadow: inset 0 0 1em rgba(255, 255, 255, .33),
-              1px 1px .5em rgba(0, 0, 0, .33);
 
   cursor: pointer;
   filter: grayscale(0);
-  transition-property: filter, opacity, color, box-shadow;
+  transition-property: filter, background, color, text-shadow, box-shadow, opacity;
 
-  &:hover, &:active, &:focus {
-    box-shadow: inset 0 0 2em rgba(255, 255, 255, .5),
-                1px 1px .75em rgba(0, 0, 0, .33);
-  }
   &:disabled {
-    cursor: default;
-    pointer-events: none;
     color: rgba(255, 255, 255, .8);
-    opacity: .667;
     filter: grayscale(1);
-    box-shadow: inset 0 0 2em rgba(255, 255, 255, .33),
-                1px 1px .5em rgba(0, 0, 0, .25);
+  }
+
+  &:not(:disabled):not(.nohover):hover {
+    background-color: rgba(255, 255, 255, .67);
   }
 
   > svg {
+    transition-property: filter, background, color, text-shadow, box-shadow, opacity;
     filter: drop-shadow(0 0 2px rgba(0, 0, 0, .33))
   }
   > img {

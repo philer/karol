@@ -9,13 +9,14 @@ import {Logging} from "./Logging"
 import {Editor} from "./Editor"
 import type {LanguageSpecification} from "../language/specification"
 import type {Marks} from "../language/highlight"
-import {ResizeLayout, ResizePanel} from "./ResizeLayout"
+import {Resizable} from "./Resizable"
 import {WorldPanel} from "./WorldPanel"
 import {Tooltip} from "./Tooltip"
 import {clsx, defaultPreventer} from "../util"
 import {readFile, saveTextAs} from "../util/files"
 import type {ChangeEvent} from "../util/types"
 import {
+  IconKeyboard,
   IconPause,
   IconPlay,
   IconQuestion,
@@ -24,7 +25,6 @@ import {
   IconStop,
   IconWalking,
 } from "./Icon"
-import * as buttonClasses from "../button.module.scss"
 import * as classes from "./Main.module.scss"
 
 const MIN_SPEED = 1
@@ -122,13 +122,12 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
   }, [simulation, isPaused])
 
   return (
-    <ResizeLayout>
-      <ResizePanel key="editor" size="25em" minSize={300} class={classes.panel}>
-        <header><h2>{t("program.code")}</h2></header>
-
-        <form class={classes.panelInner} onSubmit={defaultPreventer()}>
-          <div class={buttonClasses.buttonRow}>
-            <label class={buttonClasses.button}>
+    <div class={classes.root}>
+      <Resizable right class={classes.editorPanel}>
+        <form onSubmit={defaultPreventer()}>
+          <header class={classes.row}>
+            <h2><IconKeyboard lg /> {t("program.code")}</h2>
+            <label class={classes.button}>
               {t("program.load")}
               <input
                 type="file"
@@ -136,10 +135,13 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
                 onChange={loadProgram}
               />
             </label>
-            <button class={buttonClasses.button} onClick={saveProgram}>
+            <button class={classes.button} onClick={saveProgram}>
               {t("program.save")}
             </button>
-          </div>
+            <button class={classes.iconButton}>
+              <IconQuestion />
+            </button>
+          </header>
 
           <Editor
             class={classes.editor}
@@ -148,33 +150,33 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
             marks={editorMarks}
           >{code}</Editor>
 
-          <div class={buttonClasses.buttonRow}>
+          <div class={classes.row}>
 
             {simulation
               ? <span class={classes.runControls}>
                   {isPaused
                     ? <button
-                        class={buttonClasses.iconButton}
+                        class={classes.iconButton}
                         onClick={resumeSimulation}
                       >
                         <IconPlay />
                       </button>
                     : <button
-                        class={buttonClasses.iconButton}
+                        class={classes.iconButton}
                         onClick={pauseSimulation}
                       >
                         <IconPause />
                       </button>
                   }
                   <button
-                    class={buttonClasses.iconButton}
+                    class={classes.iconButton}
                     disabled={!simulation}
                     onClick={() => simulation?.step()}
                   >
                     <IconStepForward />
                   </button>
                   <button
-                    class={buttonClasses.iconButton}
+                    class={classes.iconButton}
                     disabled={!simulation}
                     onClick={haltSimulation}
                   >
@@ -182,7 +184,7 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
                   </button>
                 </span>
               : <button
-                  class={clsx(buttonClasses.button, classes.runButton)}
+                  class={clsx(classes.button, classes.runButton)}
                   onClick={runSimulation}
                   disabled={!code}
                 >
@@ -191,7 +193,7 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
             }
 
             <Tooltip above tip={t("simulation.speed")}>
-              <label class={clsx(buttonClasses.button, buttonClasses.nohover)}>
+              <label class={clsx(classes.button, classes.nohover)}>
                 <IconWalking lg fw />
                 <input
                   type="range"
@@ -207,18 +209,12 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
 
           </div>
         </form>
-      </ResizePanel>
+      </Resizable>
 
-      <ResizePanel key="world" class={classes.panel}>
-        <header><h2>{t("world.world")}</h2></header>
-
-        <div class={classes.panelInner}>
-          <WorldPanel
-            onChange={updateWorld}
-            isSimulationRunning={simulation !== null}
-          />
-        </div>
-      </ResizePanel>
-    </ResizeLayout>
+      <WorldPanel
+        onChange={updateWorld}
+        isSimulationRunning={simulation !== null}
+      />
+    </div>
   )
 }

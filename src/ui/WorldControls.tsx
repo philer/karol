@@ -115,20 +115,18 @@ export const WorldControls = ({world, disabled}: WorldControlsProps) => {
             onClick={callBuiltin("turnLeft")}
             disabled={disabled}
           ><IconReply /></button></Tooltip>
-        <div>
-          <Tooltip above tip={t("world.action.step")}>
-            <button
-              class={classes.button}
-              onClick={callBuiltin("step")}
-              disabled={disabled}
-            ><IconPlay transform={{rotate: 270}} /></button></Tooltip>
-          <Tooltip below tip={t("world.action.stepBackwards")}>
-            <button
-              class={classes.button}
-              onClick={callBuiltin("stepBackwards")}
-              disabled={disabled}
-            ><IconPlay transform={{rotate: 90}} /></button></Tooltip>
-        </div>
+        <Tooltip above tip={t("world.action.step")}>
+          <button
+            class={classes.button}
+            onClick={callBuiltin("step")}
+            disabled={disabled}
+          ><IconPlay transform={{rotate: 270}} /></button></Tooltip>
+        <Tooltip left tip={t("world.action.stepBackwards")}>
+          <button
+            class={classes.button}
+            onClick={callBuiltin("stepBackwards")}
+            disabled={disabled}
+          ><IconPlay transform={{rotate: 90}} /></button></Tooltip>
         <Tooltip left tip={t("world.action.turnRight")}>
           <button
             class={classes.button}

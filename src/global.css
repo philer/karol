@@ -5,7 +5,7 @@
   transition-duration: .25s;
   transition-property: background, color, text-shadow, box-shadow, opacity;
 }
-html {
+html, body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -14,18 +14,8 @@ html {
 body {
   font-family: Roboto, Ubuntu, verdana, arial, helvetica, sans-serif;
   font-size: 16px;
-  position: absolute;
-  top: .25em;
-  left: .5em;
-  right: .5em;
-  bottom: .5em;
-  padding: 0;
-  margin: 0;
   background-color: #f7f7f7;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  user-select: none;
 }
 
 input[type="range"] {

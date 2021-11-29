@@ -12,7 +12,7 @@ import {
   faWalking, faRunning,
 
   // settings toggles
-  faCog, faTimes,
+  faCog, faTimes, faQuestion,
 
   // touch controls
   faArrowUp, faArrowDown, faReply,
@@ -20,8 +20,14 @@ import {
 
   // miscellaneous
   faCircleNotch,
+  faTerminal,
+  faCode,
+  faGlobe,
+  faRobot,
 } from "@fortawesome/free-solid-svg-icons"
-
+import {
+  faKeyboard,
+} from "@fortawesome/free-regular-svg-icons"
 
 export type ClassName =
   | "xs" | "sm" | "lg" | "2x" | "3x" | "5x" | "7x" | "10x"
@@ -58,6 +64,8 @@ export const IconCog = (props: IconProps) =>
   <Icon faIcon={faCog} {...props} />
 export const IconTimes = (props: IconProps) =>
   <Icon faIcon={faTimes} {...props} />
+export const IconQuestion = (props: IconProps) =>
+  <Icon faIcon={faQuestion} {...props} />
 
 // touch controls
 export const IconArrowUp = (props: IconProps) =>
@@ -74,6 +82,16 @@ export const IconMinusCircle = (props: IconProps) =>
 // miscellaneous
 export const IconCircleNotch = (props: IconProps) =>
   <Icon faIcon={faCircleNotch} {...props} />
+export const IconTerminal = (props: IconProps) =>
+  <Icon faIcon={faTerminal} {...props} />
+export const IconCode = (props: IconProps) =>
+  <Icon faIcon={faCode} {...props} />
+export const IconGlobe = (props: IconProps) =>
+  <Icon faIcon={faGlobe} {...props} />
+export const IconKeyboard = (props: IconProps) =>
+  <Icon faIcon={faKeyboard} {...props} />
+export const IconRobot = (props: IconProps) =>
+  <Icon faIcon={faRobot} {...props} />
 
 
 /** Turn FontAwesome's abstract tree into a component tree */

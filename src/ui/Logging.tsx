@@ -3,7 +3,7 @@ import {StateUpdater, useContext, useState} from "preact/hooks"
 
 import {Exception} from "../exception"
 import {InterpolationData, translate as t} from "../localization"
-import {noop} from "../util"
+import {clsx, noop} from "../util"
 
 import * as classes from "./Logging.module.scss"
 
@@ -66,10 +66,10 @@ export const LoggingProvider = (props: {children: ComponentChildren}) => {
 }
 
 
-export const LogOutput = () => {
+export const LogOutput = ({class: class_}: {class?: string}) => {
   const messages = useContext(LogMessages)
   return (
-    <pre class={classes.root}>
+    <pre class={clsx(classes.root, class_)}>
       {messages.map(({level, message, exception, child}, idx) =>
         <p
           key={idx}  // idx as key is fine as long as we only append

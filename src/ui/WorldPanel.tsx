@@ -7,12 +7,11 @@ import {translate as t} from "../localization"
 import {clamp, clsx, defaultPreventer} from "../util"
 import {readFile, saveTextAs} from "../util/files"
 import {LogOutput, Logging} from "./Logging"
-import {IconCog, IconTimes} from "./Icon"
-import {ResizeLayout, ResizePanel} from "./ResizeLayout"
+import {IconCog, IconRobot, IconTimes} from "./Icon"
 import {WorldControls} from "./WorldControls"
 import type {ChangeEvent} from "../util/types"
 
-import {button as buttonClass, iconButton as iconButtonClass} from "../button.module.scss"
+import * as buttonClasses from "../button.module.scss"
 import * as classes from "./WorldPanel.module.scss"
 
 export interface WorldPanelProps {
@@ -75,84 +74,78 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
   }
 
   return (
-    <ResizeLayout vertical>
-      <ResizePanel key="world" minSize={400} class={classes.worldPanel}>
-        <nav class={classes.tools}>
-          <button
-            class={iconButtonClass}
-            onClick={defaultPreventer(toggleSettings)}
-          >
-            <IconCog />
-          </button>
-          <button class={buttonClass} onClick={resetWorld}>{t("world.reset")}</button>
+    <div class={classes.worldPanel}>
+      <h2><IconRobot /> {t("world.world")}</h2>
 
-          <i class={classes.separator} />
+      <nav class={classes.tools}>
+        <button
+          class={buttonClasses.iconButton}
+          onClick={defaultPreventer(toggleSettings)}
+        >
+          <IconCog />
+        </button>
+        <button class={buttonClasses.button} onClick={resetWorld}>{t("world.reset")}</button>
 
-          <label class={buttonClass}>
-            {t("world.load")}
-            <input type="file" class="hidden" onChange={loadWorld} />
-          </label>
-          <button class={buttonClass} onClick={saveWorld}>{t("world.save")}</button>
-        </nav>
+        <label class={buttonClasses.button}>
+          {t("world.load")}
+          <input type="file" class="hidden" onChange={loadWorld} />
+        </label>
+        <button class={buttonClasses.button} onClick={saveWorld}>{t("world.save")}</button>
+      </nav>
 
-        <div class={classes.world}>
 
-          <form
-            class={clsx(classes.settings, !isSettingsVisible && classes.hidden)}
-            onSubmit={defaultPreventer()}
-          >
-            <label>
-              {t("world.width")}:
-              <input type="number" name="width" min={1} max={100} value={width}
-                onChange={updateSetting} />
-            </label>
-            <label>
-              {t("world.length")}:
-              <input type="number" name="length" min={1} max={100} value={length}
-                onChange={updateSetting} />
-            </label>
-            <label>
-              {t("world.height")}:
-              <input type="number" name="height" min={1} max={25} value={height}
-                onChange={updateSetting} />
-            </label>
-            <label>
-              <input type="checkbox" checked={showFlat}
-                onChange={updateShowFlat} />
-              <span>{t("world.flat")}</span>
-            </label>
-            <label>
-              <input type="checkbox" checked={showPlayer}
-                onChange={updateShowPlayer} />
-              <span>{t("world.show_player")}</span>
-            </label>
+      <form
+        class={clsx(classes.settings, !isSettingsVisible && classes.hidden)}
+        onSubmit={defaultPreventer()}
+      >
+        <label>
+          {t("world.width")}:
+          <input type="number" name="width" min={1} max={100} value={width}
+            onChange={updateSetting} />
+        </label>
+        <label>
+          {t("world.length")}:
+          <input type="number" name="length" min={1} max={100} value={length}
+            onChange={updateSetting} />
+        </label>
+        <label>
+          {t("world.height")}:
+          <input type="number" name="height" min={1} max={25} value={height}
+            onChange={updateSetting} />
+        </label>
+        <label>
+          <input type="checkbox" checked={showFlat}
+            onChange={updateShowFlat} />
+          <span>{t("world.flat")}</span>
+        </label>
+        <label>
+          <input type="checkbox" checked={showPlayer}
+            onChange={updateShowPlayer} />
+          <span>{t("world.show_player")}</span>
+        </label>
 
-            <i class={classes.expander} />
+        <i class={classes.expander} />
 
-            <button class={classes.settingsToggle} onClick={toggleSettings}>
-              <IconTimes />
-            </button>
-          </form>
+        <button class={classes.settingsToggle} onClick={toggleSettings}>
+          <IconTimes />
+        </button>
+      </form>
 
-          <div class={classes.canvasContainer}>
-            <canvas
-              class={classes.canvas}
-              ref={graphics.setCanvas}
-              width="600"
-              height="400"
-            >
+      <WorldControls world={world} disabled={isSimulationRunning} />
+
+      <LogOutput class={classes.log} />
+
+      <div class={classes.canvasContainer}>
+        <canvas
+          class={classes.canvas}
+          ref={graphics.setCanvas}
+          width="600"
+          height="400"
+        >
             Your Browser needs to support HTML5
-            </canvas>
-          </div>
+        </canvas>
+      </div>
 
-          <WorldControls world={world} disabled={isSimulationRunning} />
-
-        </div>
-      </ResizePanel>
-
-      <ResizePanel key="log" size={120} minSize={24}>
-        <LogOutput />
-      </ResizePanel>
-    </ResizeLayout>
+    </div>
   )
 }
