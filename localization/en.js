@@ -6,8 +6,9 @@
  * and serve as reference for other languages.
  */
 config({
-  welcome: "Welcome! 👋🤖 I am online Karol v{version}. You can also try an {older_release}.",
+  welcome: "Welcome! 👋🤖 I am online Karol version {version}. You can also try an {older_release}.",
   older_release: "older release",
+  or: "or",
   program: {
     code: "Code",
     save: "Save",
@@ -46,20 +47,36 @@ config({
       turnRight: "Turn right",
     },
   },
+  language: {
+    IF: "if",
+    THEN: "then",
+    ELSE: "else",
+    WHILE: "while",
+    DO: "do",
+    NOT: "not",
+    REPEAT: "repeat",
+    TIMES: "times",
+    PROGRAM: "program",
+    ROUTINE: "routine",
+  },
   error: {
     browser_feature_not_available: "Your browser does not support his feature. Consider switch to an up-to-date browser.",
     invalid_world_file: "This does not appear to be a valid *.kdw file.",
     parser: {
       token_read:
         "Syntax Error on line {line}, column {column}: Could not read next token.",
+      unexpected_eof:
+        "Parse Error: Unexpected end of input.",
+      unexpected_eof_instead:
+        "Parse Error: Unexpected end of input, was expecting {expected}",
       unexpected_token:
         "Parse Error on line {line}, column {column}: Unexpected token '{value}'.",
       unexpected_token_instead:
-        "Parse Error on line {line}, column {column}: Unexpected token '{value}', was expecting {expected} .",
+        "Parse Error on line {line}, column {column}: Unexpected token '{value}', was expecting {expected}.",
       nested_program_definition:
-        "Parse Error on line {}: Can't define program in nested context.",
+        "Parse Error on line {line}: Can't define program in nested context.",
       nested_routine_definition:
-        "Parse Error on line {}: Can't define routine in nested context.",
+        "Parse Error on line {line}: Can't define routine in nested context.",
     },
     runtime: {
       undefined: "Runtime Error on line {line}: {identifier} is not defined.",

@@ -1,7 +1,8 @@
 import {Fragment, h} from "preact"
 import {useContext, useEffect, useState} from "preact/hooks"
 
-import {Exception, translate as t} from "../localization"
+import {Exception} from "../exception"
+import {translate as t} from "../localization"
 import {run} from "../simulation/simulation"
 import {World} from "../simulation/world"
 import {Logging} from "./Logging"

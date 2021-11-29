@@ -59,6 +59,13 @@ export const flattenKeys = (obj: Record<string, any>) => {
 }
 
 
+/** Join items with commas and a final word, e.g. "1, 2 and 3" */
+export const commaList = (xs: any[], finalSeparator = " and ") =>
+  xs.length < 3
+    ? xs.join(finalSeparator)
+    : xs.slice(0, -1).join(", ") + finalSeparator + xs[xs.length - 1]
+
+
 /** Calculate sum of numbers in an array */
 export const sum = (xs: number[]) => xs.reduce((x, acc) => x + acc, 0)
 

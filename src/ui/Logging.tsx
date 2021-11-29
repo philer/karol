@@ -1,7 +1,8 @@
 import {ComponentChild, ComponentChildren, createContext, h} from "preact"
 import {StateUpdater, useContext, useState} from "preact/hooks"
 
-import {Exception, translate as t} from "../localization"
+import {Exception} from "../exception"
+import {translate as t} from "../localization"
 import {noop} from "../util"
 
 import style from "./Logging.module.css"
@@ -75,7 +76,10 @@ export const LogOutput = () => {
           ref={p => idx === messages.length - 1 && p?.scrollIntoView({behavior: "smooth"})}
           class={style[level]}
         >
-          {message ? t(...message) : exception ? exception.translatedMessage : child}
+          {message
+            ? t(...message)
+            : exception ? t(exception.message, ...exception.data) : child
+          }
         </p>,
       )}
     </pre>

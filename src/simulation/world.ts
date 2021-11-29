@@ -1,5 +1,5 @@
 import {rand} from "../util"
-import {Exception} from "../localization"
+import {Exception} from "../exception"
 
 export interface WorldInteraction {
   isLookingAtEdge: () => boolean

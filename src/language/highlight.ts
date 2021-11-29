@@ -1,4 +1,4 @@
-import {Exception} from "../localization"
+import {Exception} from "../exception"
 import {clsx} from "../util"
 
 import * as tokens from "./tokens"

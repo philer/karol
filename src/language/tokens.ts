@@ -1,4 +1,5 @@
-import {Exception} from "../localization"
+import {Exception} from "../exception"
+
 
 // Token types
 export const IDENTIFIER = "IDENTIFIER" as const
@@ -48,30 +49,7 @@ export type TokenType =
   | "SINGLEQUOTE" | "DOUBLEQUOTE"
   | "WHITESPACE" | "COMMENT" | "EOF"
 
-const keywordTokenTypes: Record<string, TokenType> = {
-  wenn: IF,
-  if: IF,
-  dann: THEN,
-  then: THEN,
-  sonst: ELSE,
-  else: ELSE,
-  solange: WHILE,
-  while: WHILE,
-  tue: DO,
-  do: DO,
-  nicht: NOT,
-  not: NOT,
-  wiederhole: REPEAT,
-  repeat: REPEAT,
-  mal: TIMES,
-  times: TIMES,
-  programm: PROGRAM,
-  program: PROGRAM,
-  anweisung: ROUTINE,
-  routine: ROUTINE,
-}
-
-const symbolTokenTypes: Record<string, TokenType> = {
+const symbolToTokenType = new Map<string, TokenType>(Object.entries({
   "(": LPAREN,
   ")": RPAREN,
   "[": LBRACKET,
@@ -91,7 +69,42 @@ const symbolTokenTypes: Record<string, TokenType> = {
   ";": SEMI,
   "'": SINGLEQUOTE,
   '"': DOUBLEQUOTE,
+}))
+
+export const keywordTokenTypes = [
+  IF, THEN, ELSE,
+  REPEAT, WHILE, DO,
+  NOT, TIMES,
+  PROGRAM, ROUTINE,
+] as const
+
+const keywordToTokenType = new Map<string, TokenType>(Object.entries({
+  if: IF,
+  then: THEN,
+  else: ELSE,
+  while: WHILE,
+  do: DO,
+  not: NOT,
+  repeat: REPEAT,
+  times: TIMES,
+  program: PROGRAM,
+  routine: ROUTINE,
+}))
+
+export const tokenTypeToLiteral = new Map<TokenType, string>(
+  [...symbolToTokenType, ...keywordToTokenType].map(([literal, tokenType]) => [tokenType, literal]),
+)
+
+export function setKeywords(keywords: Map<string, TokenType>) {
+  keywordToTokenType.clear()
+  tokenTypeToLiteral.clear()
+  symbolToTokenType.forEach((tokenType, symbol) => tokenTypeToLiteral.set(tokenType, symbol))
+  for (const [keyword, tokenType] of keywords) {
+    keywordToTokenType.set(keyword, tokenType)
+    tokenTypeToLiteral.set(tokenType, keyword)
+  }
 }
+
 
 export interface Token {
   type: TokenType
@@ -133,7 +146,7 @@ export function* tokenize(
     reWord.lastIndex = position
     if (match = reWord.exec(text)) {
       value = match[0]
-      yield {type: keywordTokenTypes[value.toLowerCase()] || IDENTIFIER,
+      yield {type: keywordToTokenType.get(value.toLowerCase()) || IDENTIFIER,
         value, line, column}
       column += value.length
       position += value.length
@@ -190,8 +203,8 @@ export function* tokenize(
 
     // special character (must be checked after // comments)
     value = text[position]
-    if (symbolTokenTypes.hasOwnProperty(value)) {
-      yield {type: symbolTokenTypes[value], value, line, column}
+    if (symbolToTokenType.has(value)) {
+      yield {type: symbolToTokenType.get(value) as TokenType, value, line, column}
       ++column
       ++position
       continue

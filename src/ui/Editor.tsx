@@ -257,11 +257,13 @@ const Highlight = ({children, marks}: {children: string, marks?: Marks}) => {
 }
 
 
-// Load editor theme css
-export const loadTheme = () => config.get()
-  .then(({editor_theme}) => document.head.append(
+/** Load editor theme css */
+export async function init() {
+  const {editor_theme} = await config.get()
+  document.head.append(
     elem("link", {
       rel: "stylesheet",
       href: `themes/editor-${editor_theme || "bright"}.css`,
     }),
-  ))
+  )
+}

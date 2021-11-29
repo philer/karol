@@ -1,4 +1,4 @@
-import {Exception} from "../localization"
+import {Exception} from "../exception"
 import * as tokens from "./tokens"
 import {Call, Expression, RoutineDefinition, Sequence, Statement, textToAst} from "./parser"
 

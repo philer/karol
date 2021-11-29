@@ -1,39 +1,36 @@
 import * as config from "./config"
 import {flattenKeys} from "./util"
+import {keywordTokenTypes, setKeywords} from "./language/tokens"
 
-// const DATA_ATTRIBUTE_SUFFIX = "i18t"
 
 const INTERPOLATION_REGEX = /\{([^}]*?)\}/g
 
-let translations: Record<string, string>
+const BROWSER_LOCALE = navigator.language.split(/[_-]/)[0]
+
+
+let translations: Map<string, string>
 
 async function setLocales(locales: string[]) {
-  locales = Array.isArray(locales) ? locales : [locales]
-  if (locales.includes("auto")) {
-    const browserLocale = navigator.language.split(/[_-]/)[0]
-    locales = locales.map(locale => locale === "auto" ? browserLocale : locale)
-  }
-  locales = Array.from(new Set(locales.filter(Boolean)))
-  translations = Object.assign(Object.create(null), ...await Promise.all(
-    locales
-      .map(l => config.get(`localization/${l}.js`).then(flattenKeys))
-      .reverse(),
-  ))
+  const promises = Array.from(new Set(Array.isArray(locales) ? locales : [locales]))
+    .filter(Boolean)
+    .reverse()
+    .map(locale => locale.replace(/auto(?=-|$)/, BROWSER_LOCALE))
+    .map(locale => config.get(`localization/${locale}.js`))
+  const definitions = await Promise.all(promises)
+  translations = new Map(definitions.map(flattenKeys).flatMap(Object.entries))
 }
+
 
 /** Translate a language variable according to the configured locale. */
 export function translate(variable: string, ...values: any[]) {
-  if (!(variable in translations)) {
+  if (!translations.has(variable)) {
     console.warn(`Could not resolve localization variable ${variable}`)
     return variable
   }
-  const result = translations[variable]
-  if (typeof result === "string") {
-    return values.length ? interpolate(result, values) : result
-  } else {
-    return JSON.stringify(result)
-  }
+  const result = translations.get(variable) as string
+  return values.length ? interpolate(result, values) : result
 }
+
 
 /** Subsitute values into a string. Inspired by Python's str.format method. */
 function interpolate(string: string, values: any[]) {
@@ -47,23 +44,13 @@ function interpolate(string: string, values: any[]) {
   )
 }
 
-/**
- * Errors for our programming environment.
- * These do not inherit from JS's own Error as they do not need
- * to reveal details of the interpreter/runtime internals.
- *
- * Offers translation & interpolation.
- */
-export class Exception {
-  message: string
-  data: any[]
-  constructor(message: string, ...data: any[]) {
-    this.message = message
-    this.data = data
-  }
-  get translatedMessage(): string {
-    return translate(this.message, ...this.data)
-  }
-}
 
-export const init = () => config.get().then(cfg => setLocales(cfg.locale))
+/** Load translations */
+export async function init() {
+  const {locale} = await config.get()
+  await setLocales(locale)
+
+  setKeywords(new Map(
+    keywordTokenTypes.map(tt => [translate(`language.${tt}`), tt]),
+  ))
+}

@@ -2,9 +2,9 @@ import {h, render} from "preact"
 import {useContext, useEffect, useErrorBoundary, useState} from "preact/hooks"
 
 import "./global.css"
-import * as graphics from "./graphics"
+import {init as initGraphics} from "./graphics"
 import {init as initLocalization, translate as t} from "./localization"
-import * as editor from "./ui/Editor"
+import {init as initEditor} from "./ui/Editor"
 import {Main} from "./ui/Main"
 import {Logging, LoggingProvider} from "./ui/Logging"
 import {Translate} from "./ui/Translate"
@@ -15,9 +15,9 @@ import * as style from "./App.module.css"
 
 
 const initPromises = Promise.all([
-  graphics.init(),
+  initGraphics(),
+  initEditor(),
   initLocalization(),
-  editor.loadTheme(),
 ])
 
 

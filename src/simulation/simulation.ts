@@ -4,6 +4,17 @@ import type {World, WorldInteraction} from "./world"
 import {noop} from "../util"
 
 const commandNames: Record<string, keyof WorldInteraction> = {
+  // TODO set from localization
+  ...Object.fromEntries([
+    "turnLeft", "turnRight",
+    "isLookingAtEdge", "isNotLookingAtEdge",
+    "step", "stepBackwards",
+    "isLookingAtBlock", "isNotLookingAtBlock",
+    "placeBlock", "takeBlock",
+    "isOnMark", "isNotOnMark",
+    "placeMark", "takeMark",
+  ].map(command => [command.toLowerCase(), command])),
+
   linksdrehen: "turnLeft",
   rechtsdrehen: "turnRight",
 

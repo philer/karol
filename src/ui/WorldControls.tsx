@@ -2,7 +2,8 @@ import {Fragment, h} from "preact"
 import {useCallback, useContext, useEffect} from "preact/hooks"
 
 import {render} from "../graphics"
-import {Exception, translate as t} from "../localization"
+import {Exception} from "../exception"
+import {translate as t} from "../localization"
 import type {World, WorldInteraction} from "../simulation/world"
 import {Logging} from "./Logging"
 import {IconMinusCircle, IconPlay, IconPlusCircle, IconReply} from "./Icon"
@@ -45,7 +46,7 @@ export const WorldControls = ({world, disabled}: WorldControlsProps) => {
         render(world)
       } catch (err) {
         if (err instanceof Exception) {
-          log.error(err.translatedMessage)
+          log.error(err)
         } else {
           log.error(err.message)
           console.error(err)
