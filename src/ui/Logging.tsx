@@ -2,7 +2,7 @@ import {ComponentChild, ComponentChildren, createContext, h} from "preact"
 import {StateUpdater, useContext, useState} from "preact/hooks"
 
 import {Exception} from "../exception"
-import {translate as t} from "../localization"
+import {InterpolationData, translate as t} from "../localization"
 import {noop} from "../util"
 
 import style from "./Logging.module.css"
@@ -12,15 +12,15 @@ export type LogLevel = "info" | "error"
 
 export interface Message {
   level: LogLevel
-  message?: [string, ...(string|number)[]]
+  message?: [string, InterpolationData | undefined]
   child?: ComponentChild
   exception?: Exception
 }
 
 export interface Logger {
-  info(message: string, ...data: (string | number)[]): void
+  info(message: string, data?: InterpolationData): void
   info(child: ComponentChild): void
-  error(message: string, ...data: (string | number)[]): void
+  error(message: string, data?: InterpolationData): void
   error(exception: Exception): void
   error(child: ComponentChild): void
 }
@@ -28,21 +28,21 @@ export interface Logger {
 export class LoggerImpl implements Logger {
   _setMessages: StateUpdater<Message[]> = noop
 
-  log = (level: LogLevel, message: ComponentChild | Exception, ...data: any[]) =>
+  log = (level: LogLevel, message: ComponentChild | Exception, data?: InterpolationData) =>
     this._setMessages(messages => [
       ...messages,
       typeof message === "string"
-        ? {level, message: [message, ...data]}
+        ? {level, message: [message, data]}
         : message instanceof Exception
           ? {level, exception: message}
           : {level, child: message},
     ])
 
-  info = (message: ComponentChild, ...args: any[]) =>
-    this.log("info", message, ...args)
+  info = (message: ComponentChild, data?: InterpolationData) =>
+    this.log("info", message, data)
 
-  error = (message: ComponentChild | Exception, ...args: any[]) =>
-    this.log("error", message, ...args)
+  error = (message: ComponentChild | Exception, data?: InterpolationData) =>
+    this.log("error", message, data)
 }
 
 export const Logging = createContext<Logger>(new LoggerImpl())
@@ -78,7 +78,7 @@ export const LogOutput = () => {
         >
           {message
             ? t(...message)
-            : exception ? t(exception.message, ...exception.data) : child
+            : exception ? t(exception.message, exception.data) : child
           }
         </p>,
       )}

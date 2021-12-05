@@ -25,6 +25,7 @@ config({
     },
     runtime: {
       undefined: "Den Befehl '{identifier}' kenne ich nicht.",
+      cannot_overwrite_function: "Die Anweisung {identifier} gibt es schon.",
     },
     world: {
       move_out_of_world: "Ich kann nicht über den Rand meiner Welt laufen.",

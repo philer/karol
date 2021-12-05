@@ -33,11 +33,14 @@
   color: #ccc;
 }
 .token.keyword {
-  color: #06e;
+  color: #924;
   font-weight: bold;
 }
 .token.identifier {
-  color: #272;
+  color: #04e;
+}
+.token.identifier.builtin {
+  color: #171
 }
 .token.comment {
   color: #888;

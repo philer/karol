@@ -5,41 +5,39 @@ import "./global.css"
 import {init as initGraphics} from "./graphics"
 import {init as initLocalization, translate as t} from "./localization"
 import {init as initEditor} from "./ui/Editor"
+import {defaultSpec, load as loadSpec} from "./language/specification"
 import {Main} from "./ui/Main"
 import {Logging, LoggingProvider} from "./ui/Logging"
 import {Translate} from "./ui/Translate"
 import {IconCircleNotch} from "./ui/Icon"
 import {version} from "../package.json"
-
 import * as style from "./App.module.css"
 
 
-const initPromises = Promise.all([
-  initGraphics(),
-  initEditor(),
+const initPromises = [
+  loadSpec(),
   initLocalization(),
-])
+  initEditor(),
+  initGraphics(),
+] as const
 
 
 function App() {
+  const [spec, setSpec] = useState(defaultSpec)
   const [isLoading, setIsLoading] = useState(true)
-  const [hasError, setHasError] = useState(false)
+  const [error, setError] = useState<unknown>()
 
   useEffect(() => {
-    initPromises
-      .then(() => setIsLoading(false))
-      .catch(err => {
-        console.error(err)
-        setHasError(true)
-      })
+    Promise.all(initPromises)
+      .then(([spec]) => setSpec(spec))
+      .catch(setError)
+      .finally(() => setIsLoading(false))
   }, [])
 
-  useErrorBoundary(err => {
-    console.error(err)
-    setHasError(true)
-  })
+  useErrorBoundary(setError)
 
-  if (hasError) {
+  if (error) {
+    console.error(error)
     return (
       <div class={style.error}>
         <p>Looks like something went wrong. 🤔</p>
@@ -68,7 +66,7 @@ function App() {
   return (
     <LoggingProvider>
       <LogWelcome />
-      <Main />
+      <Main spec={spec} />
     </LoggingProvider>
   )
 }

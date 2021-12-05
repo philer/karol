@@ -2,6 +2,9 @@
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop = () => {}
 
+/** Return a single argument unchanged */
+export const identity = <T = unknown>(x: T) => x
+
 
 /** Turn an object into a valid CSS property list */
 export const css = (mapping: Record<string, string>) =>
@@ -57,6 +60,30 @@ export const flattenKeys = (obj: Record<string, any>) => {
   }
   return result
 }
+
+/**
+ * Apply a function to all key/value pairs in an object to create a new object.
+ *
+ * Example:
+ *     > mapObject((key, value) => [key.toUpperCase(), value * 10], {a: 1, b: 2})
+ *     {A: 10, B: 20}
+ */
+export const mapObject = <X extends Record<string, any>, Y extends Record<string, any>>(
+  fn: (key: keyof X, value: X[keyof X]) => [keyof Y, Y[keyof Y]],
+  obj: X,
+) =>
+    Object.fromEntries(Object.entries(obj).map(([key, value]) => fn(key, value)))
+
+
+/**
+ * Reverse keys and values of an object
+ *
+ * Example:
+ *     > flipObject({a: "foo", b: "bar"})
+ *     {foo: "a", bar: "b"}
+ */
+export const flipObject = (obj: Record<string, string>) =>
+  mapObject((key, value) => [value, key], obj)
 
 
 /** Join items with commas and a final word, e.g. "1, 2 and 3" */

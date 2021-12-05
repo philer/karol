@@ -1,13 +1,25 @@
-import {resolveUrl} from "./util"
+import {elem, resolveUrl} from "./util"
+
+export type Config = {
+  locale: string[]
+  tile_theme: string
+  player_theme: string
+  editor_theme: string
+  code: {
+    locales: string[]
+    caseSensitiveKeywords: boolean
+    caseSensitiveIdentifiers: boolean
+  },
+}
 
 /** Mapping of URLs to Promises, which will be resolved with data. */
 const promises: Record<string, Promise<any>> = Object.create(null)
 
 /** Mapping of URLs to the resolve function of each Promise. */
-const resolvers: Record<string, (data: any) => void> = Object.create(null)
+const resolvers: Record<string, (data: unknown) => void> = Object.create(null)
 
 declare global {
-  interface Window { config: <T = any>(data: T) => void }
+  interface Window { config: <T = unknown>(data: T) => void }
 }
 
 /**
@@ -24,20 +36,20 @@ window.config = function setConfigData(data) {
  *
  * TODO? validation
  */
-export function get<T = any>(url="config.js"): Promise<T> {
+export function get<T = Config>(url="config.js"): Promise<T> {
   url = resolveUrl(url)
   if (url in promises) {
     return promises[url]
   }
   return promises[url] = new Promise((resolve, reject) => {
-    const script = document.createElement("script")
+    const script = document.head.appendChild(elem("script", {
+      src: url,
+      onerror: reject,
+    }))
     resolvers[url] = data => {
       delete resolvers[url]
       resolve(data)
       script.remove()
     }
-    script.addEventListener("error", () => reject(`Failed to load '${url}'`))
-    script.src = url
-    document.head.appendChild(script)
   })
 }

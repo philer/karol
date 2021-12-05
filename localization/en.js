@@ -48,16 +48,34 @@ config({
     },
   },
   language: {
-    IF: "if",
-    THEN: "then",
-    ELSE: "else",
-    WHILE: "while",
-    DO: "do",
-    NOT: "not",
-    REPEAT: "repeat",
-    TIMES: "times",
-    PROGRAM: "program",
-    ROUTINE: "routine",
+    keywords: {
+      IF: ["if"],
+      THEN: ["then"],
+      ELSE: ["else"],
+      WHILE: ["while"],
+      DO: ["do"],
+      NOT: ["not"],
+      REPEAT: ["repeat"],
+      TIMES: ["times"],
+      PROGRAM: ["program"],
+      ROUTINE: ["routine"],
+    },
+    builtins: {
+      isLookingAtEdge: ["isEdge"],
+      isNotLookingAtEdge: ["notIsEdge"],
+      step: ["step"],
+      stepBackwards: ["stepBackwards"],
+      turnLeft: ["turnLeft"],
+      turnRight: ["turnRight"],
+      isLookingAtBlock: ["isBlock"],
+      isNotLookingAtBlock: ["notIsBlock"],
+      placeBlock: ["placeBlock"],
+      takeBlock: ["takeBlock"],
+      isOnMark: ["isOnMark"],
+      isNotOnMark: ["notIsOnMark"],
+      placeMark: ["placeMark"],
+      takeMark: ["takeMark"],
+    },
   },
   error: {
     browser_feature_not_available: "Your browser does not support his feature. Consider switch to an up-to-date browser.",
@@ -81,11 +99,13 @@ config({
     runtime: {
       undefined: "Runtime Error on line {line}: {identifier} is not defined.",
       max_recursion_depth_exceeded:
-        "Runtime Error: Maximum recursion depth ({}) exceeded.",
+        "Runtime Error: Maximum recursion depth ({depth}) exceeded.",
+      cannot_overwrite_function:
+        "Runtime Error: Can't overwrite existing function {identifier}.",
       unimplemented_statement_type:
-        "Runtime Error: Unimplemented statementtype {type}.",
+        "Runtime Error: Unimplemented statement type {type}.",
       unimplemented_expression_type:
-        "Runtime Error: Unimplemented expressiontype {type}.",
+        "Runtime Error: Unimplemented expression type {type}.",
     },
     world: {
       move_out_of_world: "Invalid move: out of world",

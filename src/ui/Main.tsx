@@ -7,6 +7,7 @@ import {run} from "../simulation/simulation"
 import {World} from "../simulation/world"
 import {Logging} from "./Logging"
 import {Editor} from "./Editor"
+import type {LanguageSpecification} from "../language/specification"
 import type {Marks} from "../language/highlight"
 import {ResizeLayout, ResizePanel} from "./ResizeLayout"
 import {WorldPanel} from "./WorldPanel"
@@ -30,7 +31,7 @@ const MAX_SPEED = 2.5
 const calculateDelay = (speed: number) => Math.pow(10, 4 - speed)
 
 
-export const Main = () => {
+export const Main = ({spec}: {spec: LanguageSpecification}) => {
   const log = useContext(Logging)
   const [code, setCode] = useState("")
   const [editorMarks, setEditorMarks] = useState<Marks>({})
@@ -68,6 +69,7 @@ export const Main = () => {
     try {
       const simulation = run({
         code,
+        spec,
         world,
         delay: calculateDelay(speed),
         onExecute: ({line}) => setEditorMarks({[line]: "current"}),
@@ -81,7 +83,9 @@ export const Main = () => {
     } catch (err) {
       if (err instanceof Exception) {
         log.error(err)
-        setEditorMarks({[err.data[0].line]: "error"})
+        if (typeof err.data?.line === "number") {
+          setEditorMarks({[err.data.line]: "error"})
+        }
       } else {
         log.error(err.message)
         console.error(err)
@@ -139,6 +143,7 @@ export const Main = () => {
           <Editor
             class={style.editor}
             onChange={updateCode}
+            languageSpec={spec}
             marks={editorMarks}
           >{code}</Editor>
 

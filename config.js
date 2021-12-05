@@ -10,4 +10,13 @@ config({
 
   // options: "bright", "monokai"
   editor_theme: "monokai",
+
+  // programming language configuration
+  code: {
+    // translations for keywords and builtins
+    // unlike for UI locales, all listed languages are added
+    locales: ["en", "de"],
+    caseSensitiveKeywords: false,
+    caseSensitiveIdentifiers: false,
+  },
 })

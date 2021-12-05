@@ -11,11 +11,6 @@ import * as config from "./config"
 import * as noise from "./util/perlin"
 import type {World} from "./simulation/world"
 
-interface Config {
-  tile_theme: string
-  player_theme: string
-}
-
 export type TileSpriteName =
   | "floor"
   | "block"
@@ -205,7 +200,7 @@ function loadImage(path: string): Promise<HTMLImageElement> {
 
 
 /** Load sprite theme including fallbacks */
-async function initSprites({tile_theme, player_theme}: Config) {
+async function initSprites({tile_theme, player_theme}: config.Config) {
   const tileThemeDir = tile_theme
   const playerThemeDir = player_theme || tile_theme
 
@@ -316,4 +311,4 @@ function _render({width, length, height, player, tiles, seed}: World) {
 }
 
 /** Initialize the module. Loads graphics. */
-export const init = () => config.get<Config>().then(initSprites)
+export const init = () => config.get().then(initSprites)

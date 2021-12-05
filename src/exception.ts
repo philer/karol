@@ -5,8 +5,8 @@
  */
 export class Exception {
   message: string
-  data: any[]
-  constructor(message: string, ...data: any[]) {
+  data?: Record<string, any>
+  constructor(message: string, data?: Record<string, any>) {
     this.message = message
     this.data = data
   }

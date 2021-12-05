@@ -45,16 +45,34 @@ config({
     },
   },
   language: {
-    IF: "wenn",
-    THEN: "dann",
-    ELSE: "sonst",
-    WHILE: "solange",
-    DO: "tue",
-    NOT: "nicht",
-    REPEAT: "wiederhole",
-    TIMES: "mal",
-    PROGRAM: "programm",
-    ROUTINE: "anweisung",
+    keywords: {
+      IF: ["wenn"],
+      THEN: ["dann"],
+      ELSE: ["sonst"],
+      WHILE: ["solange"],
+      DO: ["tue"],
+      NOT: ["nicht"],
+      REPEAT: ["wiederhole"],
+      TIMES: ["mal"],
+      PROGRAM: ["programm"],
+      ROUTINE: ["anweisung"],
+    },
+    builtins: {
+      isLookingAtEdge: ["istWand"],
+      isNotLookingAtEdge: ["nichtIstWand"],
+      step: ["schritt"],
+      stepBackwards: ["schrittZurück", "schrittZurueck"],
+      turnLeft: ["linksDrehen"],
+      turnRight: ["rechtsDrehen"],
+      isLookingAtBlock: ["istZiegel"],
+      isNotLookingAtBlock: ["nichtIstZiegel"],
+      placeBlock: ["hinlegen"],
+      takeBlock: ["aufheben"],
+      isOnMark: ["istMarke"],
+      isNotOnMark: ["nichtIstMarke"],
+      placeMark: ["markeSetzen"],
+      takeMark: ["markeLöschen", "markeLoeschen"],
+    },
   },
   error: {
     browser_feature_not_available: "Der Browser ist veraltet und unterstützt diese Funktionalität nicht.",
@@ -78,7 +96,9 @@ config({
     runtime: {
       undefined: "Laufzeit-Fehler in Zeile {line}: {identifier} nicht definiert.",
       max_recursion_depth_exceeded:
-        "Laufzeit-Fehler: Maximales Rekursionstiefe ({}) überschritten.",
+        "Laufzeit-Fehler: Maximales Rekursionstiefe ({depth}) überschritten.",
+      cannot_overwrite_function:
+        "Laufzeit-Fehler: Die Anweisung {identifier} kann nicht überschrieben werden.",
       unimplemented_statement_type:
         "Laufzeit-Fehler: Nicht implementierter Anweisungstyp {type}.",
       unimplemented_expression_type:

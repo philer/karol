@@ -1,7 +1,7 @@
 import {rand} from "../util"
 import {Exception} from "../exception"
 
-export interface WorldInteraction {
+export interface Builtins {
   isLookingAtEdge: () => boolean
   isNotLookingAtEdge: () => boolean
   step: (count?: number) => void
@@ -37,7 +37,7 @@ export interface Tile {
 export const checkKdwFormat = (str: string) =>
   /^\w+(?:\s+\d+){6}(?:\s+\w)*\s*$/.test(str)
 
-export class World implements WorldInteraction {
+export class World implements Builtins {
   width: number
   length: number
   height: number

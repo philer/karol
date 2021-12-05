@@ -1,9 +1,10 @@
 import {Exception} from "../exception"
 import {commaList} from "../util"
 import {translate} from "../localization"
-import * as tokens from "./tokens"
+import {Token, tokenize} from "./tokenize"
+import type {LanguageSpecification, TokenType} from "./specification"
 // eslint-disable-next-line no-duplicate-imports
-import {Token, TokenType, tokenTypeToLiteral, tokenize} from "./tokens"
+import {symbolToTokenType, TokenType as tt} from "./specification"
 
 
 export interface AbstractStatement {
@@ -69,11 +70,13 @@ export type Sequence = Statement[]
 
 export class Parser {
   tokens: Iterator<Token>
+  spec: LanguageSpecification
   currentToken: Token
   depth: number
 
-  constructor(tokens: Iterator<Token>) {
+  constructor(tokens: Iterator<Token>, spec: LanguageSpecification) {
     this.tokens = tokens
+    this.spec = spec
     this.depth = 0
     this.forward()
   }
@@ -88,7 +91,7 @@ export class Parser {
       this.forward()
       return type
     } else {
-      throw error("error.parser.unexpected_token_instead", this.currentToken, types)
+      throw this.error("error.parser.unexpected_token_instead", types)
     }
   }
 
@@ -107,47 +110,47 @@ export class Parser {
       this.forward()
       return value
     }
-    throw error("error.parser.unexpected_token_instead", this.currentToken, types)
+    throw this.error("error.parser.unexpected_token_instead", types)
   }
 
   readExpression(): Expression {
     const {line} = this.currentToken
     switch (this.currentToken.type) {
-      case tokens.IDENTIFIER: {
+      case tt.IDENTIFIER: {
         return this.readCall()
       }
 
-      case tokens.INTEGER: {
+      case tt.INTEGER: {
         const value = +this.currentToken.value
         this.forward()
-        return {type: tokens.INTEGER, line, value}
+        return {type: tt.INTEGER, line, value}
       }
 
-      case tokens.NOT: {
+      case tt.NOT: {
         this.forward()
-        return {type: tokens.NOT, line, expression: this.readExpression()}
+        return {type: tt.NOT, line, expression: this.readExpression()}
       }
 
-      case tokens.LPAREN: {
+      case tt.LPAREN: {
         const expr = this.readExpression()
-        this.eat(tokens.RPAREN)
+        this.eat(tt.RPAREN)
         return expr
       }
     }
-    throw error("error.parser.unexpected_token", this.currentToken)
+    throw this.error("error.parser.unexpected_token")
   }
 
   readCall(): Call {
     const call = {
-      type: tokens.IDENTIFIER,
+      type: tt.IDENTIFIER,
       line: this.currentToken.line,
       identifier: this.currentToken.value,
       arguments: [] as Expression[],
     }
     this.forward()
-    if (this.maybeEat(tokens.LPAREN) && !this.maybeEat(tokens.RPAREN)) {
+    if (this.maybeEat(tt.LPAREN) && !this.maybeEat(tt.RPAREN)) {
       call.arguments.push(this.readExpression())
-      while (this.eat(tokens.RPAREN, tokens.COMMA) === tokens.COMMA) {
+      while (this.eat(tt.RPAREN, tt.COMMA) === tt.COMMA) {
         call.arguments.push(this.readExpression())
       }
     }
@@ -167,106 +170,113 @@ export class Parser {
   readStatement(): Statement {
     const {type, line} = this.currentToken
     switch (type) {
-      case tokens.IDENTIFIER: {
+      case tt.IDENTIFIER: {
         return this.readCall()
       }
 
-      case tokens.IF: {
+      case tt.IF: {
         this.forward()
         const condition = this.readExpression()
-        this.eat(tokens.THEN)
-        const sequence = this.readSequence(tokens.ELSE, tokens.ASTERISC)
+        this.eat(tt.THEN)
+        const sequence = this.readSequence(tt.ELSE, tt.ASTERISC)
         const statement: IfStatement = {type, line, condition, sequence}
-        if (this.currentToken.type === tokens.ELSE) {
+        if (this.currentToken.type === tt.ELSE) {
           this.forward()
-          statement.alternative = this.readSequence(tokens.ASTERISC)
+          statement.alternative = this.readSequence(tt.ASTERISC)
         }
-        this.eat(tokens.ASTERISC)
-        this.eat(tokens.IF)
+        this.eat(tt.ASTERISC)
+        this.eat(tt.IF)
         return statement
       }
 
-      case tokens.WHILE: {
+      case tt.WHILE: {
         this.forward()
         const condition = this.readExpression()
-        this.eat(tokens.DO)
-        const sequence = this.readSequence(tokens.ASTERISC)
-        this.eat(tokens.ASTERISC)
-        this.eat(tokens.WHILE)
+        this.eat(tt.DO)
+        const sequence = this.readSequence(tt.ASTERISC)
+        this.eat(tt.ASTERISC)
+        this.eat(tt.WHILE)
         return {type, line, condition, sequence}
       }
 
-      case tokens.REPEAT: {
-        const type: "REPEAT" | "WHILE" = tokens.REPEAT
+      case tt.REPEAT: {
+        const type: "REPEAT" | "WHILE" = tt.REPEAT
         let statement: WhileStatement | RepeatStatement
         this.forward()
-        if (this.currentToken.type === tokens.WHILE) {
+        if (this.currentToken.type === tt.WHILE) {
           this.forward()
           statement = {
-            type: tokens.WHILE,
+            type: tt.WHILE,
             line,
             condition: this.readExpression(),
-            sequence: this.readSequence(tokens.ASTERISC),
+            sequence: this.readSequence(tt.ASTERISC),
           }
         } else {
           const count = this.readExpression()
-          this.eat(tokens.TIMES)
-          statement = {type, line, count, sequence: this.readSequence(tokens.ASTERISC)}
+          this.eat(tt.TIMES)
+          statement = {type, line, count, sequence: this.readSequence(tt.ASTERISC)}
         }
-        this.eat(tokens.ASTERISC)
-        this.eat(tokens.REPEAT)
+        this.eat(tt.ASTERISC)
+        this.eat(tt.REPEAT)
         return statement
       }
 
-      case tokens.PROGRAM: {
+      case tt.PROGRAM: {
         if (this.depth > 1) {
-          throw error("error.parser.nested_program_definition", this.currentToken)
+          throw this.error("error.parser.nested_program_definition")
         }
         this.forward()
-        const sequence = this.readSequence(tokens.ASTERISC)
-        this.eat(tokens.ASTERISC)
-        this.eat(tokens.PROGRAM)
+        const sequence = this.readSequence(tt.ASTERISC)
+        this.eat(tt.ASTERISC)
+        this.eat(tt.PROGRAM)
         return {type, line, sequence}
       }
 
-      case tokens.ROUTINE: {
+      case tt.ROUTINE: {
         if (this.depth > 1) {
-          throw error("error.parser.nested_program_definition", this.currentToken)
+          throw this.error("error.parser.nested_routine_definition")
         }
         this.forward()
-        const identifier = this.readToken(tokens.IDENTIFIER)
+        const identifier = this.readToken(tt.IDENTIFIER)
         const argNames = []
-        if (this.maybeEat(tokens.LPAREN) && !this.maybeEat(tokens.RPAREN)) {
-          argNames.push(this.readToken(tokens.IDENTIFIER))
-          while (this.eat(tokens.RPAREN, tokens.COMMA) === tokens.COMMA) {
-            argNames.push(this.readToken(tokens.IDENTIFIER))
+        if (this.maybeEat(tt.LPAREN) && !this.maybeEat(tt.RPAREN)) {
+          argNames.push(this.readToken(tt.IDENTIFIER))
+          while (this.eat(tt.RPAREN, tt.COMMA) === tt.COMMA) {
+            argNames.push(this.readToken(tt.IDENTIFIER))
           }
         }
-        const sequence = this.readSequence(tokens.ASTERISC)
-        this.eat(tokens.ASTERISC)
-        this.eat(tokens.ROUTINE)
+        const sequence = this.readSequence(tt.ASTERISC)
+        this.eat(tt.ASTERISC)
+        this.eat(tt.ROUTINE)
         return {type, line, identifier, argNames, sequence}
       }
     }
-    throw error("error.parser.unexpected_token", this.currentToken)
+    throw this.error("error.parser.unexpected_token")
   }
-}
 
+  error(key: string, expected: TokenType[] = []) {
+    if (this.currentToken.type === tt.EOF) {
+      key = expected.length
+        ? "error.parser.unexpected_eof_instead"
+        : "error.parser.unexpected_eof"
+    }
 
-function error(key: string, token: Token, expected: TokenType[] = []) {
-  if (token.type === tokens.EOF) {
-    key = expected.length ? "error.parser.unexpected_eof_instead" : "error.parser.unexpected_eof"
+    // reverse lookup of expected TokenTypes for helpful error messages
+    const tokenTypeToLiteral = Object.fromEntries(
+      Object.entries({...this.spec.keywords, ...symbolToTokenType})
+        .map(([literal, tt]) => [tt, literal]),
+    )
+    return new Exception(key, {
+      ...this.currentToken,
+      expected: commaList(
+        expected.map(tt => `'${tokenTypeToLiteral[tt] || tt}'`),
+        ` ${translate("or")} `,
+      ),
+    })
   }
-  return new Exception(key, {
-    ...token,
-    expected: commaList(
-      expected.map(tt => `'${tokenTypeToLiteral.get(tt) || tt}'`),
-      ` ${translate("or")} `,
-    ),
-  })
 }
 
 
 /** Convenience funtion turns code into an abstract syntax tree. */
-export const textToAst = (text: string) =>
-  new Parser(tokenize(text)).readSequence(tokens.EOF)
+export const textToAst = (text: string, spec: LanguageSpecification) =>
+  new Parser(tokenize(text, spec), spec).readSequence(tt.EOF)

@@ -1,5 +1,5 @@
 import {Exception} from "../exception"
-import * as tokens from "./tokens"
+import {LanguageSpecification, TokenType as tt} from "./specification"
 import {Call, Expression, RoutineDefinition, Sequence, Statement, textToAst} from "./parser"
 
 const MAX_RECURSION_DEPTH = 100
@@ -21,6 +21,11 @@ interface Builtin {
 
 type SymbolTable = Record<string, Builtin | RoutineDefinition | Value>
 
+type Context = LanguageSpecification & {
+  symbols: SymbolTable
+  depth: number
+}
+
 const checkBuiltin = (symbol: any): symbol is Builtin => symbol.isBuiltin
 
 
@@ -30,61 +35,67 @@ const checkBuiltin = (symbol: any): symbol is Builtin => symbol.isBuiltin
  * yield actions for each step that may be executed
  * in their own time by a RunTime.
  */
-export function run(code: string, builtins: string[]) {
-  const ast = textToAst(code)
+export function run(code: string, spec: LanguageSpecification) {
+  const ast = textToAst(code, spec)
   const symbols: SymbolTable = Object.create(null)
-  for (const identifier of builtins) {
+  for (const identifier of Object.keys(spec.builtins)) {
     symbols[identifier] = {identifier, isBuiltin: true}
   }
-  return visitSequence(ast, symbols, 0)
+  return visitSequence(ast, {...spec, symbols, depth: 0})
 }
 
-function* visitSequence(sequence: Sequence, symbols: SymbolTable, depth: number): BuiltinCalls {
+function* visitSequence(sequence: Sequence, context: Context): BuiltinCalls {
   let result
   for (const statement of sequence) {
-    result = yield* visitStatement(statement, symbols, depth)
+    result = yield* visitStatement(statement, context)
   }
   return result
 }
 
-function* visitStatement(statement: Statement, symbols: SymbolTable, depth: number): BuiltinCalls {
+function* visitStatement(statement: Statement, context: Context): BuiltinCalls {
   switch (statement.type) {
-    case tokens.IDENTIFIER:
-      return yield* call(statement, symbols, depth)
+    case tt.IDENTIFIER:
+      return yield* call(statement, context)
 
-    case tokens.IF:
-      if (yield* visitExpression(statement.condition, symbols, depth)) {
-        return yield* visitSequence(statement.sequence, symbols, depth)
+    case tt.IF:
+      if (yield* visitExpression(statement.condition, context)) {
+        return yield* visitSequence(statement.sequence, context)
       } else if (statement.alternative) {
-        return yield* visitSequence(statement.alternative, symbols, depth)
+        return yield* visitSequence(statement.alternative, context)
       }
       return
 
-    case tokens.WHILE: {
+    case tt.WHILE: {
       let result
-      while (yield* visitExpression(statement.condition, symbols, depth)) {
-        result = yield* visitSequence(statement.sequence, symbols, depth)
+      while (yield* visitExpression(statement.condition, context)) {
+        result = yield* visitSequence(statement.sequence, context)
       }
       return result
     }
 
-    case tokens.REPEAT: {
+    case tt.REPEAT: {
       // There is currently nothing in the language that could change the
       // result of the limit expression while the loop is running.
-      const count = (yield* visitExpression(statement.count, symbols, depth)) as number
+      const count = (yield* visitExpression(statement.count, context)) as number
       let result
       for (let i = 0 ; i < count ; i++) {
-        result = yield* visitSequence(statement.sequence, symbols, depth)
+        result = yield* visitSequence(statement.sequence, context)
       }
       return result
     }
 
-    case tokens.PROGRAM:
-      return yield* visitSequence(statement.sequence, symbols, depth)
+    case tt.PROGRAM:
+      return yield* visitSequence(statement.sequence, context)
 
-    case tokens.ROUTINE:
-      symbols[statement.identifier.toLowerCase()] = statement
-      break
+    case tt.ROUTINE: {
+      const {symbols, normalizeIdentifier} = context
+      const identifier = normalizeIdentifier(statement.identifier)
+      if (identifier in symbols) {
+        throw new Exception("error.runtime.cannot_overwrite_function", {identifier})
+      }
+      symbols[identifier] = statement
+      return
+    }
 
     default:
       throw new Exception("error.runtime.unimplemented_statement_type",
@@ -93,17 +104,17 @@ function* visitStatement(statement: Statement, symbols: SymbolTable, depth: numb
   }
 }
 
-function* visitExpression(expression: Expression, symbols: SymbolTable, depth: number): BuiltinCalls {
+function* visitExpression(expression: Expression, context: Context): BuiltinCalls {
   switch (expression.type) {
-    case tokens.INTEGER:
+    case tt.INTEGER:
       return +expression.value
 
-    case tokens.IDENTIFIER: {
-      return yield* call(expression, symbols, depth)
+    case tt.IDENTIFIER: {
+      return yield* call(expression, context)
     }
 
-    case tokens.NOT:
-      return ! (yield* visitExpression(expression.expression, symbols, depth))
+    case tt.NOT:
+      return ! (yield* visitExpression(expression.expression, context))
 
     default:
       throw new Exception("error.runtime.unimplemented_expression_type",
@@ -113,13 +124,13 @@ function* visitExpression(expression: Expression, symbols: SymbolTable, depth: n
 }
 
 /** Call a builtin or user defined routine. */
-function* call(call: Call, symbols: SymbolTable, depth: number): BuiltinCalls {
+function* call(call: Call, context: Context): BuiltinCalls {
+  const {depth, symbols, normalizeIdentifier} = context
   if (depth > MAX_RECURSION_DEPTH) {
-    throw new Exception("error.runtime.max_recursion_depth_exceeded",
-      MAX_RECURSION_DEPTH)
+    throw new Exception("error.runtime.max_recursion_depth_exceeded", {depth})
   }
 
-  const identifier = call.identifier.toLowerCase()
+  const identifier = normalizeIdentifier(call.identifier)
   if (!(identifier in symbols)) {
     throw new Exception("error.runtime.undefined",
       {identifier, line: call.line})
@@ -133,7 +144,7 @@ function* call(call: Call, symbols: SymbolTable, depth: number): BuiltinCalls {
   const args: Value[] = []
   for (const arg of call.arguments) {
     // Note that results can be undefined - The language is _not_ type safe.
-    args.push(yield* visitExpression(arg, symbols, depth))
+    args.push(yield* visitExpression(arg, context))
   }
 
   if (checkBuiltin(routine)) {
@@ -146,5 +157,9 @@ function* call(call: Call, symbols: SymbolTable, depth: number): BuiltinCalls {
   for (let i = 0, len = routine.argNames.length ; i < len ; ++i) {
     localSymbols[routine.argNames[i]] = args[i]
   }
-  return yield* visitSequence(routine.sequence, localSymbols, depth + 1)
+  return yield* visitSequence(routine.sequence, {
+    ...context,
+    symbols: localSymbols,
+    depth: depth + 1,
+  })
 }

@@ -25,6 +25,7 @@ config({
     },
     runtime: {
       undefined: "I don't know the command '{identifier}'.",
+      cannot_overwrite_function: "The routine {identifier} already exists.",
     },
     world: {
       move_out_of_world: "I can't walk over the edge of my world.",

@@ -1,50 +1,19 @@
+import {LanguageSpecification} from "../language/specification"
 import {BuiltinCall, Value, run as runInterpreter} from "../language/interpreter"
 import {render} from "../graphics"
-import type {World, WorldInteraction} from "./world"
+import type {World} from "./world"
 import {noop} from "../util"
-
-const commandNames: Record<string, keyof WorldInteraction> = {
-  // TODO set from localization
-  ...Object.fromEntries([
-    "turnLeft", "turnRight",
-    "isLookingAtEdge", "isNotLookingAtEdge",
-    "step", "stepBackwards",
-    "isLookingAtBlock", "isNotLookingAtBlock",
-    "placeBlock", "takeBlock",
-    "isOnMark", "isNotOnMark",
-    "placeMark", "takeMark",
-  ].map(command => [command.toLowerCase(), command])),
-
-  linksdrehen: "turnLeft",
-  rechtsdrehen: "turnRight",
-
-  istwand: "isLookingAtEdge",
-  nichtistwand: "isNotLookingAtEdge",
-  schritt: "step",
-  schrittzurück: "stepBackwards",
-  schrittzurueck: "stepBackwards",
-
-  istziegel: "isLookingAtBlock",
-  nichtistziegel: "isNotLookingAtBlock",
-  hinlegen: "placeBlock",
-  aufheben: "takeBlock",
-
-  istmarke: "isOnMark",
-  nichtistmarke: "isNotOnMark",
-  markesetzen: "placeMark",
-  markelöschen: "takeMark",
-  markeloeschen: "takeMark",
-}
 
 export interface RunProps {
   code: string
-  delay: number
+  spec: LanguageSpecification
   world: World
+  delay: number
   onExecute: (call: BuiltinCall) => void
 }
 
 export function run(props: RunProps) {
-  const {code, world, onExecute = noop} = props
+  const {code, spec, world, onExecute = noop} = props
   let {delay = 200} = props
 
   let setFinished: (value?: never) => void
@@ -58,7 +27,7 @@ export function run(props: RunProps) {
   let timeoutId: number
   let result: Value
 
-  const gen = runInterpreter(code, Object.keys(commandNames))
+  const gen = runInterpreter(code, spec)
 
   function tick() {
     try {
@@ -68,7 +37,7 @@ export function run(props: RunProps) {
       }
       onExecute(value)
       const {identifier, args} = value
-      result = world[commandNames[identifier]](...args as any) as Value
+      result = world[spec.builtins[identifier]](...args as any) as Value
       if (result === undefined) {
         render(world)
       }

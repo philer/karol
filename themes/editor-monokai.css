@@ -33,14 +33,14 @@
   color: #575852;
 }
 .token.keyword {
-  color: #f92672; /* red-ish */
+  color: #f92672;
   font-weight: normal;
 }
 .token.identifier {
-  color: #a6e22e; /* green */
+  color: #66d9ef;
 }
 .token.identifier.builtin {
-  color: #66d9ef;
+  color: #a6e22e;
 }
 .token.comment {
   color: #75715e;
@@ -49,9 +49,9 @@
   color: #474842;
 }
 .token.punctuation {
-  color: #f8f8f2; /* white */
+  color: #f8f8f2;
 }
 .token.boolean,
 .token.number {
-  color: #ae81ff; /* purple */
+  color: #ae81ff;
 }

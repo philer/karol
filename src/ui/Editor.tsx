@@ -4,6 +4,7 @@ import {useEffect, useMemo, useRef, useState} from "preact/hooks"
 import * as config from "../config"
 import {clsx, elem, noop} from "../util"
 import {Marks, highlight} from "../language/highlight"
+import {LanguageSpecification} from "../language/specification"
 import type {ChangeEvent} from "../util/types"
 
 import * as style from "./Editor.module.css"
@@ -18,6 +19,7 @@ const TEXTAREA_UPDATE_DELAY = 5
 
 export interface EditorProps {
   children: string
+  languageSpec: LanguageSpecification
   indentation?: string
   onChange?: (text: string) => void
   marks?: Marks
@@ -32,6 +34,7 @@ interface Selection {
 
 export const Editor = ({
   children = "",
+  languageSpec,
   indentation = "    ",
   onChange = noop,
   marks,
@@ -194,7 +197,7 @@ export const Editor = ({
     <div class={clsx("editor", class_, style.root)}>
       <div class={style.scrollbox}>
         <div>
-          <Highlight marks={marks}>{value}</Highlight>
+          <Highlight spec={languageSpec} marks={marks}>{value}</Highlight>
 
           <textarea
             ref={textareaRef}
@@ -236,8 +239,14 @@ export const Editor = ({
 }
 
 
+type HighlightProps = {
+  children: string,
+  spec: LanguageSpecification
+  marks?: Marks
+}
+
 /** Use a separate component to gain automatic memoization */
-const Highlight = ({children, marks}: {children: string, marks?: Marks}) => {
+const Highlight = ({children, spec, marks}: HighlightProps) => {
   const codeRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -251,7 +260,7 @@ const Highlight = ({children, marks}: {children: string, marks?: Marks}) => {
     <code
       ref={codeRef}
       class={clsx("highlight", style.highlight)}
-      dangerouslySetInnerHTML={{__html: highlight(children, marks)}}
+      dangerouslySetInnerHTML={{__html: highlight(children, spec, marks)}}
     />
   )
 }
