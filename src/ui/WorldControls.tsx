@@ -10,7 +10,7 @@ import {IconMinusCircle, IconPlay, IconPlusCircle, IconReply} from "./Icon"
 import {Sprite} from "./Sprite"
 import {Tooltip} from "./Tooltip"
 
-import * as style from "./WorldControls.module.css"
+import * as classes from "./WorldControls.module.scss"
 
 const keyMap: Record<string, keyof Builtins> = {
   ArrowUp: "step",
@@ -78,60 +78,60 @@ export const WorldControls = ({world, disabled}: WorldControlsProps) => {
 
   return (
     <>
-      <div class={style.itemControls}>
+      <div class={classes.itemControls}>
         <Tooltip left tip={t("world.action.placeBlock")}>
           <button
-            class={style.button}
+            class={classes.button}
             onClick={callBuiltin("placeBlock")}
             disabled={disabled}
           ><Sprite block /><IconPlusCircle sm /></button>
         </Tooltip>
         <Tooltip left tip={t("world.action.takeBlock")}>
           <button
-            class={style.button}
+            class={classes.button}
             onClick={callBuiltin("takeBlock")}
             disabled={disabled}
           ><Sprite block /><IconMinusCircle sm /></button>
         </Tooltip>
         <Tooltip left tip={t("world.action.placeMark")}>
           <button
-            class={style.button}
+            class={classes.button}
             onClick={callBuiltin("placeMark")}
             disabled={disabled}
           ><Sprite mark /><IconPlusCircle sm /></button>
         </Tooltip>
         <Tooltip left tip={t("world.action.takeMark")}>
           <button
-            class={style.button}
+            class={classes.button}
             onClick={callBuiltin("takeMark")}
             disabled={disabled}
           ><Sprite mark /><IconMinusCircle sm /></button>
         </Tooltip>
       </div>
-      <div class={style.movementControls}>
+      <div class={classes.movementControls}>
         <Tooltip left tip={t("world.action.turnLeft")}>
           <button
-            class={style.button}
+            class={classes.button}
             onClick={callBuiltin("turnLeft")}
             disabled={disabled}
           ><IconReply /></button></Tooltip>
         <div>
           <Tooltip above tip={t("world.action.step")}>
             <button
-              class={style.button}
+              class={classes.button}
               onClick={callBuiltin("step")}
               disabled={disabled}
             ><IconPlay transform={{rotate: 270}} /></button></Tooltip>
           <Tooltip below tip={t("world.action.stepBackwards")}>
             <button
-              class={style.button}
+              class={classes.button}
               onClick={callBuiltin("stepBackwards")}
               disabled={disabled}
             ><IconPlay transform={{rotate: 90}} /></button></Tooltip>
         </div>
         <Tooltip left tip={t("world.action.turnRight")}>
           <button
-            class={style.button}
+            class={classes.button}
             onClick={callBuiltin("turnRight")}
             disabled={disabled}
           ><IconReply transform={{flipX: true}} /></button></Tooltip>

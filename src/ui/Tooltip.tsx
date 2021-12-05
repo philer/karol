@@ -2,7 +2,7 @@ import {ComponentChild, VNode, cloneElement, h, toChildArray} from "preact"
 
 import {clsx} from "../util"
 
-import style from "./Tooltip.module.css"
+import * as classes from "./Tooltip.module.css"
 
 export type Direction = "above" | "below" | "left" | "right"
 
@@ -16,8 +16,8 @@ export const Tooltip = ({children, tip, ...rest}: TooltipProps) => {
   const direction = directionEntry ? directionEntry[0] as Direction : "below"
   return cloneElement(
     children,
-    {class: clsx(style.wrapper, children.props.class)},
+    {class: clsx(classes.wrapper, children.props.class)},
     ...toChildArray(children.props.children),
-    <span class={`${style.tooltip} ${style[direction]}`}>{tip}</span>,
+    <span class={clsx(classes.tooltip, classes[direction])}>{tip}</span>,
   )
 }

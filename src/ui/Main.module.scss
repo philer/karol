@@ -1,0 +1,64 @@
+.panel {
+  padding: .5em;
+  min-width: 300px;
+
+  > header {
+    display: flex;
+    align-items: center;
+    padding: 0 .25em;
+    color: #444;
+    text-shadow: 1px 1px 0 white;
+
+    > h2 {
+      margin: 0;
+      padding: 0 .5em;
+      font-weight: normal;
+      display: inline-block;
+    }
+
+    &::before, &::after {
+      content: "";
+      display: inline-block;
+      vertical-align: middle;
+      border: 1px solid white;
+      border-color: #ddd white white #ddd;
+    }
+    &::before {
+      width: 2em;
+    }
+    &::after {
+      flex: 1;
+    }
+  }
+}
+
+.panelInner {
+  margin-top: .5em;
+
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, .1),
+              0 0 2px rgba(0, 0, 0, .1);
+}
+
+.editor {
+  flex: 1 1 auto;
+}
+
+.runButton {
+  font-weight: bold;
+  width: 9em;
+  min-width: 9em;
+  max-width: 9em;
+  flex: 9em 0 0; /* width = 3x .iconButton */
+}
+
+.runControls {
+  display: flex;
+}

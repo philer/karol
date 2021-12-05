@@ -5,6 +5,7 @@
   line-height: 1.25em;
   font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
+
 .scrollbox {
   overflow: auto;
   position: absolute;
@@ -13,11 +14,13 @@
   height: 100%;
   width: 100%;
   background: inherit;
+
+  > div {
+    position: relative;
+    min-height: 100%;
+  }
 }
-.scrollbox > div {
-  position: relative;
-  min-height: 100%;
-}
+
 .textarea,
 .highlight,
 .caretLayer
@@ -89,38 +92,41 @@
 }
 
 
-.highlight :global(.line) {
-  display: flex;
-  border-radius: 2px;
-}
-.highlight :global(.lineno) {
-  position: relative;
-  flex: 0 0 4.5ch;
-  padding-right: 1.5ch;
-  margin-right: .5ch;
-  border-right: 1px solid #ddd;
-  text-align: right;
-  color: grey;
-}
-.highlight :global(.line:not(.current, .error)) {
-  transition: .1s background, .1s box-shadow;
-}
-.highlight :global(.marked .lineno::after) {
-  position: absolute;
-  right: 0;
-  font-size: 1.3em;
-}
-.highlight :global(.current .lineno::after) {
-  content: "➡";
-}
-.highlight :global(.error .lineno::after) {
-  content: "✕";
-  color: red;
-}
-.highlight :global(.line-content .error),
-.highlight :global(.error .line-content span) {
-  text-decoration: wavy underline #f00a;
-}
-.highlight :global(.error .line-content .whitespace) {
-  text-decoration: none;
+// :global styles to be overwritten by editor themes
+.highlight {
+  :global(.line) {
+    display: flex;
+    border-radius: 2px;
+  }
+  :global(.lineno) {
+    position: relative;
+    flex: 0 0 4.5ch;
+    padding-right: 1.5ch;
+    margin-right: .5ch;
+    border-right: 1px solid #ddd;
+    text-align: right;
+    color: grey;
+  }
+  :global(.line:not(.current, .error)) {
+    transition: .1s background, .1s box-shadow;
+  }
+  :global(.marked .lineno::after) {
+    position: absolute;
+    right: 0;
+    font-size: 1.3em;
+  }
+  :global(.current .lineno::after) {
+    content: "➡";
+  }
+  :global(.error .lineno::after) {
+    content: "✕";
+    color: red;
+  }
+  :global(.line-content .error),
+  :global(.error .line-content span) {
+    text-decoration: wavy underline #f00a;
+  }
+  :global(.error .line-content .whitespace) {
+    text-decoration: none;
+  }
 }

@@ -7,7 +7,7 @@ import {Marks, highlight} from "../language/highlight"
 import {LanguageSpecification} from "../language/specification"
 import type {ChangeEvent} from "../util/types"
 
-import * as style from "./Editor.module.css"
+import * as classes from "./Editor.module.scss"
 
 
 /**
@@ -194,15 +194,15 @@ export const Editor = ({
   }
 
   return (
-    <div class={clsx("editor", class_, style.root)}>
-      <div class={style.scrollbox}>
+    <div class={clsx("editor", class_, classes.root)}>
+      <div class={classes.scrollbox}>
         <div>
           <Highlight spec={languageSpec} marks={marks}>{value}</Highlight>
 
           <textarea
             ref={textareaRef}
             value={value}
-            class={`editor-textarea ${style.textarea}`}
+            class={clsx("editor-textarea", classes.textarea)}
             spellcheck={false}
 
             // Listening to both keydown & keypress because chrome doesn't trigger
@@ -221,15 +221,17 @@ export const Editor = ({
           {/* Put caret layer behind the textarea so we can hide it via css when
             * textarea isn't focused
             */}
-          <pre class={style.caretLayer}>
+          <pre class={classes.caretLayer}>
             {value.slice(0, selection.start)}
-            {selection.direction === "backward"
-              && <span key="caret" class={`editor-caret ${style.caret} ${style.blink}`} />}
-            <span key="editor-selection" class={`editor-selection ${style.selection}`}>
+            {selection.direction === "backward" && (
+              <span key="caret" class={clsx("editor-caret", classes.caret, classes.blink)} />
+            )}
+            <span key="editor-selection" class={clsx("editor-selection", classes.selection)}>
               {value.slice(selection.start, selection.end)}
             </span>
-            {selection.direction === "forward"
-              && <span key="caret" class={`editor-caret ${style.caret} ${style.blink}`} />}
+            {selection.direction === "forward" && (
+              <span key="caret" class={clsx("editor-caret", classes.caret, classes.blink)} />
+            )}
             {value.slice(selection.end)}
           </pre>
         </div>
@@ -259,7 +261,7 @@ const Highlight = ({children, spec, marks}: HighlightProps) => {
   return (
     <code
       ref={codeRef}
-      class={clsx("highlight", style.highlight)}
+      class={clsx("highlight", classes.highlight)}
       dangerouslySetInnerHTML={{__html: highlight(children, spec, marks)}}
     />
   )

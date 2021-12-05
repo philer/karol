@@ -1,4 +1,4 @@
-.button {
+.button, .iconButton {
   position: relative;
 
   margin: .5em .25em;
@@ -25,30 +25,49 @@
   border-radius: 3px;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, .2),
               inset -1px -2px 1em rgba(0, 0, 0, .05);
+
+  &.nohover {
+    cursor: default;
+  }
+
+  &:disabled {
+    color: #aaa;
+    cursor: default;
+  }
+
+  &:not(:disabled):not(.nohover):hover {
+    z-index: 1;
+    background-color: #fff;
+    box-shadow: 0 0 4px rgba(0, 0, 0, .2),
+                inset -1px -2px 1em rgba(0, 0, 0, .1);
+  }
 }
-.button svg {
-  /* text-shadow for font-awesome svg icons */
-  filter: drop-shadow(1px 1px 0px white);
+
+.iconButton {
+  width: 3em;
+  svg {
+    /* text-shadow for font-awesome svg icons */
+    filter: drop-shadow(1px 1px 0px white);
+  }
 }
-.button.nohover{
-  cursor: default;
-}
-.button:not(:disabled):not(.nohover):hover {
-  z-index: 1;
-  background-color: #fff;
-  box-shadow: 0 0 4px rgba(0, 0, 0, .2),
-              inset -1px -2px 1em rgba(0, 0, 0, .1);
-}
-.button:disabled {
-  color: #aaa;
-  cursor: default;
-}
+
 .button input[type="range"] {
   width: 100%;
   flex: 100% 1 1;
   margin: 0 .5em;
 }
 
-.iconButton {
-  width: 3em;
+.buttonRow {
+  display: flex;
+  gap: .5em;
+  padding: .5em;
+
+  .button {
+    margin: 0;
+    flex: 1 1 auto;
+  }
+  .iconButton {
+    margin: 0;
+    flex: 0 0 auto;
+  }
 }

@@ -1,0 +1,26 @@
+.root {
+  margin: 0;
+  padding: .5em 1em;
+  overflow: auto;
+  font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  white-space: normal;
+
+  > p {
+    margin: 0;
+    font-size: .85em;
+    line-height: 1.6em;
+    border-top: 1px dotted #ccc;
+    user-select: text;
+
+    &:last-child {
+      font-weight: bold;
+    }
+    &:first-child {
+      font-weight: normal;
+      border-top-width: 0;
+    }
+  }
+}
+
+.info {color: inherit}
+.error {color: #a00}

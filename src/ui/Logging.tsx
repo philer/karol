@@ -5,7 +5,7 @@ import {Exception} from "../exception"
 import {InterpolationData, translate as t} from "../localization"
 import {noop} from "../util"
 
-import style from "./Logging.module.css"
+import * as classes from "./Logging.module.scss"
 
 
 export type LogLevel = "info" | "error"
@@ -69,12 +69,12 @@ export const LoggingProvider = (props: {children: ComponentChildren}) => {
 export const LogOutput = () => {
   const messages = useContext(LogMessages)
   return (
-    <pre class={style.root}>
+    <pre class={classes.root}>
       {messages.map(({level, message, exception, child}, idx) =>
         <p
           key={idx}  // idx as key is fine as long as we only append
           ref={p => idx === messages.length - 1 && p?.scrollIntoView({behavior: "smooth"})}
-          class={style[level]}
+          class={classes[level]}
         >
           {message
             ? t(...message)

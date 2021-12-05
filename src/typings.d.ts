@@ -4,3 +4,4 @@
 // To get actual errors, 'typescript-plugin-css-modules' provides the IDE
 // with types.
 declare module "*.css"
+declare module "*.scss"

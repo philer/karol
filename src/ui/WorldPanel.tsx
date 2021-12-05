@@ -12,8 +12,8 @@ import {ResizeLayout, ResizePanel} from "./ResizeLayout"
 import {WorldControls} from "./WorldControls"
 import type {ChangeEvent} from "../util/types"
 
-import {button as buttonStyle, iconButton as iconButtonStyle} from "../button.module.css"
-import * as style from "./WorldPanel.module.css"
+import {button as buttonClass, iconButton as iconButtonClass} from "../button.module.scss"
+import * as classes from "./WorldPanel.module.scss"
 
 export interface WorldPanelProps {
   onChange: (world: World) => void
@@ -76,29 +76,29 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
 
   return (
     <ResizeLayout vertical>
-      <ResizePanel key="world" minSize={400} class={style.worldPanel}>
-        <nav class={style.tools}>
+      <ResizePanel key="world" minSize={400} class={classes.worldPanel}>
+        <nav class={classes.tools}>
           <button
-            class={`${buttonStyle} ${iconButtonStyle}`}
+            class={iconButtonClass}
             onClick={defaultPreventer(toggleSettings)}
           >
             <IconCog />
           </button>
-          <button class={buttonStyle} onClick={resetWorld}>{t("world.reset")}</button>
+          <button class={buttonClass} onClick={resetWorld}>{t("world.reset")}</button>
 
-          <i class={style.separator} />
+          <i class={classes.separator} />
 
-          <label class={buttonStyle}>
+          <label class={buttonClass}>
             {t("world.load")}
             <input type="file" class="hidden" onChange={loadWorld} />
           </label>
-          <button class={buttonStyle} onClick={saveWorld}>{t("world.save")}</button>
+          <button class={buttonClass} onClick={saveWorld}>{t("world.save")}</button>
         </nav>
 
-        <div class={style.world}>
+        <div class={classes.world}>
 
           <form
-            class={clsx(style.settings, !isSettingsVisible && style.hidden)}
+            class={clsx(classes.settings, !isSettingsVisible && classes.hidden)}
             onSubmit={defaultPreventer()}
           >
             <label>
@@ -127,16 +127,16 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
               <span>{t("world.show_player")}</span>
             </label>
 
-            <i class={style.expander} />
+            <i class={classes.expander} />
 
-            <button class={style.settingsToggle} onClick={toggleSettings}>
+            <button class={classes.settingsToggle} onClick={toggleSettings}>
               <IconTimes />
             </button>
           </form>
 
-          <div class={style.canvasContainer}>
+          <div class={classes.canvasContainer}>
             <canvas
-              class={style.canvas}
+              class={classes.canvas}
               ref={graphics.setCanvas}
               width="600"
               height="400"

@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from "preact/hooks"
 
 import {clamp, clsx, zip} from "../util"
 
-import * as style from "./ResizeLayout.module.css"
+import * as classes from "./ResizeLayout.module.css"
 
 export type CSSUnit =
   | "%"
@@ -168,7 +168,7 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
 
   return (
     <div
-      class={clsx(class_, style.container, vertical && style.vertical)}
+      class={clsx(class_, classes.container, vertical && classes.vertical)}
       onMouseMove={handleDrag}
       onMouseUp={handleDragEnd}
     >
@@ -177,7 +177,7 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
           <Fragment key={key}>
             {idx > 0 && (
               <div
-                class={style.separator}
+                class={classes.separator}
                 onMouseDown={handleDragStart(idx)}
               >
                 <div>{vertical ? "⋯" : "⋮"}</div>
@@ -185,7 +185,7 @@ export const ResizeLayout = (props: ResizeLayoutProps) => {
             )}
             <div
               ref={setPanelDiv(idx)}
-              class={clsx(style.panel, props.class)}
+              class={clsx(classes.panel, props.class)}
               style={panel.css}
             >
               {props.children}

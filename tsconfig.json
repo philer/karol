@@ -13,7 +13,7 @@
     "target": "es2017",
     "plugins": [{
       "name": "typescript-plugin-css-modules",
-      "options": {"customMatcher": ".css$"},
+      "options": {"customMatcher": ".(css|scss)$"},
     }],
     "typeRoots": [
       "node_modules/@types",

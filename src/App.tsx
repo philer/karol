@@ -11,7 +11,7 @@ import {Logging, LoggingProvider} from "./ui/Logging"
 import {Translate} from "./ui/Translate"
 import {IconCircleNotch} from "./ui/Icon"
 import {version} from "../package.json"
-import * as style from "./App.module.css"
+import * as classes from "./App.module.css"
 
 
 const initPromises = [
@@ -39,7 +39,7 @@ function App() {
   if (error) {
     console.error(error)
     return (
-      <div class={style.error}>
+      <div class={classes.error}>
         <p>Looks like something went wrong. 🤔</p>
         <p>
           To continue, try reloading the page.
@@ -60,7 +60,7 @@ function App() {
   }
 
   if (isLoading) {
-    return <div class={style.loading}><IconCircleNotch spin /></div>
+    return <div class={classes.loading}><IconCircleNotch spin /></div>
   }
 
   return (

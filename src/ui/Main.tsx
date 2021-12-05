@@ -1,4 +1,4 @@
-import {Fragment, h} from "preact"
+import {h} from "preact"
 import {useContext, useEffect, useState} from "preact/hooks"
 
 import {Exception} from "../exception"
@@ -12,19 +12,20 @@ import type {Marks} from "../language/highlight"
 import {ResizeLayout, ResizePanel} from "./ResizeLayout"
 import {WorldPanel} from "./WorldPanel"
 import {Tooltip} from "./Tooltip"
-import {defaultPreventer} from "../util"
+import {clsx, defaultPreventer} from "../util"
 import {readFile, saveTextAs} from "../util/files"
 import type {ChangeEvent} from "../util/types"
 import {
   IconPause,
   IconPlay,
+  IconQuestion,
   IconRunning,
   IconStepForward,
   IconStop,
   IconWalking,
 } from "./Icon"
-
-import * as style from "./Main.module.css"
+import * as buttonClasses from "../button.module.scss"
+import * as classes from "./Main.module.scss"
 
 const MIN_SPEED = 1
 const MAX_SPEED = 2.5
@@ -122,12 +123,12 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
 
   return (
     <ResizeLayout>
-      <ResizePanel key="editor" size="25em" minSize={300} class={style.panel}>
+      <ResizePanel key="editor" size="25em" minSize={300} class={classes.panel}>
         <header><h2>{t("program.code")}</h2></header>
 
-        <form class={style.panelInner} onSubmit={defaultPreventer()}>
-          <div class={style.buttonRow}>
-            <label class={style.button}>
+        <form class={classes.panelInner} onSubmit={defaultPreventer()}>
+          <div class={buttonClasses.buttonRow}>
+            <label class={buttonClasses.button}>
               {t("program.load")}
               <input
                 type="file"
@@ -135,53 +136,53 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
                 onChange={loadProgram}
               />
             </label>
-            <button class={style.button} onClick={saveProgram}>
+            <button class={buttonClasses.button} onClick={saveProgram}>
               {t("program.save")}
             </button>
           </div>
 
           <Editor
-            class={style.editor}
+            class={classes.editor}
             onChange={updateCode}
             languageSpec={spec}
             marks={editorMarks}
           >{code}</Editor>
 
-          <div class={style.buttonRow}>
+          <div class={buttonClasses.buttonRow}>
 
             {simulation
-              ? <>
+              ? <span class={classes.runControls}>
                   {isPaused
                     ? <button
-                        class={`${style.button} ${style.iconButton}`}
+                        class={buttonClasses.iconButton}
                         onClick={resumeSimulation}
                       >
                         <IconPlay />
                       </button>
                     : <button
-                        class={`${style.button} ${style.iconButton}`}
+                        class={buttonClasses.iconButton}
                         onClick={pauseSimulation}
                       >
                         <IconPause />
                       </button>
                   }
                   <button
-                    class={`${style.button} ${style.iconButton}`}
+                    class={buttonClasses.iconButton}
                     disabled={!simulation}
                     onClick={() => simulation?.step()}
                   >
                     <IconStepForward />
                   </button>
                   <button
-                    class={`${style.button} ${style.iconButton}`}
+                    class={buttonClasses.iconButton}
                     disabled={!simulation}
                     onClick={haltSimulation}
                   >
                     <IconStop />
                   </button>
-                </>
+                </span>
               : <button
-                  class={`${style.button} ${style.runButton}`}
+                  class={clsx(buttonClasses.button, classes.runButton)}
                   onClick={runSimulation}
                   disabled={!code}
                 >
@@ -190,7 +191,7 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
             }
 
             <Tooltip above tip={t("simulation.speed")}>
-              <label class={`${style.button} ${style.nohover}`}>
+              <label class={clsx(buttonClasses.button, buttonClasses.nohover)}>
                 <IconWalking lg fw />
                 <input
                   type="range"
@@ -208,10 +209,10 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
         </form>
       </ResizePanel>
 
-      <ResizePanel key="world" class={style.panel}>
+      <ResizePanel key="world" class={classes.panel}>
         <header><h2>{t("world.world")}</h2></header>
 
-        <div class={style.panelInner}>
+        <div class={classes.panelInner}>
           <WorldPanel
             onChange={updateWorld}
             isSimulationRunning={simulation !== null}
