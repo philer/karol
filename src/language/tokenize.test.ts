@@ -1,4 +1,5 @@
 import {mapObject} from "../util"
+import {Exception} from "../exception"
 import {tokenize} from "./tokenize"
 import {LanguageSpecification, defaultSpec} from "./specification"
 
@@ -84,6 +85,10 @@ describe("tokenizer", () => {
   test("returns EOF", () => {
     expect(tokenize("", defaultSpec).next())
       .toEqual({done: true, value: {type: "EOF", value: "", line: 1, column: 1}})
+  })
+
+  test("unknown characters", () => {
+    expect(() => [...tokenize("·", defaultSpec)]).toThrow(Exception)
   })
 })
 

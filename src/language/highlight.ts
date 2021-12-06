@@ -73,7 +73,7 @@ export function highlight(text: string, spec: LanguageSpecification, marks: Mark
     if (!(err instanceof Exception)) {
       throw err
     }
-    if (err.data?.remainingLines) {
+    if (err.data?.remainingText) {
       const {remainingText} = err.data
       const [currentWord] = remainingText.split(/\s/, 1)
       const [currentLineTail, ...remainingLines]= wrapSpaces(
