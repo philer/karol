@@ -3,10 +3,10 @@ import {useEffect, useMemo, useRef, useState} from "preact/hooks"
 
 import * as config from "../config"
 import {clsx, elem, noop} from "../util"
-import {Marks, highlight} from "../language/highlight"
-import {LanguageSpecification} from "../language/specification"
+import type {Marks} from "../language/highlight"
+import type {LanguageSpecification} from "../language/specification"
 import type {ChangeEvent} from "../util/types"
-
+import {Highlight} from "./Highlight"
 import * as classes from "./Editor.module.scss"
 
 
@@ -197,7 +197,7 @@ export const Editor = ({
     <div class={clsx("editor", class_, classes.root)}>
       <div class={classes.scrollbox}>
         <div>
-          <Highlight spec={languageSpec} marks={marks}>{value}</Highlight>
+          <Highlight spec={languageSpec} marks={marks} class={classes.highlight}>{value}</Highlight>
 
           <textarea
             ref={textareaRef}
@@ -237,33 +237,6 @@ export const Editor = ({
         </div>
       </div>
     </div>
-  )
-}
-
-
-type HighlightProps = {
-  children: string,
-  spec: LanguageSpecification
-  marks?: Marks
-}
-
-/** Use a separate component to gain automatic memoization */
-const Highlight = ({children, spec, marks}: HighlightProps) => {
-  const codeRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    if (marks && Object.keys(marks).length === 1) {
-      const [line] = Object.keys(marks)
-      codeRef.current?.children[+line - 1]?.scrollIntoView({block: "nearest"})
-    }
-  }, [codeRef.current, marks])
-
-  return (
-    <code
-      ref={codeRef}
-      class={clsx("highlight", classes.highlight)}
-      dangerouslySetInnerHTML={{__html: highlight(children, spec, marks)}}
-    />
   )
 }
 

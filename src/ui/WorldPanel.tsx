@@ -1,13 +1,14 @@
 import {h} from "preact"
-import {useContext, useEffect, useState} from "preact/hooks"
+import {useContext, useEffect, useRef, useState} from "preact/hooks"
 
 import {World, checkKdwFormat} from "../simulation/world"
 import * as graphics from "../graphics"
 import {translate as t} from "../localization"
-import {clamp, clsx, defaultPreventer} from "../util"
+import {clamp} from "../util"
 import {readFile, saveTextAs} from "../util/files"
+import {Popover} from "./Popover"
 import {LogOutput, Logging} from "./Logging"
-import {IconCog, IconRobot, IconTimes} from "./Icon"
+import {IconCog, IconRobot} from "./Icon"
 import {WorldControls} from "./WorldControls"
 import type {ChangeEvent} from "../util/types"
 
@@ -28,6 +29,7 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
     height: 5,
   })
   const [isSettingsVisible, setIsSettingsVisible] = useState(false)
+  const toolsToggleRef = useRef<HTMLButtonElement>(null)
   const [world, setWorld] = useState(new World(width, length, height))
   const [showFlat, setShowFlat] = useState(false)
   const [showPlayer, setShowPlayer] = useState(true)
@@ -37,8 +39,6 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
 
   const updateSetting = ({currentTarget: {name, min, max, value}}: ChangeEvent) =>
     setSettings(settings => ({...settings, [name]: clamp(+min, +max, +value)}))
-
-  const toggleSettings = () => setIsSettingsVisible(visible => !visible)
 
   const resetWorld = () =>
     setWorld(new World(width, length, height))
@@ -77,59 +77,55 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
     <div class={classes.worldPanel}>
       <h2><IconRobot /> {t("world.world")}</h2>
 
-      <nav class={classes.tools}>
-        <button
-          class={buttonClasses.iconButton}
-          onClick={defaultPreventer(toggleSettings)}
-        >
-          <IconCog />
-        </button>
+      <nav class={classes.tools} >
         <button class={buttonClasses.button} onClick={resetWorld}>{t("world.reset")}</button>
-
         <label class={buttonClasses.button}>
           {t("world.load")}
           <input type="file" class="hidden" onChange={loadWorld} />
         </label>
         <button class={buttonClasses.button} onClick={saveWorld}>{t("world.save")}</button>
+        <button
+          class={buttonClasses.iconButton}
+          ref={toolsToggleRef}
+          onClick={() => setIsSettingsVisible(visible => !visible)}
+        >
+          <IconCog />
+        </button>
+        <Popover
+          show={isSettingsVisible}
+          autoClose
+          onClose={() => setIsSettingsVisible(false)}
+          anchor={toolsToggleRef.current}
+          orientation="below right"
+          class={classes.settings}
+        >
+          <form>
+            <h3>World Settings</h3>
+            <fieldset>
+              <label>{t("world.width")}</label>
+              <input type="number" name="width" min={1} max={100} value={width}
+                onChange={updateSetting} />
+
+              <label>{t("world.length")}</label>
+              <input type="number" name="length" min={1} max={100} value={length}
+                onChange={updateSetting} />
+
+              <label>{t("world.height")}</label>
+              <input type="number" name="height" min={1} max={25} value={height}
+                onChange={updateSetting} />
+            </fieldset>
+            <fieldset>
+              <input type="checkbox" checked={showFlat}
+                onChange={updateShowFlat} />
+              <label>{t("world.flat")}</label>
+              <input type="checkbox" checked={showPlayer}
+                onChange={updateShowPlayer} />
+              <label>{t("world.show_player")}</label>
+            </fieldset>
+          </form>
+        </Popover>
       </nav>
 
-
-      <form
-        class={clsx(classes.settings, !isSettingsVisible && classes.hidden)}
-        onSubmit={defaultPreventer()}
-      >
-        <label>
-          {t("world.width")}:
-          <input type="number" name="width" min={1} max={100} value={width}
-            onChange={updateSetting} />
-        </label>
-        <label>
-          {t("world.length")}:
-          <input type="number" name="length" min={1} max={100} value={length}
-            onChange={updateSetting} />
-        </label>
-        <label>
-          {t("world.height")}:
-          <input type="number" name="height" min={1} max={25} value={height}
-            onChange={updateSetting} />
-        </label>
-        <label>
-          <input type="checkbox" checked={showFlat}
-            onChange={updateShowFlat} />
-          <span>{t("world.flat")}</span>
-        </label>
-        <label>
-          <input type="checkbox" checked={showPlayer}
-            onChange={updateShowPlayer} />
-          <span>{t("world.show_player")}</span>
-        </label>
-
-        <i class={classes.expander} />
-
-        <button class={classes.settingsToggle} onClick={toggleSettings}>
-          <IconTimes />
-        </button>
-      </form>
 
       <WorldControls world={world} disabled={isSimulationRunning} />
 

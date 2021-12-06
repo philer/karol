@@ -15,7 +15,7 @@ config({
   code: {
     // translations for keywords and builtins
     // unlike for UI locales, all listed languages are added
-    locales: ["en", "de"],
+    locales: ["de", "en"],
     caseSensitiveKeywords: false,
     caseSensitiveIdentifiers: false,
   },

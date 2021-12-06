@@ -1,0 +1,46 @@
+// :global styles to be overwritten by editor themes
+.root {
+  display: block;
+  // I don't know why the extra padding-right is necessary to prevent overflow
+  padding: .5em 2em .5em 0;
+  white-space: pre;
+
+  user-select: text;
+
+  :global(.line) {
+    display: flex;
+    border-radius: 2px;
+  }
+  :global(.lineno) {
+    position: relative;
+    flex: 0 0 4.5ch;
+    padding-right: 1.5ch;
+    margin-right: .5ch;
+    border-right: 1px solid #ddd;
+    text-align: right;
+    color: grey;
+    user-select: none;
+  }
+  :global(.line:not(.current, .error)) {
+    transition: .1s background, .1s box-shadow;
+  }
+  :global(.marked .lineno::after) {
+    position: absolute;
+    right: 0;
+    font-size: 1.3em;
+  }
+  :global(.current .lineno::after) {
+    content: "➡";
+  }
+  :global(.error .lineno::after) {
+    content: "✕";
+    color: red;
+  }
+  :global(.line-content .error),
+  :global(.error .line-content span) {
+    text-decoration: wavy underline #f00a;
+  }
+  :global(.error .line-content .whitespace) {
+    text-decoration: none;
+  }
+}

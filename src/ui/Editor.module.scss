@@ -53,6 +53,8 @@
   z-index: 2;
   pointer-events: none;
   padding-left: 0.5ch; /* line numbers */
+  background-color: transparent !important;
+  user-select: none !important;
 }
 .textarea {
   z-index: 0;
@@ -89,44 +91,4 @@
 }
 .selection:empty {
   display: none;
-}
-
-
-// :global styles to be overwritten by editor themes
-.highlight {
-  :global(.line) {
-    display: flex;
-    border-radius: 2px;
-  }
-  :global(.lineno) {
-    position: relative;
-    flex: 0 0 4.5ch;
-    padding-right: 1.5ch;
-    margin-right: .5ch;
-    border-right: 1px solid #ddd;
-    text-align: right;
-    color: grey;
-  }
-  :global(.line:not(.current, .error)) {
-    transition: .1s background, .1s box-shadow;
-  }
-  :global(.marked .lineno::after) {
-    position: absolute;
-    right: 0;
-    font-size: 1.3em;
-  }
-  :global(.current .lineno::after) {
-    content: "➡";
-  }
-  :global(.error .lineno::after) {
-    content: "✕";
-    color: red;
-  }
-  :global(.line-content .error),
-  :global(.error .line-content span) {
-    text-decoration: wavy underline #f00a;
-  }
-  :global(.error .line-content .whitespace) {
-    text-decoration: none;
-  }
 }

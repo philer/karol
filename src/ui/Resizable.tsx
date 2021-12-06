@@ -1,9 +1,9 @@
 import {ComponentChild, JSX, h} from "preact"
 import {useEffect, useRef, useState} from "preact/hooks"
+import {clsx} from "../util"
+import type {DivProps} from "../util/types"
 
-import css from "./Resizable.module.css"
-
-export type DivProps = JSX.HTMLAttributes<HTMLDivElement>
+import * as classes from "./Resizable.module.scss"
 
 export type ResizableProps = DivProps & {
   top?: boolean
@@ -75,13 +75,13 @@ export const Resizable = (props: ResizableProps) => {
 
   const Handle = ({direction}: {direction: Direction}) =>
     !props[direction] ? null : (
-      <div class={css[direction]} onMouseDown={handleDragStart(direction)}>
+      <div class={classes[direction]} onMouseDown={handleDragStart(direction)}>
         <div />
       </div>
     )
 
   return (
-    <div {...divProps} ref={containerRef} style={style}>
+    <div {...divProps} ref={containerRef} class={clsx(divProps.class, classes.root)} style={style}>
       <Handle direction="top" />
       <Handle direction="left" />
       {children}

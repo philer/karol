@@ -4,7 +4,7 @@
  *** bright color scheme ***
  ***************************/
 
-.editor {
+.highlight, .editor {
   background: white;
   color: #222;
 }
@@ -25,7 +25,7 @@
   color: #666; /* arrow */
 }
 
-.editor .lineno {
+.highlight .lineno {
   border-color: #ddd;
 }
 

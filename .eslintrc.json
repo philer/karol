@@ -61,7 +61,11 @@
       "ignoreMemberSort": false,
       "allowSeparatedGroups": true
     }],
-    "space-before-function-paren": ["warn", "never"],
+    "space-before-function-paren": ["warn", {
+      "anonymous": "never",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
     "space-in-parens": ["warn", "never"],
     "strict": "error",
     "template-curly-spacing": ["warn", "never"],

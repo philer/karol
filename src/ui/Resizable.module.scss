@@ -1,0 +1,46 @@
+.root {
+  position: relative; /* create offset parent */
+}
+
+.top, .left, .right, .bottom {
+  position: relative;
+  > div {
+    z-index: 10;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:hover {
+      background: #aaa;
+    }
+  }
+}
+
+.top, .bottom {
+  cursor: row-resize;
+  > div {
+    inset: -2px 0 -3px 0;
+  }
+}
+
+.left, .right {
+  cursor: col-resize;
+  > div {
+    flex-direction: column;
+    inset: 0 -3px 0 -2px;
+  }
+}
+
+/* grid-area: <name> | start-row / start-col / end-row / end-col */
+.top {
+  grid-area: top-row-start / center-col-start / center-row-start / center-col-end;
+}
+.left {
+  grid-area: center-row-start / left-col-start / center-row-end / center-col-start;
+}
+.right {
+  grid-area: center-row-start / center-col-end / center-row-end / right-col-end;
+}
+.bottom {
+  grid-area: center-row-end / center-col-start / bottom-row-end / center-col-end;
+}

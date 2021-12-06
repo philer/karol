@@ -1,5 +1,5 @@
 import {h} from "preact"
-import {useContext, useEffect, useState} from "preact/hooks"
+import {useContext, useEffect, useRef, useState} from "preact/hooks"
 
 import {Exception} from "../exception"
 import {translate as t} from "../localization"
@@ -26,6 +26,8 @@ import {
   IconWalking,
 } from "./Icon"
 import * as classes from "./Main.module.scss"
+import {Popover} from "./Popover"
+import {LanguageHelp} from "./LanguageHelp"
 
 const MIN_SPEED = 1
 const MAX_SPEED = 2.5
@@ -121,10 +123,13 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
     document.title = `${simulation ? isPaused ? "⏸️" : "▶️" : ""} Karol`
   }, [simulation, isPaused])
 
+  const [isLanguageHelpVisible, setIsLanguageHelpVisible] = useState(false)
+  const editorPanelRef = useRef<HTMLFormElement>(null)
+
   return (
     <div class={classes.root}>
       <Resizable right class={classes.editorPanel}>
-        <form onSubmit={defaultPreventer()}>
+        <form onSubmit={defaultPreventer()} ref={editorPanelRef}>
           <header class={classes.row}>
             <h2><IconKeyboard lg /> {t("program.code")}</h2>
             <label class={classes.button}>
@@ -138,9 +143,22 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
             <button class={classes.button} onClick={saveProgram}>
               {t("program.save")}
             </button>
-            <button class={classes.iconButton}>
+            <button
+              class={classes.iconButton}
+              onClick={() => setIsLanguageHelpVisible(yes => !yes)}
+            >
               <IconQuestion />
             </button>
+            <Popover
+              class={classes.help}
+              show={isLanguageHelpVisible}
+              onClose={() => setIsLanguageHelpVisible(false)}
+              anchor={editorPanelRef.current}
+              orientation="right top"
+              title="Language Help"
+            >
+              <LanguageHelp spec={spec} />
+            </Popover>
           </header>
 
           <Editor
