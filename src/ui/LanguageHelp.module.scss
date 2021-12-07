@@ -2,8 +2,15 @@
   overflow-x: hidden;
   overflow-y: auto;
   padding: 1em 1em 0 1em;
+  line-height: 1.5em;
 
-  p, h3, h4, .example {
+  p, ul, h3, h4, .example {
     margin: 0 0 1em;
+  }
+
+  ul {
+    padding: 0 1.5em;
+    list-style-type: square;
+    color: #999;
   }
 }

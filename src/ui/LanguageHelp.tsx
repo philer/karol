@@ -48,7 +48,7 @@ export const LanguageHelp = ({spec}: {spec: LanguageSpecification}) => {
       <ul>
         {Object.values(builtins).map((([builtin]) =>
           <li key={builtin}>
-            <code>{builtin}</code>
+            <code className="token identifier builtin">{builtin}</code>
           </li>
         ))}
       </ul>
