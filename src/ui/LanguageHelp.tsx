@@ -3,7 +3,7 @@ import {useMemo, useState} from "preact/hooks"
 
 import * as config from "../config"
 import {useAsyncEffect} from "../util/hooks"
-import {Translations, getLocaleData} from "../localization"
+import {Translations, getLocaleData, translate as t} from "../localization"
 import type {LanguageSpecification} from "../language/specification"
 import {Highlight} from "./Highlight"
 
@@ -35,7 +35,7 @@ export const LanguageHelp = ({spec}: {spec: LanguageSpecification}) => {
 
   return (
     <div class={classes.root}>
-      <h3>Example</h3>
+      <h3>{t("language.help.example")}</h3>
       <Code>
         {`
           REPEAT WHILE isNotLookingAtEdge()
@@ -44,7 +44,7 @@ export const LanguageHelp = ({spec}: {spec: LanguageSpecification}) => {
         `}
       </Code>
 
-      <h3>Commands</h3>
+      <h3>{t("language.help.builtins")}</h3>
       <ul>
         {Object.values(builtins).map((([builtin]) =>
           <li key={builtin}>

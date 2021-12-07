@@ -13,6 +13,7 @@ config({
     code: "Code",
     save: "Save",
     load: "Load",
+    help: "Programming Help",
     default_filename: "program.kdp",
   },
   simulation: {
@@ -30,6 +31,7 @@ config({
     reset: "Reset",
     save: "Save",
     load: "Load",
+    settings: "Settings",
     length: "Length",
     width: "Width",
     height: "Height",
@@ -75,6 +77,10 @@ config({
       isNotOnMark: ["notIsOnMark"],
       placeMark: ["placeMark"],
       takeMark: ["takeMark"],
+    },
+    help: {
+      example: "Example",
+      builtins: "Commands",
     },
   },
   error: {

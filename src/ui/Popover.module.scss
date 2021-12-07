@@ -7,7 +7,7 @@
   overflow: auto;
   // margin: .5em;
 
-  background: #444d;
+  background: #333d;
   backdrop-filter: blur(3px);
   color: white;
   box-shadow: 1px 1px 10px rgba(0, 0, 0, .33);
@@ -38,9 +38,9 @@
   cursor: pointer;
   color: inherit;
   font-size: 1.5em;
-  background-color: #666a;
+  background-color: #555c;
   &:hover {
-    background-color: #b66f;
+    background-color: #b55f;
   }
   svg {
     /* text-shadow for font-awesome svg icons */

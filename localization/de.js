@@ -10,6 +10,7 @@ config({
     code: "Programm",
     save: "Speichern",
     load: "Öffnen",
+    help: "Programmierhilfe",
     default_filename: "program.kdp",
   },
   simulation: {
@@ -27,6 +28,7 @@ config({
     reset: "Zurücksetzen",
     save: "Speichern",
     load: "Öffnen",
+    settings: "Einstellungen",
     length: "Länge",
     width: "Breite",
     height: "Höhe",
@@ -72,6 +74,10 @@ config({
       isNotOnMark: ["nichtIstMarke"],
       placeMark: ["markeSetzen"],
       takeMark: ["markeLöschen", "markeLoeschen"],
+    },
+    help: {
+      example: "Beispiel",
+      builtins: "Anweisungen",
     },
   },
   error: {

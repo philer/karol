@@ -62,6 +62,7 @@ export type Translations = {
     code: string
     save: string
     load: string
+    help: string
     default_filename: string
   }
   simulation: {
@@ -79,6 +80,7 @@ export type Translations = {
     reset: string
     save: string
     load: string
+    settings: string
     length: string
     width: string
     height: string
@@ -124,6 +126,10 @@ export type Translations = {
       isNotOnMark: string[]
       placeMark: string[]
       takeMark: string[]
+    }
+    help: {
+      example: string
+      builtins: string
     }
   }
   error: {

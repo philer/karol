@@ -100,7 +100,7 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
           class={classes.settings}
         >
           <form>
-            <h3>World Settings</h3>
+            <h3>{t("world.settings")}</h3>
             <fieldset>
               <label>{t("world.width")}</label>
               <input type="number" name="width" min={1} max={100} value={width}

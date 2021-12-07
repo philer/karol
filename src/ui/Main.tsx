@@ -155,7 +155,7 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
               onClose={() => setIsLanguageHelpVisible(false)}
               anchor={editorPanelRef.current}
               orientation="right top"
-              title="Language Help"
+              title={t("program.help")}
             >
               <LanguageHelp spec={spec} />
             </Popover>
