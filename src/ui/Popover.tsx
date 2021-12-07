@@ -1,5 +1,5 @@
 import {ComponentChildren, JSX, h} from "preact"
-import {useEffect, useRef} from "preact/hooks"
+import {useEffect, useRef, useState} from "preact/hooks"
 import {clsx} from "../util"
 
 import type {DivProps} from "../util/types"
@@ -34,6 +34,21 @@ export const Popover = ({
   ...divProps
 }: PopoverProps) => {
   const ref = useRef<HTMLDivElement>(null)
+
+  const [resizeObserver, setResizeObserver] = useState<ResizeObserver | null>(null)
+
+  useEffect(() => {
+    if (anchor) {
+      const observer = new ResizeObserver(() => {
+        if (ref.current) {
+          Object.assign(ref.current.style, orientationStyle(anchor, orientation))
+        }
+      })
+      observer.observe(anchor)
+      setResizeObserver(observer)
+    }
+    return () => resizeObserver?.disconnect()
+  }, [anchor, orientation, ref.current])
 
   useEffect(() => {
     if (autoClose && show) {
