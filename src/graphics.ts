@@ -74,7 +74,7 @@ let noiseAmplifier: number
 
 let playerHeight: number
 
-let canvas: HTMLCanvasElement
+let canvas: HTMLCanvasElement | null
 let ctx: CanvasRenderingContext2D | null
 
 let _showPlayer = true
@@ -89,7 +89,7 @@ export function showHeightNoise(show=true) {
 }
 
 /** Prepare canvas and drawing context */
-export function setCanvas(canvasElement: HTMLCanvasElement) {
+export function setCanvas(canvasElement: HTMLCanvasElement | null) {
   canvas = canvasElement
   if (!canvas) {
     ctx = null
@@ -246,7 +246,7 @@ export function render(world: World) {
 }
 
 function _render({width, length, height, player, tiles, seed}: World) {
-  if (!ctx) {
+  if (!canvas || !ctx) {
     return
   }
   const w = (width + length) * 0.5 * (tileWidth + 2 * tileGap)

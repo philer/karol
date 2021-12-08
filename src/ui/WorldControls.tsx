@@ -48,7 +48,7 @@ export const WorldControls = ({world, disabled}: WorldControlsProps) => {
         if (err instanceof Exception) {
           log.error(err)
         } else {
-          log.error(err.message)
+          log.error(err instanceof Error ? err.message : `${err}`)
           console.error(err)
         }
       }

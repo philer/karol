@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "isolatedModules": true,
     "jsx": "preserve",
     "jsxFactory": "h",
@@ -9,7 +9,8 @@
     "moduleResolution": "node",
     "noImplicitAny": true,
     "resolveJsonModule": true,
-    "strictNullChecks": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
     "target": "es2017",
     "plugins": [{
       "name": "typescript-plugin-css-modules",
@@ -19,5 +20,6 @@
       "node_modules/@types",
       "src/**/*.d.ts"
     ]
-  }
+  },
+  "include": ["src"]
 }
