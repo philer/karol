@@ -1,4 +1,4 @@
-import {h} from "preact"
+import {JSX, h} from "preact"
 import {useEffect, useMemo, useRef} from "preact/hooks"
 
 import {clsx} from "../util"
@@ -36,6 +36,16 @@ export const Highlight = ({children, spec, marks, ...props}: HighlightProps) => 
       ref={codeRef}
       class={clsx("highlight", classes.root, props.class)}
       dangerouslySetInnerHTML={{__html: highlighted}}
+      onCopy={cleanCopy}
     />
   )
+}
+
+/** Replace special characters added by syntax highlighting */
+function cleanCopy(evt: JSX.TargetedClipboardEvent<HTMLElement>) {
+  const selection = document.getSelection()
+  if (selection && evt.clipboardData) {
+    evt.clipboardData.setData("text/plain", selection.toString().replace(/·/g, " "))
+    evt.preventDefault()
+  }
 }
