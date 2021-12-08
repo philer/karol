@@ -1,6 +1,6 @@
 import {Exception} from "../exception"
-import {LanguageSpecification, TokenType as tt} from "./specification"
 import {Call, Expression, RoutineDefinition, Sequence, Statement, textToAst} from "./parser"
+import {LanguageSpecification, TokenType as tt} from "./specification"
 
 const MAX_RECURSION_DEPTH = 100
 

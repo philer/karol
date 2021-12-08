@@ -11,7 +11,8 @@
     "dist": "vite build",
     "test": "jest",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src/**/*.[jt]s{,x} --cache",
+    "lint": "eslint src",
+    "format": "eslint src --fix",
     "pre-commit": "yarn lint && yarn typecheck && yarn test"
   },
   "devDependencies": {
@@ -23,6 +24,8 @@
     "@typescript-eslint/parser": "^5.6.0",
     "eslint": "^8.4.1",
     "eslint-config-preact": "^1.1.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
     "jest": "^27.4.3",
     "preact": "^10.6.2",
     "sass": "^1.44.0",

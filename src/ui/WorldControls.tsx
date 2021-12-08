@@ -1,12 +1,12 @@
 import {Fragment, h} from "preact"
 import {useCallback, useContext, useEffect} from "preact/hooks"
 
-import {render} from "../graphics"
 import {Exception} from "../exception"
+import {render} from "../graphics"
 import {translate as t} from "../localization"
 import type {Builtins, World} from "../simulation/world"
-import {Logging} from "./Logging"
 import {IconMinusCircle, IconPlay, IconPlusCircle, IconReply} from "./Icon"
+import {Logging} from "./Logging"
 import {Sprite} from "./Sprite"
 import {Tooltip} from "./Tooltip"
 

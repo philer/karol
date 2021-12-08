@@ -1,7 +1,11 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "simple-import-sort"
+  ],
   "parserOptions": {
     "ecmaFeatures": {"impliedStrict": true},
     "ecmaVersion": 2017,
@@ -29,6 +33,8 @@
     "block-scoped-var": "warn",
     "comma-dangle": ["warn", "always-multiline"],
     "comma-spacing": "warn",
+    "import/no-cycle": "error",
+    "import/no-duplicates": "warn",
     "indent": ["error", 2, {
       "SwitchCase": 1,
       "offsetTernaryExpressions": true
@@ -56,11 +62,13 @@
     "react-hooks/exhaustive-deps": "off",
     "react/no-danger": "off",
     "semi": ["error", "never"],
-    "sort-imports": ["warn", {
-      "ignoreDeclarationSort": true,
-      "ignoreMemberSort": false,
-      "allowSeparatedGroups": true
-    }],
+    "simple-import-sort/imports": ["warn", {"groups": [
+      ["^preact", "^@?\\w"],
+      ["^\\u0000"],
+      ["^"],
+      ["^\\."],
+      ["\\.module\\.(css|scss|less)$", "\\.(json|svg|png|jpg|jpeg)"]
+    ]}],
     "space-before-function-paren": ["warn", {
       "anonymous": "never",
       "named": "never",

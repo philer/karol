@@ -1,5 +1,5 @@
-import {rand} from "../util"
 import {Exception} from "../exception"
+import {rand} from "../util"
 
 export interface Builtins {
   isLookingAtEdge: () => boolean

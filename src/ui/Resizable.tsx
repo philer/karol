@@ -1,5 +1,6 @@
-import {ComponentChild, JSX, h} from "preact"
+import {ComponentChild, h, JSX} from "preact"
 import {useEffect, useRef, useState} from "preact/hooks"
+
 import {clsx} from "../util"
 import type {DivProps} from "../util/types"
 

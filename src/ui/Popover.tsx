@@ -1,10 +1,11 @@
-import {ComponentChildren, JSX, h} from "preact"
+import {ComponentChildren, h, JSX} from "preact"
 import {useEffect, useRef, useState} from "preact/hooks"
-import {clsx} from "../util"
 
+import {clsx} from "../util"
 import type {DivProps} from "../util/types"
 import {Appear} from "./Appear"
 import {IconTimes} from "./Icon"
+
 import * as classes from "./Popover.module.scss"
 
 export type Orientation =

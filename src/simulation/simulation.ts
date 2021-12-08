@@ -1,8 +1,8 @@
-import {LanguageSpecification} from "../language/specification"
-import {BuiltinCall, Value, run as runInterpreter} from "../language/interpreter"
 import {render} from "../graphics"
-import type {World} from "./world"
+import {BuiltinCall, run as runInterpreter, Value} from "../language/interpreter"
+import {LanguageSpecification} from "../language/specification"
 import {noop} from "../util"
+import type {World} from "./world"
 
 export interface RunProps {
   code: string

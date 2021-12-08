@@ -1,4 +1,4 @@
-import {ComponentChild, VNode, cloneElement, h, toChildArray} from "preact"
+import {cloneElement, ComponentChild, h, toChildArray, VNode} from "preact"
 
 import {clsx} from "../util"
 

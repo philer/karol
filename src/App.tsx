@@ -2,16 +2,18 @@ import {h, render} from "preact"
 import {useContext, useEffect, useErrorBoundary, useState} from "preact/hooks"
 
 import "./global.css"
+
 import {init as initGraphics} from "./graphics"
+import {defaultSpec, load as loadSpec} from "./language/specification"
 import {init as initLocalization, translate as t} from "./localization"
 import {init as initEditor} from "./ui/Editor"
-import {defaultSpec, load as loadSpec} from "./language/specification"
-import {Main} from "./ui/Main"
-import {Logging, LoggingProvider} from "./ui/Logging"
-import {Translate} from "./ui/Translate"
 import {IconCircleNotch} from "./ui/Icon"
-import {version} from "../package.json"
+import {Logging, LoggingProvider} from "./ui/Logging"
+import {Main} from "./ui/Main"
+import {Translate} from "./ui/Translate"
+
 import * as classes from "./App.module.css"
+import {version} from "../package.json"
 
 
 const initPromises = [

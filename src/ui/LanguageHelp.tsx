@@ -2,9 +2,9 @@ import {h} from "preact"
 import {useMemo, useState} from "preact/hooks"
 
 import * as config from "../config"
-import {useAsyncEffect} from "../util/hooks"
-import {Translations, getLocaleData, translate as t} from "../localization"
 import type {LanguageSpecification} from "../language/specification"
+import {getLocaleData, translate as t, Translations} from "../localization"
+import {useAsyncEffect} from "../util/hooks"
 import {Highlight} from "./Highlight"
 
 import * as classes from "./LanguageHelp.module.scss"

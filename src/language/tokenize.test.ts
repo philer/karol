@@ -1,7 +1,7 @@
-import {mapObject} from "../util"
 import {Exception} from "../exception"
+import {mapObject} from "../util"
+import {defaultSpec, LanguageSpecification} from "./specification"
 import {tokenize} from "./tokenize"
-import {LanguageSpecification, defaultSpec} from "./specification"
 
 describe("tokenizer", () => {
 

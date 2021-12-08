@@ -1,9 +1,9 @@
 import {Exception} from "../exception"
 import {clsx} from "../util"
-import {tokenize} from "./tokenize"
 import type {LanguageSpecification, TokenType} from "./specification"
 // eslint-disable-next-line no-duplicate-imports
 import {TokenType as tt} from "./specification"
+import {tokenize} from "./tokenize"
 
 const VISUAL_SPACE = "·<wbr>"
 
@@ -76,7 +76,7 @@ export function highlight(text: string, spec: LanguageSpecification, marks: Mark
     if (err.data?.remainingText) {
       const {remainingText} = err.data
       const [currentWord] = remainingText.split(/\s/, 1)
-      const [currentLineTail, ...remainingLines]= wrapSpaces(
+      const [currentLineTail, ...remainingLines] = wrapSpaces(
         remainingText.slice(currentWord.length),
       ).split("\n")
       htmlLines.push(

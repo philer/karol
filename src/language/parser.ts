@@ -1,10 +1,10 @@
 import {Exception} from "../exception"
-import {commaList} from "../util"
 import {translate} from "../localization"
-import {Token, tokenize} from "./tokenize"
+import {commaList} from "../util"
 import type {LanguageSpecification, TokenType} from "./specification"
 // eslint-disable-next-line no-duplicate-imports
 import {symbolToTokenType, TokenType as tt} from "./specification"
+import {Token, tokenize} from "./tokenize"
 
 
 export interface AbstractStatement {

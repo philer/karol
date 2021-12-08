@@ -1,4 +1,4 @@
-import {JSX, VNode, cloneElement} from "preact"
+import {cloneElement, JSX, VNode} from "preact"
 import {useEffect, useState} from "preact/hooks"
 
 import type {DivProps} from "../util/types"

@@ -2,11 +2,12 @@ import {h} from "preact"
 import {useEffect, useMemo, useRef, useState} from "preact/hooks"
 
 import * as config from "../config"
-import {clsx, elem, noop} from "../util"
 import type {Marks} from "../language/highlight"
 import type {LanguageSpecification} from "../language/specification"
+import {clsx, elem, noop} from "../util"
 import type {ChangeEvent} from "../util/types"
 import {Highlight} from "./Highlight"
+
 import * as classes from "./Editor.module.scss"
 
 

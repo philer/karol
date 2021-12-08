@@ -2,19 +2,15 @@ import {h} from "preact"
 import {useContext, useEffect, useRef, useState} from "preact/hooks"
 
 import {Exception} from "../exception"
+import type {Marks} from "../language/highlight"
+import type {LanguageSpecification} from "../language/specification"
 import {translate as t} from "../localization"
 import {run} from "../simulation/simulation"
 import {World} from "../simulation/world"
-import {Logging} from "./Logging"
-import {Editor} from "./Editor"
-import type {LanguageSpecification} from "../language/specification"
-import type {Marks} from "../language/highlight"
-import {Resizable} from "./Resizable"
-import {WorldPanel} from "./WorldPanel"
-import {Tooltip} from "./Tooltip"
 import {clsx, defaultPreventer} from "../util"
 import {readFile, saveTextAs} from "../util/files"
 import type {ChangeEvent} from "../util/types"
+import {Editor} from "./Editor"
 import {
   IconKeyboard,
   IconPause,
@@ -25,9 +21,14 @@ import {
   IconStop,
   IconWalking,
 } from "./Icon"
-import * as classes from "./Main.module.scss"
-import {Popover} from "./Popover"
 import {LanguageHelp} from "./LanguageHelp"
+import {Logging} from "./Logging"
+import {Popover} from "./Popover"
+import {Resizable} from "./Resizable"
+import {Tooltip} from "./Tooltip"
+import {WorldPanel} from "./WorldPanel"
+
+import * as classes from "./Main.module.scss"
 
 const MIN_SPEED = 1
 const MAX_SPEED = 2.5

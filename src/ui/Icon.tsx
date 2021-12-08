@@ -1,33 +1,31 @@
 /* eslint-disable sort-imports */
-import {VNode, h} from "preact"
-import {AbstractElement, Attributes, IconDefinition, IconParams, icon} from "@fortawesome/fontawesome-svg-core"
-
+import {h, VNode} from "preact"
+import {AbstractElement, Attributes, icon, IconDefinition, IconParams} from "@fortawesome/fontawesome-svg-core"
+import {
+  faKeyboard,
+} from "@fortawesome/free-regular-svg-icons"
 // All icons used on the page need to be listed here.
 // Only use single statement import when tree-shaking is available,
 // see https://fontawesome.com/how-to-use/use-with-node-js#tree-shaking
 import {
-
-  // runtime controlls
-  faPlay, faPause, faStop, faStepForward,
-  faWalking, faRunning,
-
-  // settings toggles
-  faCog, faTimes, faQuestion,
-
+  faArrowDown, 
   // touch controls
-  faArrowUp, faArrowDown, faReply,
-  faPlusCircle, faMinusCircle,
-
+  faArrowUp, 
   // miscellaneous
   faCircleNotch,
-  faTerminal,
   faCode,
-  faGlobe,
+  // settings toggles
+  faCog, faGlobe,
+  faMinusCircle,
+  faPause, 
+  // runtime controlls
+  faPlay, faPlusCircle, faQuestion,
+  faReply,
   faRobot,
-} from "@fortawesome/free-solid-svg-icons"
-import {
-  faKeyboard,
-} from "@fortawesome/free-regular-svg-icons"
+  faRunning,
+  faStepForward,
+  faStop, faTerminal,
+  faTimes, faWalking} from "@fortawesome/free-solid-svg-icons"
 
 export type ClassName =
   | "xs" | "sm" | "lg" | "2x" | "3x" | "5x" | "7x" | "10x"

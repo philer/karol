@@ -8,8 +8,8 @@
  */
 
 import * as config from "./config"
-import * as noise from "./util/perlin"
 import type {World} from "./simulation/world"
+import * as noise from "./util/perlin"
 
 export type TileSpriteName =
   | "floor"

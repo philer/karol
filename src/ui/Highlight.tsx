@@ -1,10 +1,10 @@
-import {JSX, h} from "preact"
+import {type JSX, h} from "preact"
 import {useEffect, useMemo, useRef} from "preact/hooks"
 
+import {highlight, Marks} from "../language/highlight"
+import type {LanguageSpecification} from "../language/specification"
 import {clsx} from "../util"
 import type {ElementProps} from "../util/types"
-import {Marks, highlight} from "../language/highlight"
-import type {LanguageSpecification} from "../language/specification"
 
 import * as classes from "./Highlight.module.scss"
 
