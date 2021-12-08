@@ -16,5 +16,10 @@ export default defineConfig(({mode}) => ({
         ? "[name]_[local]_[hash:base64:5]"
         : "[hash:base64:6]",
     },
+    preprocessorOptions: {
+      scss: {
+        charset: false,
+      },
+    },
   },
 }))
