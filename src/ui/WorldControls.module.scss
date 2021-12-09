@@ -6,7 +6,9 @@
   gap: .5em;
 }
 .itemControls {
-  grid-area: actions;
+  position: absolute;
+  inset: 5rem 0 5rem auto;
+  // grid-area: actions;
   flex-direction: column;
   justify-content: center;
   flex-wrap: wrap-reverse;
