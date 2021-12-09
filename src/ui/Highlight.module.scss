@@ -19,7 +19,7 @@
     border-right: 1px solid #ddd;
     text-align: right;
     color: grey;
-    user-select: none;
+    // user-select: none;
   }
   :global(.line:not(.current, .error)) {
     transition: .1s background, .1s box-shadow;
