@@ -1,13 +1,12 @@
-import {cloneElement, JSX, VNode} from "preact"
-import {useEffect, useState} from "preact/hooks"
+import {cloneElement, VNode} from "preact"
+import {useEffect, useRef, useState} from "preact/hooks"
 
+import {mergeRefs} from "../util/preact"
 import type {DivProps} from "../util/types"
-
-// import * as classes from "./Appear.module.scss"
 
 
 export type AppearProps = DivProps & {
-  children: VNode<{style?: JSX.CSSProperties}>
+  children: VNode<HTMLElement>
   show: boolean
 }
 
@@ -21,9 +20,9 @@ const visible = {
 }
 
 export const Appear = ({children, show}: AppearProps) => {
-
   const [shouldBeMounted, setShouldBeMounted] = useState(show)
   const [shouldBeVisible, setShouldBeVisible] = useState(show)
+  const ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
     if (show && !shouldBeMounted) {
@@ -33,25 +32,27 @@ export const Appear = ({children, show}: AppearProps) => {
     }
   }, [show])
 
+  function handleMount(elem: HTMLElement) {
+    if (show && elem && !shouldBeVisible) {
+      // force browser to layout so CSS transition will trigger
+      elem.clientHeight
+      setShouldBeVisible(true)
+    }
+  }
+
   if (!shouldBeMounted) {
     return null
   }
   return cloneElement(children, {
-    ref: (elem: HTMLElement) => {
-      if (show && elem && !shouldBeVisible) {
-        // force browser to layout so CSS transition will trigger
-        elem.clientHeight
-        setShouldBeVisible(true)
-      }
-    },
+    ref: mergeRefs(children.ref, ref, handleMount),
     style: {
       transitionProperty: "opacity, transform",
       transformOrigin: "top center",
       ...children.props.style,
       ...(shouldBeVisible ? visible : hidden),
     },
-    onTransitionend: () => {
-      if (!show) {
+    onTransitionend: (evt: TransitionEvent) => {
+      if (!show && evt.target === ref.current) {
         setShouldBeMounted(false)
       }
     },

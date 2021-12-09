@@ -4,7 +4,7 @@ import {useMemo, useState} from "preact/hooks"
 import * as config from "../config"
 import type {LanguageSpecification} from "../language/specification"
 import {getLocaleData, translate as t, Translations} from "../localization"
-import {useAsyncEffect} from "../util/hooks"
+import {useAsyncEffect} from "../util/preact"
 import {Highlight} from "./Highlight"
 
 import * as classes from "./LanguageHelp.module.scss"
