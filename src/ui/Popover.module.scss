@@ -7,11 +7,10 @@
   overflow: auto;
   // margin: .5em;
 
-  background: #333d;
+  background: #222d;
   backdrop-filter: blur(3px);
   color: white;
   box-shadow: 1px 1px 10px rgba(0, 0, 0, .33);
-
 }
 
 .header {
@@ -20,6 +19,7 @@
   display: flex;
   align-items: center;
   backdrop-filter: blur(3px);
+  background: #2226;
 
   h3 {
     font-weight: normal;

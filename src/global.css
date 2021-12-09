@@ -19,6 +19,12 @@ body {
   user-select: none;
 }
 
+button {
+  appearance: none;
+}
+button:not(:disabled) {
+  cursor:  pointer;
+}
 input[type="range"] {
   display: inline-block;
   vertical-align: middle;

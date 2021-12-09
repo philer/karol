@@ -80,6 +80,7 @@ config({
     },
     help: {
       example: "Example",
+      copy: "Copy",
       builtins: "Commands",
     },
   },

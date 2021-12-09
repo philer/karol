@@ -6,7 +6,7 @@
 
   user-select: text;
 
-  p, ul, h3, h4, .example {
+  p, ul, h3, h4, .code {
     margin: 0 0 1em;
   }
 
@@ -14,5 +14,38 @@
     padding: 0 1.5em;
     list-style-type: square;
     color: #999;
+  }
+}
+
+.code {
+  > header {
+    display: flex;
+    justify-content: stretch;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    background: #444;
+    border-radius: 3px 3px 0 0;
+
+    > span {
+      flex: 1 1 auto;
+      padding: 0 .5em;
+      color: #ccc;
+    }
+
+    button {
+      width: 1.5rem;
+      appearance: none;
+      background: #888;
+
+      border-top-right-radius: 3px;
+      border: none;
+
+      &:hover, &:focus, &:active {
+        background: #aaa;
+      }
+    }
+  }
+  code {
+    border-radius: 0 0 3px 3px;
   }
 }

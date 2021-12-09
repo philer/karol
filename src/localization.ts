@@ -129,6 +129,7 @@ export type Translations = {
     }
     help: {
       example: string
+      copy: string
       builtins: string
     }
   }

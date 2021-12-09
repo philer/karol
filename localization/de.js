@@ -77,6 +77,7 @@ config({
     },
     help: {
       example: "Beispiel",
+      copy: "Kopieren",
       builtins: "Anweisungen",
     },
   },

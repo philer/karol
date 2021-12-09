@@ -2,6 +2,7 @@
 import {h, VNode} from "preact"
 import {AbstractElement, Attributes, icon, IconDefinition, IconParams} from "@fortawesome/fontawesome-svg-core"
 import {
+  faCopy,
   faKeyboard,
 } from "@fortawesome/free-regular-svg-icons"
 // All icons used on the page need to be listed here.
@@ -9,23 +10,26 @@ import {
 // see https://fontawesome.com/how-to-use/use-with-node-js#tree-shaking
 import {
   faArrowDown, 
-  // touch controls
-  faArrowUp, 
-  // miscellaneous
+  faArrowUp,
+  faCheck,
   faCircleNotch,
   faCode,
-  // settings toggles
-  faCog, faGlobe,
+  faCog,
+  faGlobe,
   faMinusCircle,
   faPause, 
-  // runtime controlls
-  faPlay, faPlusCircle, faQuestion,
+  faPlay,
+  faPlusCircle,
+  faQuestion,
   faReply,
   faRobot,
   faRunning,
   faStepForward,
-  faStop, faTerminal,
-  faTimes, faWalking} from "@fortawesome/free-solid-svg-icons"
+  faStop,
+  faTerminal,
+  faTimes,
+  faWalking,
+} from "@fortawesome/free-solid-svg-icons"
 
 export type ClassName =
   | "xs" | "sm" | "lg" | "2x" | "3x" | "5x" | "7x" | "10x"
@@ -43,53 +47,29 @@ export type IconProps = IconParams & PartialRecord<ClassName, boolean> & {
   class?: string
 }
 
-// runtime controlls
-export const IconPlay = (props: IconProps) =>
-  <Icon faIcon={faPlay} {...props} />
-export const IconPause = (props: IconProps) =>
-  <Icon faIcon={faPause} {...props} />
-export const IconStop = (props: IconProps) =>
-  <Icon faIcon={faStop} {...props} />
-export const IconStepForward = (props: IconProps) =>
-  <Icon faIcon={faStepForward} {...props} />
-export const IconWalking = (props: IconProps) =>
-  <Icon faIcon={faWalking} {...props} />
-export const IconRunning = (props: IconProps) =>
-  <Icon faIcon={faRunning} {...props} />
-
-// settings toggles
-export const IconCog = (props: IconProps) =>
-  <Icon faIcon={faCog} {...props} />
-export const IconTimes = (props: IconProps) =>
-  <Icon faIcon={faTimes} {...props} />
-export const IconQuestion = (props: IconProps) =>
-  <Icon faIcon={faQuestion} {...props} />
-
-// touch controls
-export const IconArrowUp = (props: IconProps) =>
-  <Icon faIcon={faArrowUp} {...props} />
-export const IconArrowDown = (props: IconProps) =>
-  <Icon faIcon={faArrowDown} {...props} />
-export const IconReply = (props: IconProps) =>
-  <Icon faIcon={faReply} {...props} />
-export const IconPlusCircle = (props: IconProps) =>
-  <Icon faIcon={faPlusCircle} {...props} />
-export const IconMinusCircle = (props: IconProps) =>
-  <Icon faIcon={faMinusCircle} {...props} />
-
-// miscellaneous
-export const IconCircleNotch = (props: IconProps) =>
-  <Icon faIcon={faCircleNotch} {...props} />
-export const IconTerminal = (props: IconProps) =>
-  <Icon faIcon={faTerminal} {...props} />
-export const IconCode = (props: IconProps) =>
-  <Icon faIcon={faCode} {...props} />
-export const IconGlobe = (props: IconProps) =>
-  <Icon faIcon={faGlobe} {...props} />
-export const IconKeyboard = (props: IconProps) =>
-  <Icon faIcon={faKeyboard} {...props} />
-export const IconRobot = (props: IconProps) =>
-  <Icon faIcon={faRobot} {...props} />
+type IP = IconProps
+export const IconArrowDown = (ip: IP) => <Icon faIcon={faArrowDown} {...ip} />
+export const IconArrowUp = (ip: IP) => <Icon faIcon={faArrowUp} {...ip} />
+export const IconCheck = (ip: IP) => <Icon faIcon={faCheck} {...ip} />
+export const IconCircleNotch = (ip: IP) => <Icon faIcon={faCircleNotch} {...ip} />
+export const IconCode = (ip: IP) => <Icon faIcon={faCode} {...ip} />
+export const IconCog = (ip: IP) => <Icon faIcon={faCog} {...ip} />
+export const IconCopy = (ip: IP) => <Icon faIcon={faCopy} {...ip} />
+export const IconGlobe = (ip: IP) => <Icon faIcon={faGlobe} {...ip} />
+export const IconKeyboard = (ip: IP) => <Icon faIcon={faKeyboard} {...ip} />
+export const IconMinusCircle = (ip: IP) => <Icon faIcon={faMinusCircle} {...ip} />
+export const IconPause = (ip: IP) => <Icon faIcon={faPause} {...ip} />
+export const IconPlay = (ip: IP) => <Icon faIcon={faPlay} {...ip} />
+export const IconPlusCircle = (ip: IP) => <Icon faIcon={faPlusCircle} {...ip} />
+export const IconQuestion = (ip: IP) => <Icon faIcon={faQuestion} {...ip} />
+export const IconReply = (ip: IP) => <Icon faIcon={faReply} {...ip} />
+export const IconRobot = (ip: IP) => <Icon faIcon={faRobot} {...ip} />
+export const IconRunning = (ip: IP) => <Icon faIcon={faRunning} {...ip} />
+export const IconStepForward = (ip: IP) => <Icon faIcon={faStepForward} {...ip} />
+export const IconStop = (ip: IP) => <Icon faIcon={faStop} {...ip} />
+export const IconTerminal = (ip: IP) => <Icon faIcon={faTerminal} {...ip} />
+export const IconTimes = (ip: IP) => <Icon faIcon={faTimes} {...ip} />
+export const IconWalking = (ip: IP) => <Icon faIcon={faWalking} {...ip} />
 
 
 /** Turn FontAwesome's abstract tree into a component tree */
