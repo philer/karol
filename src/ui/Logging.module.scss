@@ -1,15 +1,35 @@
 .root {
-  margin: 0;
+  margin: 1em;
   padding: .5em 1em;
   overflow: auto;
   font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   white-space: normal;
 
+  border-radius: 2px;
+  background-color: #fff2;
+
+  scrollbar-color: #3337 #fff2;
+  scrollbar-width: 10px;
+
+  &::-webkit-scrollbar {
+    background-color: transparent;
+    width: 10px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #fff2;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #3337;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+    border-radius: 999px;
+  }
+
   > p {
     margin: 0;
     font-size: .85em;
     line-height: 1.6em;
-    border-top: 1px dotted #ccc;
+    // border-top: 1px dotted #ccc;
     user-select: text;
 
     &:last-child {
