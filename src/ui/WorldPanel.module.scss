@@ -102,10 +102,14 @@
   align-items: center;
 }
 .numberInput {
+  --base-color: #666;
+  --highlight-color: #0c8;
+  &:hover {
+    > input[type="number"], > button {
+      border-color: var(--highlight-color);
+    }
+  }
   > button {
-    border: none;
-    background-color: #555a;
-    color: white;
     height: var(--height);
     line-height: var(--height);
     width: var(--height);
@@ -114,17 +118,29 @@
     justify-content: center;
     align-items: center;
 
+    background-color: #555a;
+    color: white;
+    border-color: var(--base-color);
+    border-style: solid;
+    border-width: 1px;
+
     &:hover, &:focus, &:active {
-      background-color: #777;
+      background-color: #666a;
+      color: var(--highlight-color);
     }
     &:first-of-type {
-      border-radius: 3px 0 0 3px;
+      order: 1;
+      border-right-width: 0;
+      border-radius: var(--border-radius) 0 0 var(--border-radius);
     }
     &:last-of-type {
-      border-radius: 0 3px 3px 0;
+      order: 3;
+      border-left-width: 0;
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
     }
   }
   > input[type="number"] {
+    order: 2;
     width: 4em;
     height: var(--height);
     line-height: var(--height);
@@ -133,16 +149,21 @@
     text-align: right;
     background: #222;
     color: white;
-    border: 1px solid #666;
+    border-color: var(--base-color);
+    border-style: solid;
     border-width: 1px 0;
     border-radius: 0;
 
     &:hover, &:focus, &:active {
-      border-color: #ccc;
       outline: none;
+      border-color: var(--highlight-color);
+      & ~ button {
+        border-color: var(--highlight-color);
+      }
     }
-    &:hover {
-      border-color: #999;
+    &:focus {
+      font-weight: bold;
+      color: var(--highlight-color);
     }
   }
 }
@@ -152,8 +173,11 @@
     border: none;
     color: #fff;
 
-    &:hover, &:focus, &:active {
+    &:focus, &:active {
       color: #aaa;
+    }
+    &:hover {
+      color: #0c8;
     }
   }
   > input {

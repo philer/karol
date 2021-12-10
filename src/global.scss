@@ -5,10 +5,16 @@
   src: url("/assets/FiraCode-VF.woff") format("woff");
 }
 
+:root {
+  --font-family: Roboto, Open Sans, Ubuntu, Verdana, Arial, Helvetica, sans-serif;
+  --font-family-mono: "FiraCode", Consolas, Monaco, monospace;
+  --border-radius: 3px;
+}
+
 * {
   box-sizing: border-box;
   transition-duration: .25s;
-  transition-property: background, color, text-shadow, box-shadow, opacity;
+  transition-property: background, color, border-color, text-shadow, box-shadow, opacity;
 }
 
 html, body {
@@ -16,15 +22,15 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  font-family: Roboto, Open Sans, Ubuntu, Verdana, Arial, Helvetica, sans-serif;
+  font-family: var(--font-family);
   font-size: 16px;
   color: black;
   background-color: #f7f7f7;
   user-select: none;
 }
 
-code {
-  font-family: "FiraCode", monospace;
+code, pre {
+  font-family: var(--font-family-mono);
 }
 
 button {

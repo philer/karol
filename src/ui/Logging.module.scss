@@ -2,10 +2,9 @@
   margin: 1em;
   padding: .5em 1em;
   overflow: auto;
-  font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   white-space: normal;
 
-  border-radius: 2px;
+  border-radius: var(--border-radius);
   background-color: #fff2;
 
   scrollbar-color: #3337 #fff2;

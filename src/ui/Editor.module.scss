@@ -1,9 +1,9 @@
 .root {
   position: relative;
 
-  font-size: 14px;
+  font-family: var(--font-family-mono);
+  font-size: inherit;
   line-height: 1.25em;
-  font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .scrollbox {

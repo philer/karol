@@ -172,11 +172,15 @@ type NumberInputProps = {
 }
 const NumberInput = ({id, min=1, max, value, onChange}: NumberInputProps) =>
   <div className={classes.numberInput}>
-    <button onClick={defaultPreventer(() => onChange(value - 1))}><IconMinus /></button>
     <input type="number" id={id} min={min} max={max} value={value}
       onChange={({currentTarget: {min, max, value}}) => onChange(clamp(+min, +max, +value))}
     />
-    <button onClick={defaultPreventer(() => onChange(value + 1))}><IconPlus /></button>
+    <button type="button" onClick={defaultPreventer(() => onChange(value - 1))}>
+      <IconMinus />
+    </button>
+    <button type="button" onClick={defaultPreventer(() => onChange(value + 1))}>
+      <IconPlus />
+    </button>
   </div>
 
 
@@ -189,7 +193,7 @@ const Toggle = ({id, checked, onChange}: ToggleProps) =>
   <div className={classes.toggle}>
     <input type="checkbox" id={id} checked={checked}
       onChange={({currentTarget: {checked}}: ChangeEvent) => onChange(checked)} />
-    <button onClick={defaultPreventer(() => onChange(!checked))}>
+    <button type="button" onClick={defaultPreventer(() => onChange(!checked))}>
       {checked ? <IconCheckSquare x2 /> : <IconSquare x2 />}
     </button>
   </div>

@@ -6,7 +6,7 @@
     font-size: 1.2rem;
     line-height: 2em;
     padding: 0 .5em;
-    border-radius: 3px;
+    border-radius: var(--border-radius);
     background: #333;
     color: white;
     text-shadow: none;
