@@ -77,19 +77,14 @@
     padding: 0;
     margin-bottom: 1em;
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto min-content;
     gap: .5em;
+    align-items: center;
   }
   label {
-    display: flex;
-    align-items: center;
-    margin: 0 .25em;
     cursor: pointer;
-  }
-  input[type="number"] {
-    width: 4em;
-    margin: 0 .25em;
-    text-align: center;
+    // flex-grow: 1;
+    padding-right: 1em;
   }
 }
 
@@ -101,3 +96,67 @@
   text-shadow: 0 0 2px white;
 }
 
+.numberInput, .toggle {
+  --height: 2rem;
+  display: flex;
+  align-items: center;
+}
+.numberInput {
+  > button {
+    border: none;
+    background-color: #555a;
+    color: white;
+    height: var(--height);
+    line-height: var(--height);
+    width: var(--height);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover, &:focus, &:active {
+      background-color: #777;
+    }
+    &:first-of-type {
+      border-radius: 3px 0 0 3px;
+    }
+    &:last-of-type {
+      border-radius: 0 3px 3px 0;
+    }
+  }
+  > input[type="number"] {
+    width: 4em;
+    height: var(--height);
+    line-height: var(--height);
+    margin: 0;
+    padding: 0 .5em;
+    text-align: right;
+    background: #222;
+    color: white;
+    border: 1px solid #666;
+    border-width: 1px 0;
+    border-radius: 0;
+
+    &:hover, &:focus, &:active {
+      border-color: #ccc;
+      outline: none;
+    }
+    &:hover {
+      border-color: #999;
+    }
+  }
+}
+.toggle {
+  > button {
+    background: transparent;
+    border: none;
+    color: #fff;
+
+    &:hover, &:focus, &:active {
+      color: #aaa;
+    }
+  }
+  > input {
+    display: none
+  }
+}

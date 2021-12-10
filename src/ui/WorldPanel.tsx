@@ -4,10 +4,10 @@ import {useContext, useEffect, useRef, useState} from "preact/hooks"
 import * as graphics from "../graphics"
 import {translate as t} from "../localization"
 import {checkKdwFormat, World} from "../simulation/world"
-import {clamp} from "../util"
+import {clamp, defaultPreventer} from "../util"
 import {readFile, saveTextAs} from "../util/files"
 import type {ChangeEvent} from "../util/types"
-import {IconCog, IconRobot} from "./Icon"
+import {IconCheckSquare, IconCog, IconMinus, IconPlus, IconRobot, IconSquare} from "./Icon"
 import {Logging, LogOutput} from "./Logging"
 import {Popover} from "./Popover"
 import {WorldControls} from "./WorldControls"
@@ -37,8 +37,8 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
   useEffect(() => onChange(world), [world])
   useEffect(() => graphics.render(world), [world, showFlat, showPlayer])
 
-  const updateSetting = ({currentTarget: {name, min, max, value}}: ChangeEvent) =>
-    setSettings(settings => ({...settings, [name]: clamp(+min, +max, +value)}))
+  const updateSetting = (name: string) => (value: number) =>
+    setSettings(settings => ({...settings, [name]: value}))
 
   const resetWorld = () =>
     setWorld(new World(width, length, height))
@@ -63,12 +63,12 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
     }
   }
 
-  function updateShowFlat({currentTarget: {checked}}: ChangeEvent) {
+  function updateShowFlat(checked: boolean) {
     graphics.showHeightNoise(!checked)
     setShowFlat(checked)
   }
 
-  function updateShowPlayer({currentTarget: {checked}}: ChangeEvent) {
+  function updateShowPlayer(checked: boolean) {
     graphics.showPlayer(checked)
     setShowPlayer(checked)
   }
@@ -102,25 +102,41 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
           <form>
             <h3>{t("world.settings")}</h3>
             <fieldset>
-              <label>{t("world.width")}</label>
-              <input type="number" name="width" min={1} max={100} value={width}
-                onChange={updateSetting} />
-
-              <label>{t("world.length")}</label>
-              <input type="number" name="length" min={1} max={100} value={length}
-                onChange={updateSetting} />
-
-              <label>{t("world.height")}</label>
-              <input type="number" name="height" min={1} max={25} value={height}
-                onChange={updateSetting} />
+              <label for="width-input">{t("world.width")}</label>
+              <NumberInput
+                id="width-input"
+                max={100}
+                value={width}
+                onChange={updateSetting("width")}
+              />
+              <label for="length-input">{t("world.length")}</label>
+              <NumberInput
+                id="length-input"
+                max={100}
+                value={length}
+                onChange={updateSetting("length")}
+              />
+              <label for="height-input">{t("world.height")}</label>
+              <NumberInput
+                id="height-input"
+                max={25}
+                value={height}
+                onChange={updateSetting("height")}
+              />
             </fieldset>
             <fieldset>
-              <input type="checkbox" checked={showFlat}
-                onChange={updateShowFlat} />
-              <label>{t("world.flat")}</label>
-              <input type="checkbox" checked={showPlayer}
-                onChange={updateShowPlayer} />
-              <label>{t("world.show_player")}</label>
+              <label for="flat-toggle">{t("world.flat")}</label>
+              <Toggle
+                id="flat-toggle"
+                checked={showFlat}
+                onChange={updateShowFlat}
+              />
+              <label for="show-player-toggle">{t("world.show_player")}</label>
+              <Toggle
+                id="show-player-toggle"
+                checked={showPlayer}
+                onChange={updateShowPlayer}
+              />
             </fieldset>
           </form>
         </Popover>
@@ -145,3 +161,36 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
     </div>
   )
 }
+
+
+type NumberInputProps = {
+  id?: string
+  min?: number
+  max: number
+  value: number
+  onChange: (value: number) => void
+}
+const NumberInput = ({id, min=1, max, value, onChange}: NumberInputProps) =>
+  <div className={classes.numberInput}>
+    <button onClick={defaultPreventer(() => onChange(value - 1))}><IconMinus /></button>
+    <input type="number" id={id} min={min} max={max} value={value}
+      onChange={({currentTarget: {min, max, value}}) => onChange(clamp(+min, +max, +value))}
+    />
+    <button onClick={defaultPreventer(() => onChange(value + 1))}><IconPlus /></button>
+  </div>
+
+
+type ToggleProps = {
+  id?: string
+  checked: boolean
+  onChange: (checked: boolean) => void
+}
+const Toggle = ({id, checked, onChange}: ToggleProps) =>
+  <div className={classes.toggle}>
+    <input type="checkbox" id={id} checked={checked}
+      onChange={({currentTarget: {checked}}: ChangeEvent) => onChange(checked)} />
+    <button onClick={defaultPreventer(() => onChange(!checked))}>
+      {checked ? <IconCheckSquare x2 /> : <IconSquare x2 />}
+    </button>
+  </div>
+

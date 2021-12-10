@@ -24,33 +24,18 @@
     flex-direction: column;
     justify-content: stretch;
   }
-  header {
+  .header {
     justify-content: space-between;
-  }
-  h2 {
-    font-weight: normal;
-    margin: 0 .5em;
-    color: white;
-    /*font-family: monospace;*/
-  }
-  .button { @extend .button; }
-  .iconButton { @extend .iconButton; }
-  .button, .iconButton {
-    background-color:  #666;
-    text-shadow: none;
-    color: white;
-    border-color: #777;
-
-    &:disabled {
-      color: #aaa;
+    button, label {
+      flex: 0 0 auto;
     }
-
-    &:not(:disabled):not(.nohover):hover {
-      background-color: #777;
+    > h2 {
+      flex: 1 1 auto;
+      font-weight: normal;
+      margin: 0 .5em;
+      color: white;
+      /*font-family: monospace;*/
     }
-  }
-  .iconButton svg {
-    filter: none;
   }
 }
 
@@ -63,6 +48,26 @@
   margin: .5em;
 }
 
+.button { @extend .button; }
+.iconButton { @extend .iconButton; }
+.button, .iconButton {
+  background-color:  #666;
+  text-shadow: none;
+  color: white;
+  border-color: #777;
+
+  &:disabled {
+    color: #aaa;
+  }
+
+  &:not(:disabled):not(.nohover):hover {
+    background-color: #777;
+  }
+}
+.iconButton svg {
+  filter: none;
+}
+
 .runButton {
   font-weight: bold;
   width: 9em;
@@ -72,5 +77,24 @@
 }
 
 .runControls {
+  @extend .button;
   display: flex;
+  padding: 0;
+  &:hover {
+    background-color: #666 !important;
+  }
+  > .iconButton {
+    box-shadow: none;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    border-radius: 0;
+  }
+  :not(:last-child) {
+    width: calc(3em - 1px);
+  }
+  // :not(:first-child) {
+  //   border-top-left-radius: 0;
+  //   border-bottom-left-radius: 0;
+  // }
 }

@@ -1,7 +1,7 @@
 import {h, render} from "preact"
 import {useContext, useEffect, useErrorBoundary, useState} from "preact/hooks"
 
-import "./global.css"
+import "./global.scss"
 
 import {init as initGraphics} from "./graphics"
 import {defaultSpec, load as loadSpec} from "./language/specification"

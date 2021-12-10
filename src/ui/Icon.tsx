@@ -12,32 +12,40 @@ import {
   faArrowDown, 
   faArrowUp,
   faCheck,
+  faCheckSquare,
+  faChevronDown,
+  faChevronUp,
   faCircleNotch,
   faCode,
   faCog,
   faGlobe,
+  faMinus,
   faMinusCircle,
-  faPause, 
+  faPause,
   faPlay,
+  faPlus,
   faPlusCircle,
   faQuestion,
   faReply,
   faRobot,
   faRunning,
+  faSquare,
   faStepForward,
   faStop,
   faTerminal,
   faTimes,
+  faToggleOff,
+  faToggleOn,
   faWalking,
 } from "@fortawesome/free-solid-svg-icons"
 
 export type ClassName =
-  | "xs" | "sm" | "lg" | "2x" | "3x" | "5x" | "7x" | "10x"
+  | "xs" | "sm" | "lg" | "x2" | "x3" | "x5" | "x7" | "x10"
   | "fw" | "size" | "rotate" | "flip" | "spin" | "pulse"
 
 /** Special classes recognized by FontAwesome */
 const classNames = new Set<ClassName>([
-  "xs", "sm", "lg", "2x", "3x", "5x", "7x", "10x",
+  "xs", "sm", "lg", "x2", "x3", "x5", "x7", "x10",
   "fw", "size", "rotate", "flip", "spin", "pulse",
 ])
 
@@ -51,24 +59,32 @@ type IP = IconProps
 export const IconArrowDown = (ip: IP) => <Icon faIcon={faArrowDown} {...ip} />
 export const IconArrowUp = (ip: IP) => <Icon faIcon={faArrowUp} {...ip} />
 export const IconCheck = (ip: IP) => <Icon faIcon={faCheck} {...ip} />
+export const IconCheckSquare = (ip: IP) => <Icon faIcon={faCheckSquare} {...ip} />
+export const IconChevronDown = (ip: IP) => <Icon faIcon={faChevronDown} {...ip} />
+export const IconChevronUp = (ip: IP) => <Icon faIcon={faChevronUp} {...ip} />
 export const IconCircleNotch = (ip: IP) => <Icon faIcon={faCircleNotch} {...ip} />
 export const IconCode = (ip: IP) => <Icon faIcon={faCode} {...ip} />
 export const IconCog = (ip: IP) => <Icon faIcon={faCog} {...ip} />
 export const IconCopy = (ip: IP) => <Icon faIcon={faCopy} {...ip} />
 export const IconGlobe = (ip: IP) => <Icon faIcon={faGlobe} {...ip} />
 export const IconKeyboard = (ip: IP) => <Icon faIcon={faKeyboard} {...ip} />
+export const IconMinus = (ip: IP) => <Icon faIcon={faMinus} {...ip} />
 export const IconMinusCircle = (ip: IP) => <Icon faIcon={faMinusCircle} {...ip} />
 export const IconPause = (ip: IP) => <Icon faIcon={faPause} {...ip} />
 export const IconPlay = (ip: IP) => <Icon faIcon={faPlay} {...ip} />
+export const IconPlus = (ip: IP) => <Icon faIcon={faPlus} {...ip} />
 export const IconPlusCircle = (ip: IP) => <Icon faIcon={faPlusCircle} {...ip} />
 export const IconQuestion = (ip: IP) => <Icon faIcon={faQuestion} {...ip} />
 export const IconReply = (ip: IP) => <Icon faIcon={faReply} {...ip} />
 export const IconRobot = (ip: IP) => <Icon faIcon={faRobot} {...ip} />
 export const IconRunning = (ip: IP) => <Icon faIcon={faRunning} {...ip} />
+export const IconSquare = (ip: IP) => <Icon faIcon={faSquare} {...ip} />
 export const IconStepForward = (ip: IP) => <Icon faIcon={faStepForward} {...ip} />
 export const IconStop = (ip: IP) => <Icon faIcon={faStop} {...ip} />
 export const IconTerminal = (ip: IP) => <Icon faIcon={faTerminal} {...ip} />
 export const IconTimes = (ip: IP) => <Icon faIcon={faTimes} {...ip} />
+export const IconToggleOff = (ip: IP) => <Icon faIcon={faToggleOff} {...ip} />
+export const IconToggleOn = (ip: IP) => <Icon faIcon={faToggleOn} {...ip} />
 export const IconWalking = (ip: IP) => <Icon faIcon={faWalking} {...ip} />
 
 
@@ -103,7 +119,8 @@ export const Icon = (props: IconProps & {faIcon: IconDefinition}) => {
   // Using booleans as icon classes
   for (const [key, value] of Object.entries(boolClasses)) {
     if (value === true && classNames.has(key as ClassName)) {
-      classes.push(`fa-${key}`)
+      const faKey = key.startsWith("x") ? key.slice(1) + "x" : key
+      classes.push(`fa-${faKey}`)
     }
   }
 

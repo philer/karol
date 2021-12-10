@@ -75,7 +75,7 @@ const Code = ({children, spec, translations}: CodeProps) => {
         <span>{t("language.help.example")}</span>
         <Tooltip left tip={t("language.help.copy")}>
           <button onClick={copyToClipboard}>
-            <Icon lg fw />
+            <Icon fw />
           </button>
         </Tooltip>
       </header>

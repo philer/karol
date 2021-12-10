@@ -1,7 +1,7 @@
 .button, .iconButton {
   position: relative;
 
-  padding: 0 1em;
+  padding: 0 1.5em;
   line-height: 3em;
   height: 3em;
 
@@ -43,6 +43,7 @@
 
 .iconButton {
   width: 3em;
+  padding: 0;
   svg {
     /* text-shadow for font-awesome svg icons */
     filter: drop-shadow(1px 1px 0px white);

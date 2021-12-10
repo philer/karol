@@ -131,7 +131,7 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
     <div class={classes.root}>
       <Resizable right class={classes.editorPanel}>
         <form onSubmit={defaultPreventer()} ref={editorPanelRef}>
-          <header class={classes.row}>
+          <header class={clsx(classes.header, classes.row)}>
             <h2><IconKeyboard lg /> {t("program.code")}</h2>
             <label class={classes.button}>
               {t("program.load")}

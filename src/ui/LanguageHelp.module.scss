@@ -23,7 +23,7 @@
     justify-content: stretch;
     height: 1.5rem;
     line-height: 1.5rem;
-    background: #444;
+    background-color: #444;
     border-radius: 3px 3px 0 0;
 
     > span {
@@ -35,13 +35,14 @@
     button {
       width: 1.5rem;
       appearance: none;
-      background: #888;
+      background-color: #888;
+      color: black;
 
       border-top-right-radius: 3px;
       border: none;
 
       &:hover, &:focus, &:active {
-        background: #aaa;
+        background-color: #aaa;
       }
     }
   }
