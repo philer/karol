@@ -5,7 +5,7 @@ import * as config from "../config"
 import type {Marks} from "../language/highlight"
 import type {LanguageSpecification} from "../language/specification"
 import {clsx, elem, noop} from "../util"
-import type {ChangeEvent} from "../util/types"
+import type {ChangeEvent, DivProps} from "../util/types"
 import {Highlight} from "./Highlight"
 
 import * as classes from "./Editor.module.scss"
@@ -18,16 +18,15 @@ import * as classes from "./Editor.module.scss"
  */
 const TEXTAREA_UPDATE_DELAY = 5
 
-export interface EditorProps {
+export type EditorProps = Omit<DivProps, "children" | "onChange"> & {
   children: string
   languageSpec: LanguageSpecification
   indentation?: string
   onChange?: (text: string) => void
   marks?: Marks
-  class?: string
 }
 
-interface Selection {
+type Selection = {
   start: number
   end: number
   direction: "forward" | "backward" | "none"
@@ -39,7 +38,7 @@ export const Editor = ({
   indentation = "    ",
   onChange = noop,
   marks,
-  class: class_,
+  ...divProps
 }: EditorProps) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -149,7 +148,7 @@ export const Editor = ({
         const lineStart = value.lastIndexOf("\n", start) + 1
         const indentLen = indentation.length
                         - (start - lineStart) % indentation.length
-        indent = indentation.substr(0, indentLen)
+        indent = indentation.slice(0, indentLen)
       }
       forceValue(value.slice(0, start) + indent + value.slice(end))
       forceSelection({
@@ -195,7 +194,7 @@ export const Editor = ({
   }
 
   return (
-    <div class={clsx("editor", class_, classes.root)}>
+    <div {...divProps} class={clsx("editor", divProps.class, classes.root)} >
       <div class={classes.scrollbox}>
         <div>
           <Highlight spec={languageSpec} marks={marks} class={classes.highlight}>{value}</Highlight>

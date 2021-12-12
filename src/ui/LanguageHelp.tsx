@@ -86,7 +86,7 @@ export const LanguageHelp = ({spec}: {spec: LanguageSpecification}) => {
         {Object.values(builtins).map(builtins => builtins[0]).sort().map(builtin =>
           <li key={builtin}>
             <code className="token identifier builtin">{builtin}</code>
-          </li>
+          </li>,
         )}
       </ul>
     </div>

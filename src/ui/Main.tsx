@@ -167,6 +167,7 @@ export const Main = ({spec}: {spec: LanguageSpecification}) => {
             onChange={updateCode}
             languageSpec={spec}
             marks={editorMarks}
+            onKeyDown={evt => evt.key === "Enter" && evt.ctrlKey && runSimulation()}
           >{code}</Editor>
 
           <div class={classes.row}>
