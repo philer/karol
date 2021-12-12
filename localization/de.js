@@ -78,7 +78,11 @@ config({
     help: {
       example: "Beispiel",
       copy: "Kopieren",
-      builtins: "Anweisungen",
+      all_builtins: "Alle Anweisungen",
+      conditional_statements: "Bedingte Anweisungen",
+      repetitions: "Wiederholungen",
+      custom_routines: "Eigene Anweisungen",
+      turnAround: "umdrehen",
     },
   },
   error: {

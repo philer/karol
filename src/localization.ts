@@ -130,7 +130,11 @@ export type Translations = {
     help: {
       example: string
       copy: string
-      builtins: string
+      all_builtins: string
+      conditional_statements: string
+      repetitions: string
+      custom_routines: string
+      turnAround: string
     }
   }
   error: {

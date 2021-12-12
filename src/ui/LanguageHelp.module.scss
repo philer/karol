@@ -6,7 +6,13 @@
 
   user-select: text;
 
-  p, ul, h3, h4, .code {
+  h3, h4 {
+    margin: 1.5em 0 1em;
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  p, ul, .code {
     margin: 0 0 1em;
   }
 
@@ -35,14 +41,15 @@
     button {
       width: 1.5rem;
       appearance: none;
-      background-color: #888;
-      color: black;
+      background-color: #666;
+      color: #ddd;
 
       border-top-right-radius: var(--border-radius);
       border: none;
 
       &:hover, &:focus, &:active {
-        background-color: #aaa;
+        background-color: #444;
+        color: #0c8;
       }
     }
   }

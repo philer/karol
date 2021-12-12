@@ -81,7 +81,11 @@ config({
     help: {
       example: "Example",
       copy: "Copy",
-      builtins: "Commands",
+      all_builtins: "All Commands",
+      conditional_statements: "Conditional Statements",
+      repetitions: "Repetitions",
+      custom_routines: "Custom Routines",
+      turnAround: "turnAround",
     },
   },
   error: {

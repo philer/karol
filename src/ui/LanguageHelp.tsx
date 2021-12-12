@@ -27,24 +27,67 @@ export const LanguageHelp = ({spec}: {spec: LanguageSpecification}) => {
     setTranslations(language)
   }, [])
 
+  let example = 1
+
   return (
     <div class={classes.root}>
-      <h3>{t("language.help.example")}</h3>
-      <Code spec={spec} translations={translations}>
+
+      <h3>{t("language.help.repetitions")}</h3>
+      <Code title={t("language.help.example") + " " + example++} spec={spec}
+        translations={translations}>
+        {`
+          REPEAT 5 TIMES
+              step()
+          *REPEAT
+        `}
+      </Code>
+      <Code title={t("language.help.example") + " " + example++} spec={spec}
+        translations={translations}>
         {`
           REPEAT WHILE isNotLookingAtEdge()
-            step()
+              step()
           *REPEAT
         `}
       </Code>
 
-      <h3>{t("language.help.builtins")}</h3>
+      <h3>{t("language.help.conditional_statements")}</h3>
+      <Code title={t("language.help.example") + " " + example++} spec={spec}
+        translations={translations}>
+        {`
+          IF isNotLookingAtEdge()
+              step()
+          *IF
+        `}
+      </Code>
+      <Code title={t("language.help.example") + " " + example++} spec={spec}
+        translations={translations}>
+        {`
+          IF isNotLookingAtEdge()
+              step()
+          ELSE
+              stepBackwards()
+          *IF
+        `}
+      </Code>
+
+      <h3>{t("language.help.custom_routines")}</h3>
+      <Code title={t("language.help.example") + " " + example++} spec={spec}
+        translations={translations}>
+        {`
+          ROUTINE ${t("language.help.turnAround")}()
+              turnLeft()
+              turnLeft()
+          *ROUTINE
+        `}
+      </Code>
+
+      <h3>{t("language.help.all_builtins")}</h3>
       <ul>
-        {Object.values(builtins).map((([builtin]) =>
+        {Object.values(builtins).map(builtins => builtins[0]).sort().map(builtin =>
           <li key={builtin}>
             <code className="token identifier builtin">{builtin}</code>
           </li>
-        ))}
+        )}
       </ul>
     </div>
   )
@@ -54,10 +97,11 @@ type CodeProps = {
   children: string
   spec: LanguageSpecification
   translations: Record<string, string[]>
+  title?: string
 }
 
 /** Translate code */
-const Code = ({children, spec, translations}: CodeProps) => {
+const Code = ({children, spec, translations, title}: CodeProps) => {
   const [Icon, setIcon] = useState(() => IconCopy)
   const code = useMemo(
     () => dedent(children).replace(/\w+/g, match => translations[match]?.[0] ?? match),
@@ -72,7 +116,7 @@ const Code = ({children, spec, translations}: CodeProps) => {
   return (
     <div className={classes.code}>
       <header>
-        <span>{t("language.help.example")}</span>
+        <span>{title || t("language.help.example")}</span>
         <Tooltip left tip={t("language.help.copy")}>
           <button onClick={copyToClipboard}>
             <Icon fw />
