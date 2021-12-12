@@ -11,7 +11,7 @@
     "dist": "vite build",
     "test": "jest",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src",
+    "lint": "eslint src --max-warnings 0",
     "format": "eslint src --fix",
     "pre-commit": "yarn lint && yarn typecheck && yarn test"
   },
