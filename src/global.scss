@@ -36,6 +36,9 @@ code, pre {
 
 button {
   appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
 }
 button:not(:disabled) {
   cursor:  pointer;

@@ -40,12 +40,9 @@
 
     button {
       width: 1.5rem;
-      appearance: none;
       background-color: #666;
       color: #ddd;
-
       border-top-right-radius: var(--border-radius);
-      border: none;
 
       &:hover, &:focus, &:active {
         background-color: #444;
