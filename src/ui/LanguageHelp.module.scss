@@ -49,7 +49,7 @@
 
       &:hover, &:focus, &:active {
         background-color: #444;
-        color: #0c8;
+        color: var(--accent-color);
       }
     }
   }

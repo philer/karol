@@ -137,6 +137,12 @@ export type Translations = {
       turnAround: string
     }
   }
+  help: {
+    controls: string
+    about: string
+    builtin: string
+    key: string
+  }
   error: {
     browser_feature_not_available: string
     invalid_world_file: string

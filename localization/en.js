@@ -88,6 +88,12 @@ config({
       turnAround: "turnAround",
     },
   },
+  help: {
+    controls: "Controls",
+    about: "About",
+    builtin: "Command",
+    key: "Key",
+  },
   error: {
     browser_feature_not_available: "Your browser does not support his feature. Consider switch to an up-to-date browser.",
     invalid_world_file: "This does not appear to be a valid *.kdw file.",

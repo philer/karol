@@ -85,6 +85,12 @@ config({
       turnAround: "umdrehen",
     },
   },
+  help: {
+    controls: "Steuerung",
+    about: "Info",
+    builtin: "Anweisung",
+    key: "Taste",
+  },
   error: {
     browser_feature_not_available: "Der Browser ist veraltet und unterstützt diese Funktionalität nicht.",
     invalid_world_file: "Das ist keine valide *.kdw Datei.",

@@ -10,6 +10,8 @@ import {
 // see https://fontawesome.com/how-to-use/use-with-node-js#tree-shaking
 import {
   faArrowDown, 
+  faArrowLeft,
+  faArrowRight,
   faArrowUp,
   faCheck,
   faCheckSquare,
@@ -57,6 +59,8 @@ export type IconProps = IconParams & PartialRecord<ClassName, boolean> & {
 
 type IP = IconProps
 export const IconArrowDown = (ip: IP) => <Icon faIcon={faArrowDown} {...ip} />
+export const IconArrowLeft = (ip: IP) => <Icon faIcon={faArrowLeft} {...ip} />
+export const IconArrowRight = (ip: IP) => <Icon faIcon={faArrowRight} {...ip} />
 export const IconArrowUp = (ip: IP) => <Icon faIcon={faArrowUp} {...ip} />
 export const IconCheck = (ip: IP) => <Icon faIcon={faCheck} {...ip} />
 export const IconCheckSquare = (ip: IP) => <Icon faIcon={faCheckSquare} {...ip} />

@@ -1,0 +1,27 @@
+.tabs {
+  // display: flex;
+  // justify-content: stretch;
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+
+  > button {
+    flex: 1 1 auto;
+    padding: .5em 1em;
+    border: none;
+    border-bottom: 2px solid #666;
+    font-size: 1.2em;
+    text-align: center;
+    background-color: transparent;
+
+    &:hover {
+      background-color: #fff2;
+      border-bottom-color: #888;
+    }
+    &:disabled {
+      background-color: #fff1;
+      color: white;
+      border-bottom-color: var(--accent-color);
+    }
+  }
+}

@@ -12,7 +12,7 @@ import {Tooltip} from "./Tooltip"
 
 import * as classes from "./WorldControls.module.scss"
 
-const keyMap: Record<string, keyof Builtins> = {
+export const keyMap: Readonly<Record<string, keyof Builtins>> = {
   ArrowUp: "step",
   ArrowDown: "stepBackwards",
   ArrowLeft: "turnLeft",

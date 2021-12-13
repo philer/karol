@@ -60,17 +60,15 @@
   place-self: start end;
   padding: 1em;
 }
-.tools .separator {
-  margin: .5em .33em;
-  border: 1px solid white;
-  border-right-color: #ddd;
-}
-
-.settings {
+.toolsPopover {
   margin-top: .5em;
+}
+.settings {
   padding: 1em 1em 0;
   h3 {
     margin: 0 0 1rem;
+    font-size: 1.5em;
+    font-weight: normal;
   }
   fieldset {
     border: none;
@@ -103,10 +101,9 @@
 }
 .numberInput {
   --base-color: #666;
-  --highlight-color: #0c8;
   &:hover {
     > input[type="number"], > button {
-      border-color: var(--highlight-color);
+      border-color: var(--accent-color);
     }
   }
   > button {
@@ -126,7 +123,7 @@
 
     &:hover, &:focus, &:active {
       background-color: #666a;
-      color: var(--highlight-color);
+      color: var(--accent-color);
     }
     &:first-of-type {
       order: 1;
@@ -156,14 +153,14 @@
 
     &:hover, &:focus, &:active {
       outline: none;
-      border-color: var(--highlight-color);
+      border-color: var(--accent-color);
       & ~ button {
-        border-color: var(--highlight-color);
+        border-color: var(--accent-color);
       }
     }
     &:focus {
       font-weight: bold;
-      color: var(--highlight-color);
+      color: var(--accent-color);
     }
   }
 }
@@ -177,7 +174,7 @@
       color: #aaa;
     }
     &:hover {
-      color: #0c8;
+      color: var(--accent-color);
     }
   }
   > input {

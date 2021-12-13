@@ -4,10 +4,11 @@ import {useContext, useEffect, useRef, useState} from "preact/hooks"
 import * as graphics from "../graphics"
 import {translate as t} from "../localization"
 import {checkKdwFormat, World} from "../simulation/world"
-import {clamp, defaultPreventer} from "../util"
+import {clamp, clsx, defaultPreventer} from "../util"
 import {readFile, saveTextAs} from "../util/files"
 import type {ChangeEvent} from "../util/types"
-import {IconCheckSquare, IconCog, IconMinus, IconPlus, IconRobot, IconSquare} from "./Icon"
+import {Help} from "./Help"
+import {IconCheckSquare, IconCog, IconMinus, IconPlus, IconQuestion, IconRobot, IconSquare} from "./Icon"
 import {Logging, LogOutput} from "./Logging"
 import {Popover} from "./Popover"
 import {WorldControls} from "./WorldControls"
@@ -29,7 +30,10 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
     height: 5,
   })
   const [isSettingsVisible, setIsSettingsVisible] = useState(false)
-  const toolsToggleRef = useRef<HTMLButtonElement>(null)
+  const settingsToggleRef = useRef<HTMLButtonElement>(null)
+  const [isHelpVisible, setIsHelpVisible] = useState(false)
+  const helpToggleRef = useRef<HTMLButtonElement>(null)
+
   const [world, setWorld] = useState(new World(width, length, height))
   const [showFlat, setShowFlat] = useState(false)
   const [showPlayer, setShowPlayer] = useState(true)
@@ -78,15 +82,19 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
       <h2><IconRobot /> {t("world.world")}</h2>
 
       <nav class={classes.tools} >
+
         <button class={buttonClasses.button} onClick={resetWorld}>{t("world.reset")}</button>
+
         <label class={buttonClasses.button}>
           {t("world.load")}
           <input type="file" class="hidden" onChange={loadWorld} />
         </label>
+
         <button class={buttonClasses.button} onClick={saveWorld}>{t("world.save")}</button>
+
         <button
           class={buttonClasses.iconButton}
-          ref={toolsToggleRef}
+          ref={settingsToggleRef}
           onClick={() => setIsSettingsVisible(visible => !visible)}
         >
           <IconCog />
@@ -95,9 +103,9 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
           show={isSettingsVisible}
           autoClose
           onClose={() => setIsSettingsVisible(false)}
-          anchor={toolsToggleRef.current}
+          anchor={settingsToggleRef.current}
           orientation="below right"
-          class={classes.settings}
+          class={clsx(classes.toolsPopover, classes.settings)}
         >
           <form>
             <h3>{t("world.settings")}</h3>
@@ -140,6 +148,25 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
             </fieldset>
           </form>
         </Popover>
+
+        <button
+          class={buttonClasses.iconButton}
+          ref={helpToggleRef}
+          onClick={() => setIsHelpVisible(visible => !visible)}
+        >
+          <IconQuestion />
+        </button>
+        <Popover
+          show={isHelpVisible}
+          autoClose
+          onClose={() => setIsHelpVisible(false)}
+          anchor={helpToggleRef.current}
+          orientation="below right"
+          class={classes.toolsPopover}
+        >
+          <Help />
+        </Popover>
+
       </nav>
 
 
