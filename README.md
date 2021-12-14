@@ -33,16 +33,3 @@ Dependencies and build tools are managed via `yarn` or `npm`. The following uses
 4. Run `yarn typecheck` to check code, `yarn lint` to check formatting and `yarn test` to run tests.
 
 Check `package.json` for more commands under the `scripts` key.
-
-### Future plans & ideas
-
-* [ ] Fully configurable localization of key words and builtins
-* [ ] Resizable layout
-* [ ] About page, credits, help, changelog
-* [ ] Compass rose
-* [ ] Rendering optimization (hopefully with animations)
-* [ ] More/better sprites
-* [ ] Extended world format for more block types
-* [ ] fast/slow/instant key words
-* [ ] Recording feature
-* [ ] Fullscreen, Screenshot
