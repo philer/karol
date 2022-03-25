@@ -5,7 +5,7 @@ import type {LanguageSpecification, TokenType} from "./specification"
 import {TokenType as tt} from "./specification"
 import {tokenize} from "./tokenize"
 
-const VISUAL_SPACE = "·\u200B" // \u200B = zero width space
+const VISUAL_SPACE = "·<wbr>" // \u200B = zero width space
 
 /**
  * Map TokenTypes to css class names
