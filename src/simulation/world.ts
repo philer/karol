@@ -87,11 +87,13 @@ export class World implements Builtins {
   }
 
   isLookingAtEdge() {
-    return !this.contains(...World.move(this.player))
+    const [x, y] = World.move(this.player)
+    return !this.contains(x, y)
+        || this.tiles[x * this.length + y].cuboid
   }
 
   isNotLookingAtEdge() {
-    return this.contains(...World.move(this.player))
+    return !this.isLookingAtEdge()
   }
 
 

@@ -1,0 +1,7 @@
+wiederhole solange nicht istMarke
+    rechtsDrehen
+    wiederhole solange istWand
+        linksDrehen
+    *wiederhole
+    schritt
+*wiederhole
