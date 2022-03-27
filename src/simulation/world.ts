@@ -6,6 +6,10 @@ export interface Builtins {
   isNotLookingAtEdge: () => boolean
   step: (count?: number) => void
   stepBackwards: (count?: number) => void
+  isLookingNorth: () => boolean
+  isLookingEast: () => boolean
+  isLookingSouth: () => boolean
+  isLookingWest: () => boolean
   turnLeft: () => void
   turnRight: () => void
   isLookingAtBlock: () => boolean
@@ -117,6 +121,23 @@ export class World implements Builtins {
 
   stepBackwards(count=1) {
     this.step(-count)
+  }
+
+
+  isLookingNorth() {
+    return this.player.orientation === 2
+  }
+
+  isLookingEast() {
+    return this.player.orientation === 1
+  }
+
+  isLookingSouth() {
+    return this.player.orientation === 0
+  }
+
+  isLookingWest() {
+    return this.player.orientation === 3
   }
 
 
