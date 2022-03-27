@@ -24,30 +24,26 @@ export interface WorldPanelProps {
 export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => {
   const log = useContext(Logging)
 
-  const [{width, length, height}, setSettings] = useState({
-    width: 18,
-    length: 7,
-    height: 5,
-  })
   const [isSettingsVisible, setIsSettingsVisible] = useState(false)
   const settingsToggleRef = useRef<HTMLButtonElement>(null)
   const [isHelpVisible, setIsHelpVisible] = useState(false)
   const helpToggleRef = useRef<HTMLButtonElement>(null)
 
-  const [world, setWorld] = useState(new World(width, length, height))
+  const [world, setWorld] = useState(new World(18, 7, 5))
   const [showFlat, setShowFlat] = useState(false)
   const [showPlayer, setShowPlayer] = useState(true)
 
   useEffect(() => onChange(world), [world])
   useEffect(() => graphics.render(world), [world, showFlat, showPlayer])
 
-  const updateSetting = (name: string) => (value: number) =>
-    setSettings(settings => ({...settings, [name]: value}))
+  const updateSetting = (name: "width" | "length" | "height") => (value: number) =>
+    setWorld(({width, length, height}) =>
+      new World(...Object.values({width, length, height, [name]: value}) as
+                [number, number, number]),
+    )
 
   const resetWorld = () =>
-    setWorld(new World(width, length, height))
-
-  useEffect(resetWorld, [width, length, height])
+    setWorld(({width, length, height}) => new World(width, length, height))
 
   const saveWorld = () =>
     saveTextAs(world.toKdwString(), t("world.default_filename"))
@@ -57,11 +53,6 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
     if (checkKdwFormat(text)) {
       const newWorld = World.parseKdw(text)
       setWorld(newWorld)
-      setSettings({
-        width: newWorld.width,
-        length: newWorld.length,
-        height: newWorld.height,
-      })
     } else {
       log.error("error.invalid_world_file")
     }
@@ -114,21 +105,21 @@ export const WorldPanel = ({onChange, isSimulationRunning}: WorldPanelProps) => 
               <NumberInput
                 id="width-input"
                 max={100}
-                value={width}
+                value={world.width}
                 onChange={updateSetting("width")}
               />
               <label for="length-input">{t("world.length")}</label>
               <NumberInput
                 id="length-input"
                 max={100}
-                value={length}
+                value={world.length}
                 onChange={updateSetting("length")}
               />
               <label for="height-input">{t("world.height")}</label>
               <NumberInput
                 id="height-input"
                 max={25}
-                value={height}
+                value={world.height}
                 onChange={updateSetting("height")}
               />
             </fieldset>
