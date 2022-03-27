@@ -45,8 +45,8 @@ export const Editor = ({
   const [value, setValue] = useState(children)
   const [isMouseDragging, setIsMouseDragging] = useState(false)
   const [selection, _setSelection] = useState<Selection>({
-    start: 1,
-    end: 0,
+    start: 0,
+    end: 1,
     direction: "none",
   })
 
@@ -112,9 +112,25 @@ export const Editor = ({
       } else {
         indent(selection)
       }
+    } else if (evt.key === "Enter" && !evt.ctrlKey) {
+      evt.preventDefault()
+      autoIndentNewline(selection)
     } else {
       updateSelection(evt)
     }
+  }
+
+  function autoIndentNewline({start, end}: Selection) {
+    const beforeSelection = value.slice(0, start)
+    const lastLine = beforeSelection.split("\n").pop() as string
+    const indent = lastLine.match(/^[\t ]*/)?.[0] || ""
+    const beforeCursor = beforeSelection + "\n" + indent
+    forceValue(beforeCursor + value.slice(end))
+    forceSelection({
+      start: beforeCursor.length,
+      end: beforeCursor.length,
+      direction: "none",
+    })
   }
 
   function indent({start, end, direction}: Selection) {
@@ -229,7 +245,7 @@ export const Editor = ({
             <span key="editor-selection" class={clsx("editor-selection", classes.selection)}>
               {value.slice(selection.start, selection.end)}
             </span>
-            {selection.direction === "forward" && (
+            {(selection.direction === "forward" || selection.direction === "none") && (
               <span key="caret" class={clsx("editor-caret", classes.caret, classes.blink)} />
             )}
             {value.slice(selection.end)}
