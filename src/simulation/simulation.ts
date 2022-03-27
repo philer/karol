@@ -31,7 +31,7 @@ export function run(props: RunProps) {
 
   function tick() {
     try {
-      const {value, done} = gen.next(result) as {value: BuiltinCall, done: boolean}
+      const {value, done} = gen.next(result)
       if (done) {
         return setFinished()
       }
