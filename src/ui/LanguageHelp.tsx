@@ -54,7 +54,7 @@ export const LanguageHelp = ({spec}: {spec: LanguageSpecification}) => {
       <Code title={t("language.help.example") + " " + example++} spec={spec}
         translations={translations}>
         {`
-          IF isNotLookingAtEdge()
+          IF isNotLookingAtEdge() THEN
               step()
           *IF
         `}
@@ -62,7 +62,7 @@ export const LanguageHelp = ({spec}: {spec: LanguageSpecification}) => {
       <Code title={t("language.help.example") + " " + example++} spec={spec}
         translations={translations}>
         {`
-          IF isNotLookingAtEdge()
+          IF isNotLookingAtEdge() THEN
               step()
           ELSE
               stepBackwards()
